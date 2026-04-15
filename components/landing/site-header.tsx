@@ -33,11 +33,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" size="lg" className="px-4 text-primary">
-            Login
+          <Button
+            asChild
+            variant="ghost"
+            size="lg"
+            className="px-4 text-primary"
+          >
+            <Link href="/auth">Login</Link>
           </Button>
-          <Button size="lg" className="px-4 font-semibold">
-            Register
+          <Button asChild size="lg" className="px-4 font-semibold">
+            <Link href="/auth/register">Register</Link>
           </Button>
         </div>
 
@@ -67,10 +72,16 @@ export function SiteHeader() {
             ))}
           </nav>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button variant="outline" className="h-9">
-              Login
+            <Button asChild variant="outline" className="h-9">
+              <Link href="/auth" onClick={() => setOpen(false)}>
+                Login
+              </Link>
             </Button>
-            <Button className="h-9">Register</Button>
+            <Button asChild className="h-9">
+              <Link href="/auth/register" onClick={() => setOpen(false)}>
+                Register
+              </Link>
+            </Button>
           </div>
         </div>
       ) : null}

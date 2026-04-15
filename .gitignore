@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+/stitch-screens
 /.pnp
 .pnp.*
 .yarn/*
