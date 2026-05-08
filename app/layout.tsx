@@ -3,7 +3,15 @@ import { Geist, Geist_Mono, DM_Sans } from "next/font/google"
 import { QueryProvider } from "@/components/providers/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+
+//@ts-expect-error idk why this is needed
 import "./globals.css"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import ModalRoot from "@/components/ui/modal"
+import { MODAL_DATA } from "@/components/modals/data"
+import { SHEET_DATA } from "@/components/sheets/data"
+import SheetRoot from "@/components/ui/sheets"
+import { ModalContextProvider } from "@/components/context/modal-context"
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" })
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" })
@@ -32,7 +40,13 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <ModalContextProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+              <ModalRoot data={MODAL_DATA} />
+              <SheetRoot data={SHEET_DATA} />
+            </ModalContextProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

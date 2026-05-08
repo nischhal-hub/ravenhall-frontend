@@ -271,7 +271,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       })
       console.log(response)
       const authenticatedRole = normalizeRole(
-        (response?.data as any).user?.role
+        (response?.data as unknown as { user: { role: string } }).user?.role
       )
       if (!authenticatedRole) {
         setFormError("Login succeeded but role information is missing.")
