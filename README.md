@@ -14,16 +14,16 @@ React.js + TypeScript + Vite + Tailwind CSS + shadcn/ui
 
 | Module | Component / File | Status | Notes |
 |--------|-----------------|--------|-------|
-| Layout | `Navbar.tsx` | ⬜ | Logo, nav links, login/register or user menu |
-| Layout | `Footer.tsx` | ⬜ | Address, links, social icons, copyright |
-| Layout | `Sidebar.tsx` | ⬜ | Admin sidebar, collapsible on mobile |
-| Layout | `MobileMenu.tsx` | ⬜ | Hamburger menu for mobile navbar |
+| Layout | `Navbar.tsx` | ✅ | Logo, nav links, login/register or user menu |
+| Layout | `Footer.tsx` | ✅ | Address, links, social icons, copyright |
+| Layout | `Sidebar.tsx` | ✅ | Admin sidebar, collapsible on mobile |
+| Layout | `MobileMenu.tsx` | ✅ | Hamburger menu for mobile navbar |
 | UI | `StatusBadge.tsx` | ⬜ | Confirmed / Cancelled / Pending / Completed |
 | UI | `LaneTypeBadge.tsx` | ⬜ | BATTING / BOWLING / GENERAL colour chips |
 | UI | `LoadingSkeleton.tsx` | ⬜ | Skeleton loaders for cards, tables, calendar |
 | UI | `EmptyState.tsx` | ⬜ | Illustrated empty state for no bookings etc |
 | UI | `Pagination.tsx` | ⬜ | Page controls for tables and lists |
-| UI | `Modal.tsx` | ⬜ | Reusable modal with overlay and close button |
+| UI | `Modal.tsx` | ✅ | Reusable modal with overlay and close button |
 | UI | `ConfirmDialog.tsx` | ⬜ | Cancel / delete confirmation modal |
 | UI | `ErrorBoundary.tsx` | ⬜ | Catches and displays component errors |
 | UI | `PageHeader.tsx` | ⬜ | Page title + breadcrumb bar |
@@ -67,11 +67,11 @@ React.js + TypeScript + Vite + Tailwind CSS + shadcn/ui
 
 | Module | Component / File | Status | Notes |
 |--------|-----------------|--------|-------|
-| Page | `LoginPage.tsx` | ⬜ | Email + password, remember me, forgot password link |
-| Page | `RegisterPage.tsx` | ⬜ | First name, last name, email, phone, password |
-| Page | `ForgotPasswordPage.tsx` | ⬜ | Email input, send reset link |
-| Page | `ResetPasswordPage.tsx` | ⬜ | New password + confirm, token from URL |
-| Page | `VerifyEmailPage.tsx` | ⬜ | Token from URL, success/error state |
+| Page | `LoginPage.tsx` | 🟡 | Email + password, remember me, forgot password link |
+| Page | `RegisterPage.tsx` |  🟡 | First name, last name, email, phone, password |
+| Page | `ForgotPasswordPage.tsx` |  🟡 | Email input, send reset link |
+| Page | `ResetPasswordPage.tsx` |  🟡 | New password + confirm, token from URL |
+| Page | `VerifyEmailPage.tsx` |  🟡 | Token from URL, success/error state |
 
 ---
 
@@ -79,14 +79,14 @@ React.js + TypeScript + Vite + Tailwind CSS + shadcn/ui
 
 | Module | Component / File | Status | Notes |
 |--------|-----------------|--------|-------|
-| Page | `HomePage.tsx` | ⬜ | Hero, features, lane preview grid, how it works, membership plans, CTA |
-| Page | `LanesPage.tsx` | ⬜ | Lane grid with filter by type (All/Batting/Bowling/General) |
+| Page | `HomePage.tsx` | ✅ | Hero, features, lane preview grid, how it works, membership plans, CTA |
+| Page | `LanesPage.tsx` | 🟡 | Lane grid with filter by type (All/Batting/Bowling/General) |
 | Page | `LaneDetailPage.tsx` | ⬜ | Lane info, gallery, pricing, book now CTA |
-| Page | `AboutPage.tsx` | ⬜ | Facility info, location, contact |
+| Page | `AboutPage.tsx` |  🟡 | Facility info, location, contact |
 | Component | `LaneCard.tsx` | ⬜ | Photo, name, type badge, capacity, hourly rate, next available chip, CTA |
-| Component | `HeroSection.tsx` | ⬜ | Full-width background, headline, two CTAs |
+| Component | `HeroSection.tsx` | ✅ | Full-width background, headline, two CTAs |
 | Component | `HowItWorksSection.tsx` | ⬜ | 3-step horizontal stepper |
-| Component | `MembershipPlansSection.tsx` | ⬜ | 3 pricing cards: Casual, Monthly, Annual |
+| Component | `MembershipPlansSection.tsx` | ✅ | 3 pricing cards: Casual, Monthly, Annual |
 | Component | `FeaturesSection.tsx` | ⬜ | 4 feature cards with icons |
 
 ---
