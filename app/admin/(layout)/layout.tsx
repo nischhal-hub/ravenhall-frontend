@@ -78,7 +78,7 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
           collapsible="icon"
           defaultOpen
           header={({ isCollapsed }) => (
-            <WebSidebarHeader isCollapsed={isCollapsed} />
+            <WebSidebarHeader isCollapsed={isCollapsed} role="admin" />
           )}
         >
           <div className="max-h-screen overflow-y-auto px-5 py-3">

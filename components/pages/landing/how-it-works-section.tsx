@@ -1,6 +1,6 @@
 import { CheckCircle2 } from "lucide-react"
 
-import { bookingSteps } from "@/components/landing/data"
+import { bookingSteps } from "@/components/pages/landing/data"
 
 export function HowItWorksSection() {
   return (

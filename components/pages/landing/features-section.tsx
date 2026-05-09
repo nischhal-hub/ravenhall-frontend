@@ -1,4 +1,4 @@
-import { features } from "@/components/landing/data"
+import { features } from "@/components/pages/landing/data"
 
 export function FeaturesSection() {
   return (

@@ -2,7 +2,7 @@ import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { lanes } from "@/components/landing/data"
+import { lanes } from "@/components/pages/landing/data"
 
 export function LanesSection() {
   return (

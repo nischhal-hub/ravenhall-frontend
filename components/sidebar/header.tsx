@@ -2,10 +2,12 @@
 import Image from "next/image"
 type WebSidebarHeaderProps = {
   isCollapsed: boolean
+  role?: "admin" | "customer"
 }
 
 export default function WebSidebarHeader({
   isCollapsed,
+  role = "customer",
 }: WebSidebarHeaderProps) {
   if (isCollapsed) {
     return (
@@ -36,7 +38,7 @@ export default function WebSidebarHeader({
       <div className="pl-2">
         <p className="truncate font-heading text-lg font-bold">RavenHall</p>
         <p className="truncate text-xs text-muted-foreground">
-          Customer Portal
+          {role === "admin" ? "Admin" : "Customer"} Portal
         </p>
       </div>
     </div>

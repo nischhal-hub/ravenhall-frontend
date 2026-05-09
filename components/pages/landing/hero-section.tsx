@@ -2,7 +2,7 @@ import Image from "next/image"
 import { Sparkles, Star } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { heroStatus } from "@/components/landing/data"
+import { heroStatus } from "@/components/pages/landing/data"
 
 export function HeroSection() {
   return (

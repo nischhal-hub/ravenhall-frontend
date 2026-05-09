@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { navLinks } from "@/components/landing/data"
+import { navLinks } from "@/components/pages/landing/data"
 import { useMeQuery } from "@/services/queries/auth"
 
 function normalizeRole(value: unknown) {

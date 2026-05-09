@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { planPointIcon, plans } from "@/components/landing/data"
+import { planPointIcon, plans } from "@/components/pages/landing/data"
 
 export function MembershipSection() {
   const PointIcon = planPointIcon

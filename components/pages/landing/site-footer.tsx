@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Send } from "lucide-react"
 import { contactInfo, footerLinks, socials } from "./data"
-import { Button } from "../ui/button"
+import { Button } from "../../ui/button"
 
 export function SiteFooter() {
   return (
