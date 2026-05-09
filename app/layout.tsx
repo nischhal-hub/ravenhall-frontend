@@ -11,7 +11,7 @@ import ModalRoot from "@/components/ui/modal"
 import { MODAL_DATA } from "@/components/modals/data"
 import { SHEET_DATA } from "@/components/sheets/data"
 import SheetRoot from "@/components/ui/sheets"
-import { ModalContextProvider } from "@/components/context/modal-context"
+import { ModalProvider } from "@/components/context/modal-context"
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" })
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" })
@@ -41,11 +41,11 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <QueryProvider>
-            <ModalContextProvider>
+            <ModalProvider>
               <TooltipProvider>{children}</TooltipProvider>
               <ModalRoot data={MODAL_DATA} />
               <SheetRoot data={SHEET_DATA} />
-            </ModalContextProvider>
+            </ModalProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
