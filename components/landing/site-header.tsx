@@ -6,9 +6,29 @@ import { Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { navLinks } from "@/components/landing/data"
+import { useMeQuery } from "@/services/queries/auth"
+
+function normalizeRole(value: unknown) {
+  if (typeof value !== "string") {
+    return null
+  }
+
+  const normalized = value.toLowerCase()
+  if (normalized === "customer") {
+    return "customer"
+  }
+
+  if (normalized === "admin") {
+    return "admin"
+  }
+
+  return null
+}
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
+  const { data: user } = useMeQuery()
+  const isCustomer = normalizeRole(user?.role) === "customer"
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-50/70 backdrop-blur-xl">
@@ -33,17 +53,25 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button
-            asChild
-            variant="ghost"
-            size="lg"
-            className="px-4 text-primary"
-          >
-            <Link href="/auth">Login</Link>
-          </Button>
-          <Button asChild size="lg" className="px-4 font-semibold">
-            <Link href="/auth/register">Register</Link>
-          </Button>
+          {isCustomer ? (
+            <Button asChild size="lg" className="px-4 font-semibold">
+              <Link href="/panel">Dashboard</Link>
+            </Button>
+          ) : (
+            <>
+              <Button
+                asChild
+                variant="ghost"
+                size="lg"
+                className="px-4 text-primary"
+              >
+                <Link href="/auth">Login</Link>
+              </Button>
+              <Button asChild size="lg" className="px-4 font-semibold">
+                <Link href="/auth/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Button
@@ -71,18 +99,28 @@ export function SiteHeader() {
               </Link>
             ))}
           </nav>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button asChild variant="outline" className="h-9">
-              <Link href="/auth" onClick={() => setOpen(false)}>
-                Login
-              </Link>
-            </Button>
-            <Button asChild className="h-9">
-              <Link href="/auth/register" onClick={() => setOpen(false)}>
-                Register
-              </Link>
-            </Button>
-          </div>
+          {isCustomer ? (
+            <div className="mt-4">
+              <Button asChild className="h-9 w-full">
+                <Link href="/panel" onClick={() => setOpen(false)}>
+                  Dashboard
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Button asChild variant="outline" className="h-9">
+                <Link href="/auth" onClick={() => setOpen(false)}>
+                  Login
+                </Link>
+              </Button>
+              <Button asChild className="h-9">
+                <Link href="/auth/register" onClick={() => setOpen(false)}>
+                  Register
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       ) : null}
     </header>

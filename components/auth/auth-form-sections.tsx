@@ -17,7 +17,7 @@ import type {
   ForgotPasswordPayload,
   LoginPayload,
   RegisterFormValues,
-} from "@/lib/validations/auth"
+} from "@/schemas/auth"
 
 type RegisterFormState = Omit<RegisterFormValues, "terms"> & {
   terms: boolean

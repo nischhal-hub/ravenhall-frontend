@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import {
   useForm,
@@ -24,14 +25,15 @@ import {
   type LoginPayload,
   type RegisterFormValues,
   type VerifyEmailFormValues,
-} from "@/lib/validations/auth"
-import { ApiError } from "@/services/api/types"
+} from "@/schemas/auth"
 import {
   useForgotPasswordMutation,
   useLoginMutation,
   useRegisterMutation,
   useVerifyEmailMutation,
 } from "@/services/mutations/auth.mutations"
+import { setAuthTokens } from "@/services/auth/token-store"
+import { ApiError } from "@/types/response"
 
 type AuthMode = "login" | "register" | "forgot-password" | "verify-email"
 type AuthRole = "customer" | "admin"
@@ -72,6 +74,7 @@ function roleContent(role: AuthRole) {
       switchToRegisterHref: "/admin/auth/register",
       forgotPasswordHref: "/admin/auth/forgot-password",
       verifyEmailHref: "/admin/auth/verify-email",
+      dashboardHref: "/admin",
       backHref: "/",
       backLabel: "Back to main site",
     }
@@ -85,6 +88,7 @@ function roleContent(role: AuthRole) {
     switchToRegisterHref: "/auth/register",
     forgotPasswordHref: "/auth/forgot-password",
     verifyEmailHref: "/auth/verify-email",
+    dashboardHref: "/panel",
     backHref: "/",
     backLabel: "Back to landing",
   }
@@ -125,6 +129,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
 
   const roleInfo = roleContent(role)
   const meta = screenMeta(mode)
+  const router = useRouter()
 
   const registerMutation = useRegisterMutation()
   const loginMutation = useLoginMutation()
@@ -269,10 +274,8 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         email: parsed.data.email.trim(),
         password: parsed.data.password,
       })
+      const authenticatedRole = normalizeRole(response.data.user?.role)
       console.log(response)
-      const authenticatedRole = normalizeRole(
-        (response?.data as unknown as { user: { role: string } }).user?.role
-      )
       if (!authenticatedRole) {
         setFormError("Login succeeded but role information is missing.")
         return
@@ -286,8 +289,14 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         )
         return
       }
-
+      if (response.data?.accessToken) {
+        setAuthTokens({
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+        })
+      }
       setFormSuccess("Login successful.")
+      router.replace(roleInfo.dashboardHref)
     } catch (error) {
       if (error instanceof ApiError) {
         setFormError(error.message)
@@ -353,6 +362,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         )
         setFormSuccess(response.message ?? "Email verified successfully.")
         verifyEmailForm.reset()
+        router.replace(roleInfo.switchToLoginHref)
       } catch (error) {
         if (error instanceof ApiError) {
           setFormError(error.message)

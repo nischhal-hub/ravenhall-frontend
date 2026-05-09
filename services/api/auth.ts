@@ -3,7 +3,7 @@ import {
   type LoginPayload,
   type RegisterPayload,
   type ResetPasswordPayload,
-} from "@/lib/validations/auth"
+} from "@/schemas/auth"
 import { apiClient } from "@/services/api/client"
 
 export type AuthUserRole = "ADMIN" | "CUSTOMER" | string
@@ -21,9 +21,9 @@ export type AuthUser = {
 }
 
 export type AuthApiResponse = {
+  status?: string
   message?: string
   errors?: Record<string, string[]>
-  [key: string]: unknown
 }
 
 export type RegisterResponse = AuthApiResponse & {
@@ -35,13 +35,19 @@ export type RegisterResponse = AuthApiResponse & {
 }
 
 export type LoginResponse = AuthApiResponse & {
-  user: AuthUser
-  accessToken: string
-  refreshToken: string
+  data: {
+    user: AuthUser
+    accessToken: string
+    refreshToken?: string
+  }
 }
 
 export type RefreshTokenResponse = AuthApiResponse & {
   accessToken: string
+}
+
+export type GetMeResponse = AuthApiResponse & {
+  data: AuthUser
 }
 
 export async function loginRequest(payload: LoginPayload) {
@@ -97,10 +103,10 @@ export async function refreshAccessTokenRequest(payload: { token: string }) {
 }
 
 export async function getMeRequest() {
-  const response = await apiClient.get<AuthUser>("/auth/me", {
+  const response = await apiClient.get<GetMeResponse>("/auth/me", {
     withCredentials: true,
   })
-  return response.data
+  return response.data.data
 }
 
 export async function verifyEmailRequest(token: string) {

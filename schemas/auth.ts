@@ -8,7 +8,7 @@ const passwordSchema = z
 
 export const registerSchema = z.object({
   body: z.object({
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address"),
     password: passwordSchema,
     firstName: z
       .string()
@@ -31,7 +31,7 @@ export const loginSchema = z.object({
 
 export const forgotPasswordSchema = z.object({
   body: z.object({
-    email: z.string().email("Invalid email address"),
+    email: z.email("Invalid email address"),
   }),
 })
 

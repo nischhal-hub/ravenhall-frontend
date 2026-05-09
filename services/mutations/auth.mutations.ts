@@ -13,13 +13,13 @@ import {
   type RefreshTokenResponse,
   type RegisterResponse,
 } from "@/services/api/auth"
-import { type ApiError } from "@/services/api/types"
 import {
   type ForgotPasswordPayload,
   type LoginPayload,
   type RegisterPayload,
   type ResetPasswordPayload,
-} from "@/lib/validations/auth"
+} from "@/schemas/auth"
+import { ApiError } from "@/types/response"
 
 export function useRegisterMutation() {
   return useMutation<RegisterResponse, ApiError, RegisterPayload>({
