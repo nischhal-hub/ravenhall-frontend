@@ -1,6 +1,7 @@
 "use client"
 
 import WebSidebarHeader from "@/components/sidebar/header"
+import WebSidebarFooter from "@/components/sidebar/footer"
 import {
   ReusableSidebarItem,
   ReusableSidebarLayout,
@@ -55,6 +56,9 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
         defaultOpen
         header={({ isCollapsed }) => (
           <WebSidebarHeader isCollapsed={isCollapsed} role="customer" />
+        )}
+        footer={({ isCollapsed }) => (
+          <WebSidebarFooter isCollapsed={isCollapsed} role="customer" />
         )}
       >
         <div className="max-h-screen overflow-y-auto px-5 py-3">{children}</div>
