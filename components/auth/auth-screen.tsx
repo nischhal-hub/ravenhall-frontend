@@ -290,10 +290,13 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         return
       }
       if (response.data?.accessToken) {
-        setAuthTokens({
-          accessToken: response.data.accessToken,
-          refreshToken: response.data.refreshToken,
-        })
+        setAuthTokens(
+          {
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+          },
+          authenticatedRole
+        )
       }
       setFormSuccess("Login successful.")
       router.replace(roleInfo.dashboardHref)

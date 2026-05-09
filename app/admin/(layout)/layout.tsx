@@ -1,6 +1,5 @@
 "use client"
 
-import { AuthGuard } from "@/components/auth/auth-guard"
 import WebSidebarHeader from "@/components/sidebar/header"
 import {
   type ReusableSidebarItem,
@@ -71,21 +70,17 @@ const webSidebarItems: ReusableSidebarItem[] = [
 
 export default function WebLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthGuard role="admin">
-      <div>
-        <ReusableSidebarLayout
-          items={webSidebarItems}
-          collapsible="icon"
-          defaultOpen
-          header={({ isCollapsed }) => (
-            <WebSidebarHeader isCollapsed={isCollapsed} role="admin" />
-          )}
-        >
-          <div className="max-h-screen overflow-y-auto px-5 py-3">
-            {children}
-          </div>
-        </ReusableSidebarLayout>
-      </div>
-    </AuthGuard>
+    <div>
+      <ReusableSidebarLayout
+        items={webSidebarItems}
+        collapsible="icon"
+        defaultOpen
+        header={({ isCollapsed }) => (
+          <WebSidebarHeader isCollapsed={isCollapsed} role="admin" />
+        )}
+      >
+        <div className="max-h-screen overflow-y-auto px-5 py-3">{children}</div>
+      </ReusableSidebarLayout>
+    </div>
   )
 }
