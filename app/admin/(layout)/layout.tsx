@@ -20,50 +20,50 @@ const webSidebarItems: ReusableSidebarItem[] = [
   {
     id: "dashboard",
     label: "Dashboard",
-    href: "/",
+    href: "/admin",
     icon: <LayoutDashboard />,
   },
   {
     id: "bookings",
     label: "Bookings",
-    href: "/bookings",
+    href: "/admin/bookings",
     icon: <CalendarCheck2 />,
   },
 
   {
     id: "lanes",
     label: "Lanes",
-    href: "/lanes",
+    href: "/admin/lanes",
     icon: <Volleyball />,
   },
   {
     id: "slots",
     label: "Slots",
-    href: "/slots",
+    href: "/admin/slots",
     icon: <Clock />,
   },
   {
     id: "users",
     label: "Users",
-    href: "/users",
+    href: "/admin/users",
     icon: <Users />,
   },
   {
     id: "reports",
     label: "Reports",
-    href: "/reports",
+    href: "/admin/reports",
     icon: <BarChart3 />,
   },
   {
     id: "discount-codes",
     label: "Discount Codes",
-    href: "/discount-codes",
+    href: "/admin/discount-codes",
     icon: <BadgePercent />,
   },
   {
     id: "membership",
     label: "Membership",
-    href: "/membership",
+    href: "/admin/membership",
     icon: <Crown />,
   },
 ]

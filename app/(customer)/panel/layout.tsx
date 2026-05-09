@@ -17,31 +17,31 @@ const webSidebarItems: ReusableSidebarItem[] = [
   {
     id: "dashboard",
     label: "Dashboard",
-    href: "/",
+    href: "/panel",
     icon: <LayoutDashboard />,
   },
   {
     id: "bookings",
     label: "Bookings",
-    href: "/bookings",
+    href: "/panel/bookings",
     icon: <CalendarCheck2 />,
   },
   {
     id: "memberships",
     label: "Memberships",
-    href: "/memberships",
+    href: "/panel/membership",
     icon: <Crown />,
   },
   {
     id: "notifications",
     label: "Notifications",
-    href: "/notifications",
+    href: "/panel/notification",
     icon: <Bell />,
   },
   {
     id: "settings",
     label: "Settings",
-    href: "/settings",
+    href: "/panel/settings",
     icon: <Settings />,
   },
 ]
