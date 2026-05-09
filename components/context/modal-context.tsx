@@ -1,58 +1,53 @@
 "use client"
 import { createContext, useContext, useState } from "react"
+import { TModalKeys } from "../modals/data"
 
 type TModalState = {
-  [key in Keys.TModalKeys | Keys.TSheetKeys]: {
+  [key in TModalKeys]: {
     open: boolean
-    data?: object
     initiatorName?: string
-    type?: "modal" | "sheet"
+    data?: unknown
   }
 }
-
-type CommonOpenParams<T> = {
-  data?: T
-  initiatorName?: string
-}
-
-type TOpenParams<T extends Record<string, unknown>> = CommonOpenParams<T> &
-  (
-    | {
-        key: Keys.TModalKeys
-        type: "modal"
-      }
-    | {
-        key: Keys.TSheetKeys
-        type: "sheet"
-      }
-  )
-
 type TModalContext = {
-  open: <T extends Record<string, unknown>>(params: TOpenParams<T>) => void
-  close: (key: Keys.TModalKeys | Keys.TSheetKeys) => void
   modals: TModalState
+  openModal: ({
+    key,
+    initiatorName,
+    data,
+  }: {
+    key: TModalKeys
+    initiatorName?: string
+    data?: unknown
+  }) => void
+  closeModal: (key: TModalKeys) => void
 }
 
-const ModalContext = createContext<TModalContext | null>(null)
-export const ModalContextProvider = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+export const ModalContext = createContext<TModalContext | null>(null)
+
+export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [modals, setModals] = useState<TModalState>({} as TModalState)
-  const open = <T extends Record<string, unknown>>(params: TOpenParams<T>) => {
+
+  const openModal = ({
+    key,
+    initiatorName,
+    data,
+  }: {
+    key: TModalKeys
+    initiatorName?: string
+    data?: unknown
+  }) => {
     setModals((prev) => ({
       ...prev,
-      [params.key]: {
+      [key]: {
         open: true,
-        data: params.data,
-        initiatorName: params.initiatorName,
-        type: params.type,
+        initiatorName,
+        data,
       },
     }))
   }
 
-  const close = (key: Keys.TModalKeys | Keys.TSheetKeys) => {
+  const closeModal = (key: TModalKeys) => {
     setModals((prev) => ({
       ...prev,
       [key]: {
@@ -62,14 +57,12 @@ export const ModalContextProvider = ({
       },
     }))
   }
-
   return (
-    <ModalContext.Provider value={{ open, close, modals }}>
+    <ModalContext.Provider value={{ modals, openModal, closeModal }}>
       {children}
     </ModalContext.Provider>
   )
 }
-
 export const useModalContext = () => {
   const context = useContext(ModalContext)
   if (!context) {
