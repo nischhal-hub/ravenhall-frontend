@@ -3,6 +3,7 @@ import { apiClient } from "../api/client"
 
 import { CreateDiscountCodePayload } from "@/schemas/discount"
 import { DiscountApiResponse } from "@/types/discount-response.types"
+import { toast } from "sonner"
 
 function formatCode(code?: string) {
   return code?.toUpperCase()
@@ -64,6 +65,9 @@ function useCreateMutation<TData, TVariables>(
   return useMutation<TData, Error, TVariables>({
     mutationKey: key,
     mutationFn: fn,
+    onSuccess:()=>{
+        toast.success("Created successfully")
+    }
   })
 }
 
@@ -75,8 +79,8 @@ export function useCreateDiscountCodeMutation() {
 }
 
 export function useUpdateDiscountCodeMutation() {
-  return useCreateMutation<UpdateDiscountCodeResponse, UpdateDiscountCodePayload>(
-    ["discount", "update"],
-    updateDiscountCodeRequest
-  )
+  return useCreateMutation<
+    UpdateDiscountCodeResponse,
+    UpdateDiscountCodePayload
+  >(["discounts", "update"], updateDiscountCodeRequest)
 }

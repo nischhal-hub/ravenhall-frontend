@@ -36,7 +36,7 @@ export const useDeleteItem = () => {
   return deleteHandler
 }
 
-// Utility to capitalize first letter
+// Utility to capitalize first letterp
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }

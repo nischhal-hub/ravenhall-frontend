@@ -97,7 +97,7 @@ export function getDiscountColumns(): ColumnDef<Discount>[] {
         <ActionButton<Discount>
           row={row.original}
           edit={{ key: "EDIT_DISCOUNT" }}
-          delete={{ type: "discount" }}
+          delete={{ type: "admin/discounts" }}
         />
       ),
     },
