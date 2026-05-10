@@ -25,7 +25,7 @@ export function getDiscountColumns(): ColumnDef<Discount>[] {
         </Button>
       ),
       cell: ({ row }) => (
-        <span className="font-mono text-lg font-semibold tracking-wide text-primary">
+        <span className="font-mono font-semibold tracking-wide text-primary">
           {row.original.code}
         </span>
       ),

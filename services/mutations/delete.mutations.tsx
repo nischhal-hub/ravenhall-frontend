@@ -12,13 +12,20 @@ export const useDeleteItem = () => {
   const queryClient = useQueryClient()
   const { closeModal } = useModalContext()
 
+  const getQueryKey = (type: string) => {
+    switch (type) {
+      case "admin/discounts":
+        return ["discounts"]
+    }
+  }
+
   const deleteMutation = useMutation({
     mutationFn: async ({ type, id }: { type: string; id: string }) => {
       return await apiClient.delete(`${type}/${id}`)
     },
 
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [variables.type] })
+      queryClient.invalidateQueries({ queryKey: getQueryKey(variables.type) })
       closeModal("DELETE_ITEM")
       toast.success(`${capitalize(variables.type)} deleted successfully`)
     },
@@ -36,7 +43,6 @@ export const useDeleteItem = () => {
   return deleteHandler
 }
 
-// Utility to capitalize first letter
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }

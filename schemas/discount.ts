@@ -22,7 +22,7 @@ export const createDiscountCodeSchema = z
       .min(0.01, "Discount must be at least 0.01%")
       .max(100, "Discount cannot exceed 100%"),
 
-    maxUses: z.coerce
+    maxUses: z
       .number()
       .int("Max uses must be a whole number")
       .min(1, "Max uses must be at least 1")
@@ -36,7 +36,7 @@ export const createDiscountCodeSchema = z
       const from = new Date(data.validFrom)
       const to = new Date(data.validTo)
       return to > from
-},
+    },
     {
       message: "End date must be after start date",
       path: ["validTo"],

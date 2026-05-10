@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-screen-2xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-screen-2xl space-y-6">
         {/* Header */}
         <DashboardHeader lastUpdated={new Date()} />
 
