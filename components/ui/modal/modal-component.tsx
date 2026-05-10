@@ -20,13 +20,13 @@ export function ModalComponent<T extends object>({
   contentClassName,
   children,
 }: ModalComponentProps<T>) {
-  const { modals, close } = useModalContext()
+  const { modals, closeModal } = useModalContext()
   const modalState = modals[modalKey]
   const isOpen = Boolean(modalState?.open) && modalState?.type !== "sheet"
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      close(modalKey)
+      closeModal(modalKey)
     }
   }
 
@@ -44,7 +44,7 @@ export function ModalComponent<T extends object>({
         {children({
           data: modalState?.data as T | undefined,
           initiatorName: modalState?.initiatorName,
-          close: () => close(modalKey),
+          closeModal: () => closeModal(modalKey),
         })}
       </DialogContent>
     </Dialog>

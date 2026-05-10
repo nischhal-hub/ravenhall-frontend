@@ -80,6 +80,7 @@ export function getLaneColumns(): ColumnDef<Lane>[] {
       cell: ({ row }) => (
         <ActionButton<Lane>
           row={row.original}
+          view={{ onPageUrl: `/admin/lanes` }}
           edit={{ key: "EDIT_LANE" }}
           delete={{ type: "lane" }}
         />
