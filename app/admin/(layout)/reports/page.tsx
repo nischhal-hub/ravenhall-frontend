@@ -1,14 +1,18 @@
 "use client"
 
-import ComingSoonPage from "@/components/ui/coming-soon-page"
-import PageHeader from "@/components/ui/page-header"
+import { useRevenueReport } from "@/services/queries/revenue.query"
+import { RevenueChart } from "./chart"
 
-export default function Page() {
+export default function RevenueReportPage() {
+  const { data } = useRevenueReport()
   return (
-    <div className="space-y-4">
-      <PageHeader title="Bookings" description="Preview all bookings" />
-      <div className="flex flex-wrap gap-2"></div>
-      <ComingSoonPage title={"Bookings"} />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Revenue Report</h1>
+        <p className="text-muted-foreground">Daily revenue performance</p>
+      </div>
+
+      {data?.data && <RevenueChart data={data.data} />}
     </div>
   )
 }

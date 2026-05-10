@@ -4,6 +4,7 @@ import { TModalKeys } from "../modals/data"
 
 type TModalState = {
   [key in TModalKeys]: {
+    type: string
     open: boolean
     initiatorName?: string
     data?: unknown
