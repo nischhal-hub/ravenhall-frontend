@@ -19,9 +19,12 @@ import {
 } from "@/schemas/discount"
 import FormInput from "@/components/reusable/form-input"
 import { useCreateDiscountCodeMutation } from "@/services/mutations/discount.mutations"
+import { useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
 
 export default function CreateDiscountCodeForm() {
   const mutation = useCreateDiscountCodeMutation()
+  const queryClient = useQueryClient()
 
   const form = useForm({
     resolver: zodResolver(createDiscountCodeSchema),
@@ -39,6 +42,8 @@ export default function CreateDiscountCodeForm() {
     mutation.mutate(data, {
       onSuccess: () => {
         form.reset()
+        queryClient.invalidateQueries({ queryKey: ["discounts"] })
+        toast.success("Discount code created successfully!")
         // Optional: toast success
       },
     })
