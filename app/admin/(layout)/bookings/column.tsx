@@ -123,7 +123,7 @@ export function getBookingColumns(): ColumnDef<Booking>[] {
             onPageUrl: `/admin/bookings`,
           }}
           edit={{ key: "EDIT_BOOKING_STATUS" }}
-          delete={{ type: "booking" }}
+          delete={{ type: "bookings" }}
         />
       ),
     },
