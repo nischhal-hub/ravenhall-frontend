@@ -82,7 +82,7 @@ export function getLaneColumns(): ColumnDef<Lane>[] {
           row={row.original}
           view={{ onPageUrl: `/admin/lanes` }}
           edit={{ key: "EDIT_LANE" }}
-          delete={{ type: "lane" }}
+          delete={{ type: "lanes" }}
         />
       ),
     },

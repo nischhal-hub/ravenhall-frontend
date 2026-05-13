@@ -1,0 +1,108 @@
+"use client"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Button } from "@/components/ui/button"
+import { Form } from "@/components/ui/form"
+
+import { updateLaneSchema} from "@/schemas/lane"
+import FormInput from "@/components/reusable/form-input"
+import { useUpdateLaneMutation } from "@/services/mutations/lane.mutations"
+import { useModalContext } from "@/components/context/modal-context"
+import { _ModalProps, TModalDataMap } from "@/types/types"
+
+export default function EditLane({
+  data,
+}: _ModalProps<TModalDataMap["EDIT_LANE"]>) {
+  const { mutate: updateLane, isPending } = useUpdateLaneMutation()
+  const { closeModal } = useModalContext()
+
+  const form = useForm({
+    resolver: zodResolver(updateLaneSchema),
+    defaultValues: {
+      name: data?.name || "",
+      type: data?.type || "",
+      description: data?.description || "",
+      capacity: data?.capacity || 1,
+      hourlyRate: data?.hourlyRate || 0,
+      imageUrl: data?.imageUrl || "",
+      isActive: data?.isActive ?? true,
+    },
+  })
+
+  const onSubmit = (formData: any) => {
+    if (!data?.id) return
+
+    updateLane(
+      { id: data.id, ...formData },
+      {
+        onSuccess: () => closeModal("EDIT_LANE"),
+      }
+    )
+  }
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mx-auto w-full max-w-md space-y-6 p-2"
+      >
+        <h2 className="text-center text-2xl font-bold">Edit Lane</h2>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <FormInput form={form} name="name" label="Lane Name" required />
+          <FormInput form={form} name="type" label="Lane Type" required />
+
+          <FormInput
+            form={form}
+            name="capacity"
+            label="Capacity"
+            type="number"
+            required
+          />
+          <FormInput
+            form={form}
+            name="hourlyRate"
+            label="Hourly Rate ($)"
+            type="number"
+            step="0.01"
+            required
+          />
+
+          <div className="md:col-span-2">
+            <FormInput form={form} name="description" label="Description" />
+          </div>
+
+          <div className="md:col-span-2">
+            <FormInput
+              form={form}
+              name="imageUrl"
+              label="Image URL"
+              type="url"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <FormInput
+              form={form}
+              name="isActive"
+              label="Active"
+              render={(field) => (
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={field.onChange}
+                  className="h-5 w-5"
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Updating..." : "Update Lane"}
+        </Button>
+      </form>
+    </Form>
+  )
+}

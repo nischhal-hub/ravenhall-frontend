@@ -81,13 +81,15 @@ export default function CreateDiscountCodeForm() {
             placeholder="100"
           />
 
-          {/* Description */}
+          {/* Description - Using Textarea */}
           <div className="md:col-span-2">
             <FormInput
               form={form}
               name="description"
               label="Description"
-              placeholder="Summer sale discount..."
+              type="textarea"
+              placeholder="Enter discount description (e.g., Summer seasonal promotion...)"
+              rows={4}
             />
           </div>
 

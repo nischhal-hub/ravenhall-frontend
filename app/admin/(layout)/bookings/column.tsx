@@ -122,7 +122,7 @@ export function getBookingColumns(): ColumnDef<Booking>[] {
           view={{
             onPageUrl: `/admin/bookings`,
           }}
-          edit={{ key: "EDIT_BOOKING" }}
+          edit={{ key: "EDIT_BOOKING_STATUS" }}
           delete={{ type: "booking" }}
         />
       ),
