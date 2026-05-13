@@ -4,9 +4,22 @@ import { apiClient } from "../api/client"
 import { useModalContext } from "@/components/context/modal-context"
 
 export type TDeleteItem = {
-  initiatorName: string // usually id
-  type: "user" | "product" | "category" | "courses" // extendable
+  initiatorName: string
+  type: string
+  displayName?: string
 }
+
+const DELETE_CONFIG: Record<string, { endpoint: string; queryKey: string[] }> =
+  {
+    lanes: {
+      endpoint: "/admin/lanes",
+      queryKey: ["lanes"],
+    },
+    discounts: {
+      endpoint: "/admin/discounts",
+      queryKey: ["discounts"],
+    },
+  }
 
 export const useDeleteItem = () => {
   const queryClient = useQueryClient()
@@ -14,29 +27,39 @@ export const useDeleteItem = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async ({ type, id }: { type: string; id: string }) => {
-      return await apiClient.delete(`${type}/${id}`)
+      const config = DELETE_CONFIG[type]
+      const url = config ? `${config.endpoint}/${id}` : `/${type}/${id}`
+
+      return await apiClient.delete(url)
     },
 
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [variables.type] })
-      closeModal("DELETE_ITEM")
+      const config = DELETE_CONFIG[variables.type]
+      const queryKey = config?.queryKey || [variables.type]
+
+      queryClient.invalidateQueries({ queryKey })
       toast.success(`${capitalize(variables.type)} deleted successfully`)
+      closeModal("DELETE_ITEM")
     },
-    onError: (error) => {
-      console.error(error)
-      toast.error(`Deletion failed`)
+
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || "Deletion failed"
+      toast.error(message)
     },
   })
 
   const deleteHandler = ({ initiatorName, type }: TDeleteItem) => {
-    if (!type || !initiatorName) return
+    if (!type || !initiatorName) {
+      toast.error("Missing required information")
+      return
+    }
+
     deleteMutation.mutate({ type, id: initiatorName })
   }
 
   return deleteHandler
 }
 
-// Utility to capitalize first letterp
-function capitalize(str: string) {
+function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }

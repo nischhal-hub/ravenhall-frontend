@@ -1,4 +1,7 @@
+import { TDeleteItem } from "@/services/mutations/delete.mutations"
 import { Discount } from "./discount-response.types"
+import { Lane } from "./lane-response.types"
+import { Booking } from "./booking-response.types"
 
 export type _ModalProps<T extends object = object> = {
   data?: T
@@ -25,4 +28,6 @@ export interface TModalDataMap {
   }
   LOGOUT: null
   EDIT_DISCOUNT: Discount
+  EDIT_LANE: Lane
+  EDIT_BOOKING_STATUS: Booking
 }

@@ -12,6 +12,7 @@ import { MODAL_DATA } from "@/components/modals/data"
 import { SHEET_DATA } from "@/components/sheets/data"
 import SheetRoot from "@/components/ui/sheets"
 import { ModalProvider } from "@/components/context/modal-context"
+import { Toaster } from "@/components/ui/sonner"
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" })
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" })
@@ -42,6 +43,7 @@ export default function RootLayout({
         <ThemeProvider>
           <QueryProvider>
             <ModalProvider>
+              <Toaster position="top-right" />
               <TooltipProvider>{children}</TooltipProvider>
               <ModalRoot data={MODAL_DATA} />
               <SheetRoot data={SHEET_DATA} />

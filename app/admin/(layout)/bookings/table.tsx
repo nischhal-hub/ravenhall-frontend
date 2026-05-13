@@ -79,7 +79,7 @@ export default function BookingsPage() {
             Refresh
           </Button>
 
-          <Button onClick={() => openModal({ key: "CREATE_BOOKING" })}>
+          <Button onClick={() => openModal({ key: "ADD_BOOKING" })}>
             <Plus className="mr-2 h-4 w-4" />
             New Booking
           </Button>
