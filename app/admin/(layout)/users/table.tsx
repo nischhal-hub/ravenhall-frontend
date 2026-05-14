@@ -68,18 +68,16 @@ export default function UsersPage() {
       </div>
 
       {/* Table */}
-      <Card className="p-1">
-        <DataTable
-          columns={getUserColumns()}
-          data={users}
-          functions={{
-            search: {
-              name: "email",
-              placeholder: "Search by name or email...",
-            },
-          }}
-        />
-      </Card>
+      <DataTable
+        columns={getUserColumns()}
+        data={users}
+        functions={{
+          search: {
+            name: "email",
+            placeholder: "Search by name or email...",
+          },
+        }}
+      />
     </div>
   )
 }

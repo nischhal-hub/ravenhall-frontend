@@ -8,7 +8,7 @@ import {
   useReactTable,
   type ColumnFiltersState,
   getFilteredRowModel,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table"
 
 import {
   Table,
@@ -17,23 +17,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table';
-import { Button } from '../ui/button';
-import { useState } from 'react';
-import { Input } from '../ui/input';
+} from "../ui/table"
+import { Button } from "../ui/button"
+import { useState } from "react"
+import { Input } from "../ui/input"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  columns: ColumnDef<TData, TValue>[]
+  data: TData[]
   functions?: {
     search?: {
-      name?: string;
-      placeholder?: string;
-    };
+      name?: string
+      placeholder?: string
+    }
     add?: {
-      node: React.ReactNode;
-    };
-  };
+      node: React.ReactNode
+    }
+  }
 }
 
 export function DataTable<TData, TValue>({
@@ -41,9 +41,9 @@ export function DataTable<TData, TValue>({
   data,
   functions,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [rowSelection, setRowSelection] = useState({});
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [rowSelection, setRowSelection] = useState({})
   const table = useReactTable({
     data,
     columns,
@@ -59,11 +59,11 @@ export function DataTable<TData, TValue>({
       columnFilters,
       rowSelection,
     },
-  });
+  })
 
   return (
     <div>
-      <div className="flex justify-between items-center py-4">
+      <div className="flex items-center justify-between py-2">
         <div>
           {functions && functions.search && (
             <Input
@@ -71,14 +71,14 @@ export function DataTable<TData, TValue>({
               value={
                 (table
                   .getColumn(`${functions.search.name}`)
-                  ?.getFilterValue() as string) ?? ''
+                  ?.getFilterValue() as string) ?? ""
               }
               onChange={(event) =>
                 table
                   .getColumn(`${functions?.search?.name}`)
                   ?.setFilterValue(event.target.value)
               }
-              className="max-w-sm"
+              className="max-w-lg"
             />
           )}
         </div>
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -134,9 +134,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
 
@@ -160,5 +160,5 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
     </div>
-  );
+  )
 }

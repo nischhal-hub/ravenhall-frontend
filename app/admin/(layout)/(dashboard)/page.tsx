@@ -55,7 +55,7 @@ export default function DashboardPage() {
         />
 
         {/* Revenue Chart */}
-        <RevenueChart data={revenueReport} />
+        {/* <RevenueChart data={revenueReport} /> */}
 
         {/* Lane Performance */}
         <LaneStatsSection

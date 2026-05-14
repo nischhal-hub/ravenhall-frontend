@@ -60,8 +60,8 @@ export default function BookingsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl font-bold tracking-tight">Bookings</h1>
+          <p className="text-sm text-muted-foreground">
             Manage all customer bookings and sessions
           </p>
         </div>
@@ -87,18 +87,16 @@ export default function BookingsPage() {
       </div>
 
       {/* Table */}
-      <Card className="p-1">
-        <DataTable
-          columns={getBookingColumns()}
-          data={bookings}
-          functions={{
-            search: {
-              name: "bookingRef",
-              placeholder: "Search by booking reference...",
-            },
-          }}
-        />
-      </Card>
+      <DataTable
+        columns={getBookingColumns()}
+        data={bookings}
+        functions={{
+          search: {
+            name: "bookingRef",
+            placeholder: "Search by booking reference...",
+          },
+        }}
+      />
     </div>
   )
 }

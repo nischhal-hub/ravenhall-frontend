@@ -21,7 +21,7 @@ export function DashboardHeader({ lastUpdated }: Props) {
   return (
     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <h1 className="text-xl font-bold tracking-tight text-foreground">
           Dashboard
         </h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
