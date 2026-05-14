@@ -54,7 +54,7 @@ export default function CreateBookingForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {/* Dynamic Lane Selector */}
           <FormField
             control={form.control}
@@ -62,32 +62,32 @@ export default function CreateBookingForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Select Lane <span className="text-red-500">*</span>
+                  Select Lane <span className="text-red-500 capitalize">*</span>
                 </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
                       <SelectValue
                         placeholder={
                           lanesLoading ? "Loading lanes..." : "Select a lane"
                         }
                       />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {lanes.map((lane) => (
-                      <SelectItem key={lane.id} value={lane.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{lane.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {lane.type.toLowerCase()} • Capacity:{" "}
-                            {lane.capacity} • ${lane.hourlyRate}/hr
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <SelectContent align="center" side="bottom">
+                      {lanes.map((lane) => (
+                        <SelectItem key={lane.id} value={lane.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{lane.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {lane.type.toLowerCase()} • Capacity:{" "}
+                              {lane.capacity} • ${lane.hourlyRate}/hr
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -142,7 +142,7 @@ export default function CreateBookingForm() {
           className="w-full"
           disabled={mutation.isPending || lanesLoading}
         >
-          {mutation.isPending ? "Creating Booking..." : "Create Booking"}
+          {mutation.isPending ? "Creating Lanes..." : "Create Lanes"}
         </Button>
       </form>
     </Form>

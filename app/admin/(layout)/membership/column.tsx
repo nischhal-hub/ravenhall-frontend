@@ -20,11 +20,11 @@ export function getMembershipColumns(): ColumnDef<MembershipPlan>[] {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Plan <ArrowUpDown className="ml-2 h-4 w-4" />
+          Plan <ArrowUpDown className="h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
-        <div className="text-lg font-semibold capitalize">
+        <div className="font-semibold capitalize">
           {row.original.plan.toLowerCase()}
         </div>
       ),
@@ -33,7 +33,7 @@ export function getMembershipColumns(): ColumnDef<MembershipPlan>[] {
       accessorKey: "discountPct",
       header: "Discount",
       cell: ({ row }) => (
-        <div className="text-2xl font-bold text-emerald-600">
+        <div className="font-bold text-emerald-600">
           {row.original.discountPct}%
         </div>
       ),
@@ -72,10 +72,7 @@ export function getMembershipColumns(): ColumnDef<MembershipPlan>[] {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <div className="text-sm text-muted-foreground">
-          {/* You can add Edit/Delete if backend supports */}
-          System Plan
-        </div>
+        <div className="text-sm text-muted-foreground">System Plan</div>
       ),
     },
   ]

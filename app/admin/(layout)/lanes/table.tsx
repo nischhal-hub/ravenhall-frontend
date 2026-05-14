@@ -73,8 +73,8 @@ export default function LaneTable() {
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Lanes</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl font-bold tracking-tight">Lanes</h1>
+          <p className="text-sm text-muted-foreground">
             Manage and organize your lanes
           </p>
         </div>
@@ -100,21 +100,19 @@ export default function LaneTable() {
       </div>
 
       {/* Main Table Card */}
-      <Card className="p-1">
-        <DataTable
-          columns={getLaneColumns()}
-          data={data || []}
-          functions={{
-            search: {
-              name: "name",
-              placeholder: "Search lanes...",
-            },
-            add: {
-              node: null, // We moved the button to header
-            },
-          }}
-        />
-      </Card>
+      <DataTable
+        columns={getLaneColumns()}
+        data={data || []}
+        functions={{
+          search: {
+            name: "name",
+            placeholder: "Search lanes...",
+          },
+          add: {
+            node: null, // We moved the button to header
+          },
+        }}
+      />
     </div>
   )
 }

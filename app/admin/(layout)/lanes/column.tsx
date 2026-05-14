@@ -20,7 +20,7 @@ export function getLaneColumns(): ColumnDef<Lane>[] {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Lane Name <ArrowUpDown className="ml-2 h-4 w-4" />
+          Lane Name <ArrowUpDown className="h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
