@@ -1,15 +1,19 @@
 // types/slot.ts
 
-export interface TimeSlot {
+export interface Slot {
   id: string
-  date: string // ISO date string (YYYY-MM-DD)
-  startTime: string // e.g. "09:00"
-  endTime: string // e.g. "10:00"
+
+  // ISO string from backend
+  date: string
+
+  startTime: string
+  endTime: string
+
   isAvailable: boolean
   isBlocked: boolean
+
   laneId: string
 
-  // Included relations
   lane?: {
     id: string
     name: string
@@ -21,26 +25,36 @@ export interface TimeSlot {
   updatedAt?: string
 }
 
+// ✅ FIXED FILTER TYPE
 export interface SlotFilter {
   date?: string
   laneId?: string
   isBlocked?: boolean
   isAvailable?: boolean
+
+  // ✅ ADD THESE (IMPORTANT)
+  page?: number
+  limit?: number
+  search?: string
 }
 
-// Query Response
-export interface GetSlotsResponse {
-  success: boolean
-  message: string
-  data: TimeSlot[]
+// ✅ RESPONSE TYPE (SAFE)
+export type GetSlotsResponse = {
+  data: Slot[]
+  meta: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
-// For blocking/unblocking
+// ✅ BULK ACTION PAYLOAD
 export interface BlockSlotsPayload {
   slotIds: string[]
 }
 
-// Optional: For better frontend state management
-export interface SlotWithSelection extends TimeSlot {
+// ✅ OPTIONAL UI STATE TYPE
+export interface SlotWithSelection extends Slot {
   isSelected?: boolean
 }

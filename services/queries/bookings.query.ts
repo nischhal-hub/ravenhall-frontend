@@ -6,17 +6,35 @@ import {
   BookingByIdResponse,
 } from "@/types/booking-response.types"
 
-export const useBookingsQuery = (page = 1, limit = 20) => {
+export const useBookingsQuery = ({
+  page = 1,
+  limit = 20,
+  search = "",
+  sortBy = "createdAt",
+  order = "desc",
+}: {
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  order?: "asc" | "desc"
+}) => {
   return useQuery<BookingApiResponse>({
-    queryKey: ["bookings", page, limit],
+    queryKey: ["bookings", page, limit, search, sortBy, order],
     queryFn: async () => {
       const res = await apiClient.get<BookingApiResponse>("/bookings", {
-        params: { page, limit },
+        params: {
+          page,
+          limit,
+          search,
+          sortBy,
+          order,
+        },
       })
       return res.data
     },
     retry: 2,
-    staleTime: 1000 * 60 * 3, // 3 minutes
+    staleTime: 1000 * 60 * 3,
   })
 }
 

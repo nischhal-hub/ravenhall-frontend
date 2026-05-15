@@ -5,15 +5,23 @@ import { RefreshCw, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { DataTable } from "@/components/reusable/data-table"
 import { useModalContext } from "@/components/context/modal-context"
 import { useUsersQuery } from "@/services/queries/user.query"
 import { getUserColumns } from "./column"
+import { ServerFilterDataTable } from "@/components/reusable/server-table"
 
 export default function UsersPage() {
   const { openModal } = useModalContext()
 
-  const { data, error, refetch, isRefetching } = useUsersQuery()
+  const [page, setPage] = useState(1)
+  const [limit] = useState(20)
+  const [search, setSearch] = useState("")
+
+  const { data, error, refetch, isRefetching, isLoading } = useUsersQuery({
+    page,
+    limit,
+    search,
+  })
 
   const users = data?.data?.users || []
   const meta = data?.data?.meta
@@ -68,13 +76,28 @@ export default function UsersPage() {
       </div>
 
       {/* Table */}
-      <Card className="p-1">
-        <DataTable
+      <Card className="p-6">
+        <ServerFilterDataTable
           columns={getUserColumns()}
           data={users}
+          meta={
+            meta
+              ? {
+                  totalCount: meta.total,
+                  page: meta.page,
+                  limit: meta.limit,
+                  totalPages: meta.totalPages,
+                }
+              : undefined
+          }
+          isLoading={isLoading}
+          onSearch={(value) => {
+            setSearch(value)
+            setPage(1)
+          }}
+          onPageChange={setPage}
           functions={{
             search: {
-              name: "email",
               placeholder: "Search by name or email...",
             },
           }}
