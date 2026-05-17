@@ -34,7 +34,7 @@ export default function CreateBookingForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {/* Lane Selection - You can replace with a proper Select later */}
           <FormInput
             form={form}

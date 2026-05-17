@@ -55,8 +55,8 @@ export default function DiscountsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Discount Codes</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl font-bold tracking-tight">Discount Codes</h1>
+          <p className="text-sm text-muted-foreground">
             Manage promotional and staff discount codes
           </p>
         </div>
@@ -82,18 +82,16 @@ export default function DiscountsPage() {
       </div>
 
       {/* Table */}
-      <Card className="p-1">
-        <DataTable
-          columns={getDiscountColumns()}
-          data={discounts}
-          functions={{
-            search: {
-              name: "code",
-              placeholder: "Search discount codes...",
-            },
-          }}
-        />
-      </Card>
+      <DataTable
+        columns={getDiscountColumns()}
+        data={discounts}
+        functions={{
+          search: {
+            name: "code",
+            placeholder: "Search discount codes...",
+          },
+        }}
+      />
     </div>
   )
 }
