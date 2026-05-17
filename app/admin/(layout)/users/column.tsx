@@ -1,11 +1,9 @@
 "use client"
 
 import { type ColumnDef } from "@tanstack/react-table"
-import { Button } from "@/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ActionButton } from "@/components/reusable/action-btn"
-import type { User } from "@/types/user.types"
+import { User } from "@/types/user-response.types"
 
 const roleColors = {
   ADMIN: "bg-purple-600 text-white",
@@ -93,7 +91,9 @@ export function getUserColumns(): ColumnDef<User>[] {
           row={row.original}
           edit={{ key: "EDIT_USER" }}
           delete={{ type: "user" }}
-          view={{ key: "VIEW_USER" }}
+          view={{
+            onPageUrl: `/admin/users`,
+          }}
         />
       ),
     },

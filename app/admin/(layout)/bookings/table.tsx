@@ -2,43 +2,32 @@
 
 import { Plus, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/reusable/data-table"
 import { useModalContext } from "@/components/context/modal-context"
 import { Card } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useState } from "react"
 import { getBookingColumns } from "./column"
 import { useBookingsQuery } from "@/services/queries/bookings.query"
+import { ServerFilterDataTable } from "@/components/reusable/server-table"
 
 export default function BookingsPage() {
   const { openModal } = useModalContext()
+
   const [page, setPage] = useState(1)
+  const [limit] = useState(20)
+  const [search, setSearch] = useState("")
 
-  const { data, isLoading, error, refetch, isRefetching } =
-    useBookingsQuery(page)
-
-  const handleRefresh = async () => {
-    await refetch()
-  }
+  const { data, isLoading, error, refetch, isRefetching } = useBookingsQuery({
+    page,
+    limit,
+    search,
+  })
 
   const bookings = data?.data?.bookings || []
   const meta = data?.data?.meta
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-10 w-40" />
-        </div>
-        <Card className="p-6">
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="mb-4 h-20 w-full" />
-          ))}
-        </Card>
-      </div>
-    )
+  const handleRefresh = async () => {
+    await refetch()
   }
 
   if (error) {
@@ -47,7 +36,7 @@ export default function BookingsPage() {
         <AlertDescription>
           Failed to load bookings. Please try again.
         </AlertDescription>
-        <Button onClick={handleRefresh} className="mt-3">
+        <Button onClick={handleRefresh} className="mt-3" variant="outline">
           <RefreshCw className="mr-2 h-4 w-4" />
           Retry
         </Button>
@@ -87,16 +76,33 @@ export default function BookingsPage() {
       </div>
 
       {/* Table */}
-      <DataTable
-        columns={getBookingColumns()}
-        data={bookings}
-        functions={{
-          search: {
-            name: "bookingRef",
-            placeholder: "Search by booking reference...",
-          },
-        }}
-      />
+      <Card className="p-6">
+        <ServerFilterDataTable
+          columns={getBookingColumns()}
+          data={bookings}
+          meta={
+            meta
+              ? {
+                  totalCount: meta.total,
+                  page: meta.page,
+                  limit: meta.limit,
+                  totalPages: meta.totalPages,
+                }
+              : undefined
+          }
+          isLoading={isLoading}
+          onSearch={(value) => {
+            setSearch(value)
+            setPage(1)
+          }}
+          onPageChange={setPage}
+          functions={{
+            search: {
+              placeholder: "Search by booking reference, customer name...",
+            },
+          }}
+        />
+      </Card>
     </div>
   )
 }

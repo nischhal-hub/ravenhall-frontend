@@ -1,3 +1,5 @@
+import { PaginationMeta } from "@/services/queries/meta"
+
 export interface Lane {
   id: string
   name: string
@@ -14,5 +16,8 @@ export interface Lane {
 export interface LaneApiResponse {
   status: string
   message: string
-  data: Lane[]
+  data: {
+    lanes: Lane[]
+    meta: PaginationMeta
+  }
 }

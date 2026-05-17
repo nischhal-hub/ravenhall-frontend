@@ -1,81 +1,57 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { Plus, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DataTable } from "@/components/reusable/data-table"
 import { useModalContext } from "@/components/context/modal-context"
-import { useLaneQuery } from "@/services/queries/lane.query"
-import { getLaneColumns } from "./column"
 import { Card } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { RefreshCw } from "lucide-react"
 import { useState } from "react"
+import { useLaneQuery } from "@/services/queries/lane.query"
+import { ServerFilterDataTable } from "@/components/reusable/server-table"
+import { getLaneColumns } from "../lanes/column"
 
-export default function LaneTable() {
+export default function LanesPage() {
   const { openModal } = useModalContext()
-  const { data, isLoading, error, refetch, isRefetching } = useLaneQuery()
-  console.log("Fetched Lanes:", data) // Debug log to check fetched data
 
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [page, setPage] = useState(1)
+  const [limit] = useState(20)
+  const [search, setSearch] = useState("")
+
+  const { data, isLoading, error, refetch, isRefetching } = useLaneQuery({
+    page,
+    limit,
+    search,
+  })
+
+  const lanes = data?.data?.lanes || []
+  const meta = data?.data?.meta
 
   const handleRefresh = async () => {
-    setIsRefreshing(true)
     await refetch()
-    setIsRefreshing(false)
   }
 
-  // Loading State
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-9 w-48" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <Card className="p-6">
-          <Skeleton className="mb-4 h-12 w-full" />
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        </Card>
-      </div>
-    )
-  }
-
-  // Error State
   if (error) {
     return (
-      <div className="flex items-center justify-center">
-        <Alert variant="destructive">
-          <AlertDescription>
-            Failed to load lanes. Please try again.
-          </AlertDescription>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefetching}
-            className="mt-3"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Retry
-          </Button>
-        </Alert>
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load lanes. Please try again.
+        </AlertDescription>
+        <Button onClick={handleRefresh} className="mt-3" variant="outline">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Retry
+        </Button>
+      </Alert>
     )
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">Lanes</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage and organize your lanes
+          <h1 className="text-3xl font-bold tracking-tight">Lanes</h1>
+          <p className="text-muted-foreground">
+            Manage bowling lanes and configurations
           </p>
         </div>
 
@@ -84,35 +60,53 @@ export default function LaneTable() {
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            disabled={isRefetching || isRefreshing}
+            disabled={isRefetching}
           >
             <RefreshCw
-              className={`mr-2 h-4 w-4 ${isRefetching || isRefreshing ? "animate-spin" : ""}`}
+              className={`mr-2 h-4 w-4 ${isRefetching ? "animate-spin" : ""}`}
             />
             Refresh
           </Button>
 
           <Button onClick={() => openModal({ key: "ADD_LANE" })}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Lane
+            New Lane
           </Button>
         </div>
       </div>
 
-      {/* Main Table Card */}
-      <DataTable
-        columns={getLaneColumns()}
-        data={data || []}
-        functions={{
-          search: {
-            name: "name",
-            placeholder: "Search lanes...",
-          },
-          add: {
-            node: null, // We moved the button to header
-          },
-        }}
-      />
+      {/* Table */}
+      <Card className="p-6">
+        <ServerFilterDataTable
+          columns={getLaneColumns()}
+          data={lanes}
+          meta={
+            meta
+              ? {
+                  totalCount: meta.total,
+                  page: meta.page,
+                  limit: meta.limit,
+                  totalPages: meta.totalPages,
+                }
+              : undefined
+          }
+          isLoading={isLoading}
+          onSearch={(value) => {
+            setSearch(value)
+            setPage(1)
+          }}
+          onPageChange={setPage}
+          functions={
+            // cast to any because ServerFilterDataTable's functions prop
+            // type doesn't include our custom 'filter' property
+            {
+              search: {
+                placeholder: "Search lanes by name...",
+              },
+            }
+          }
+        />
+      </Card>
     </div>
   )
 }
