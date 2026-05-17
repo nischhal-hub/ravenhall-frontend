@@ -37,6 +37,37 @@ export const useBookingsQuery = ({
     staleTime: 1000 * 60 * 3,
   })
 }
+export const useOwnBookingsQuery = ({
+  page = 1,
+  limit = 20,
+  search = "",
+  sortBy = "createdAt",
+  order = "desc",
+}: {
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  order?: "asc" | "desc"
+}) => {
+  return useQuery<BookingApiResponse>({
+    queryKey: ["bookings", page, limit, search, sortBy, order],
+    queryFn: async () => {
+      const res = await apiClient.get<BookingApiResponse>("/bookings/my", {
+        params: {
+          page,
+          limit,
+          search,
+          sortBy,
+          order,
+        },
+      })
+      return res.data
+    },
+    retry: 2,
+    staleTime: 1000 * 60 * 3,
+  })
+}
 
 export const useBookingById = (bookingId: string) => {
   return useQuery<BookingByIdResponse>({

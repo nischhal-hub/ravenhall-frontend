@@ -39,3 +39,15 @@ export const useProfileQuery = () => {
     gcTime: 1000 * 60 * 10, // 10 minutes
   })
 }
+export const useProfilesQuery = () => {
+  return useQuery<UserProfileResponse>({
+    queryKey: ["profiles"],
+    queryFn: async () => {
+      const res = await apiClient.get<UserProfileResponse>("/auth/me")
+      return res.data
+    },
+    retry: 2,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  })
+}
