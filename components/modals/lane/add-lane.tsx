@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
 import { useCreateBookingMutation } from "@/services/mutations/booking.mutations"
 import { useLaneQuery } from "@/services/queries/lane.query"
 import {
@@ -29,7 +28,12 @@ import FormInput from "@/components/reusable/form-input"
 
 export default function CreateBookingForm() {
   const mutation = useCreateBookingMutation()
-  const { data: lanes = [], isLoading: lanesLoading } = useLaneQuery()
+
+  // Fixed data extraction
+  const { data: response, isLoading: lanesLoading } = useLaneQuery({})
+
+  // Extract lanes array safely
+  const lanes = response?.data?.lanes
 
   const form = useForm<CreateBookingPayload>({
     resolver: zodResolver(createBookingSchema),
@@ -55,7 +59,7 @@ export default function CreateBookingForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Dynamic Lane Selector */}
+          {/* Lane Selector - FIXED */}
           <FormField
             control={form.control}
             name="laneId"
@@ -75,13 +79,13 @@ export default function CreateBookingForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {lanes.map((lane) => (
+                    {lanes.data.map((lane: any) => (
                       <SelectItem key={lane.id} value={lane.id}>
                         <div className="flex flex-col">
                           <span className="font-medium">{lane.name}</span>
                           <span className="text-xs text-muted-foreground">
                             {lane.type.toLowerCase()} • Capacity:{" "}
-                            {lane.capacity} • ${lane.hourlyRate}/hr
+                            {lane.capacity} • Rs{lane.hourlyRate}/hr
                           </span>
                         </div>
                       </SelectItem>
@@ -100,7 +104,6 @@ export default function CreateBookingForm() {
             type="date"
             required
           />
-
           <FormInput
             form={form}
             name="startTime"
@@ -108,7 +111,6 @@ export default function CreateBookingForm() {
             type="time"
             required
           />
-
           <FormInput
             form={form}
             name="endTime"
@@ -116,7 +118,6 @@ export default function CreateBookingForm() {
             type="time"
             required
           />
-
           <FormInput
             form={form}
             name="numberOfPeople"

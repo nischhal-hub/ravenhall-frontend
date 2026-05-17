@@ -1,17 +1,20 @@
-// hooks/mutations/slot.mutations.ts
+"use client"
+
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { apiClient } from "@/services/api/client"
-import { toast } from "sonner"
+import { apiClient } from "../api/client"
 
 export const useBlockSlots = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (slotIds: string[]) =>
-      apiClient.post("/slots/block", { slotIds }),
+    mutationFn: async (slotIds: string[]) => {
+      const response = await apiClient.post("/admin/slots/block", {
+        slotIds,
+      })
+      return response.data
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["slots"] })
-      toast.success("Selected slots blocked successfully")
     },
   })
 }
@@ -20,11 +23,14 @@ export const useUnblockSlots = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (slotIds: string[]) =>
-      apiClient.post("/slots/unblock", { slotIds }),
+    mutationFn: async (slotIds: string[]) => {
+      const response = await apiClient.post("/admin/slots/unblock", {
+        slotIds,
+      })
+      return response.data
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["slots"] })
-      toast.success("Selected slots unblocked successfully")
     },
   })
 }

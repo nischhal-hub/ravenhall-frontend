@@ -1,7 +1,6 @@
 "use client"
 
 import { useDashboardQuery } from "@/services/queries/dashboard.query"
-import { RevenueChart } from "../reports/chart"
 import { BookingStatusBreakdown } from "./(component)/bookingstatusbreakdown"
 import { DashboardHeader } from "./(component)/header"
 import { LaneStatsSection } from "./(component)/lanestatssection"
@@ -9,6 +8,7 @@ import { MembershipStatsSection } from "./(component)/membershipstatssection"
 import { StatsCards } from "./(component)/stats-card"
 import { TopCustomers } from "./(component)/topcustomers"
 import { UserStatsSection } from "./(component)/userstatssection"
+import { RevenueChart } from "./(component)/revenuechart"
 
 export default function DashboardPage() {
   const { data, isLoading, error } = useDashboardQuery()
@@ -29,19 +29,6 @@ export default function DashboardPage() {
     )
   }
 
-  // Prepare data for RevenueChart
-  const revenueReport = {
-    total: data.revenueTimeline.reduce((sum, item) => sum + item.revenue, 0),
-    count: data.revenueTimeline.reduce((sum, item) => sum + item.bookings, 0),
-    bookings: data.revenueTimeline.flatMap((item) =>
-      Array(item.bookings).fill({
-        finalAmount: item.revenue / Math.max(item.bookings, 1),
-        createdAt: item.month,
-      })
-    ),
-    groupBy: "month",
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-screen-2xl space-y-6">
@@ -55,7 +42,7 @@ export default function DashboardPage() {
         />
 
         {/* Revenue Chart */}
-        <RevenueChart data={revenueReport} />
+        <RevenueChart data={data.revenueTimeline} />
 
         {/* Lane Performance */}
         <LaneStatsSection

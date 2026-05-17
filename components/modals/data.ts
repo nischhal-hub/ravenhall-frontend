@@ -43,7 +43,7 @@ export const MODAL_DATA: Record<TModalKeys, TModalValues> = {
   },
   ADD_LANE: {
     title: "Add Lane",
-    component: AddLaneForm,
+    component: AddLaneForm
   },
   EDIT_LANE: {
     title: "Edit Lane",

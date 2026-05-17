@@ -136,7 +136,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
               <XAxis dataKey="date" tick={{ fontSize: 12 }} />
               <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12 }} />
 
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip />
               <Legend />
 
               <Area

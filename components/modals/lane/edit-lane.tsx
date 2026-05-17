@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 
-import { updateLaneSchema} from "@/schemas/lane"
+import { updateLaneSchema } from "@/schemas/lane"
 import FormInput from "@/components/reusable/form-input"
 import { useUpdateLaneMutation } from "@/services/mutations/lane.mutations"
 import { useModalContext } from "@/components/context/modal-context"
@@ -21,7 +21,7 @@ export default function EditLane({
     resolver: zodResolver(updateLaneSchema),
     defaultValues: {
       name: data?.name || "",
-      type: data?.type || "",
+      type: data?.type || "GENERAL",
       description: data?.description || "",
       capacity: data?.capacity || 1,
       hourlyRate: data?.hourlyRate || 0,
@@ -30,7 +30,7 @@ export default function EditLane({
     },
   })
 
-  const onSubmit = (formData: any) => {
+  const onSubmit = (formData: Record<string, unknown>) => {
     if (!data?.id) return
 
     updateLane(
@@ -65,7 +65,6 @@ export default function EditLane({
             name="hourlyRate"
             label="Hourly Rate ($)"
             type="number"
-            step="0.01"
             required
           />
 
@@ -90,7 +89,7 @@ export default function EditLane({
               render={(field) => (
                 <input
                   type="checkbox"
-                  checked={field.value}
+                  checked={field.value as boolean}
                   onChange={field.onChange}
                   className="h-5 w-5"
                 />

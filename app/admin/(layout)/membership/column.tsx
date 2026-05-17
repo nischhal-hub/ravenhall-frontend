@@ -4,7 +4,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import type { MembershipPlan } from "@/types/membership.types"
+import { MembershipPlan } from "@/types/membership-response.types"
 
 export function getMembershipColumns(): ColumnDef<MembershipPlan>[] {
   return [
