@@ -5,6 +5,7 @@ import { useProfilesQuery } from "@/services/queries/user.query"
 import {
   useUpdateProfileMutation,
   useChangePasswordMutation,
+  UpdateProfilePayload,
 } from "@/services/mutations/user.mutations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -48,12 +49,27 @@ export default function SettingsPage() {
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateProfileMutation.mutate({
-      firstName: profileForm.firstName,
-      lastName: profileForm.lastName,
-      phone: profileForm.phone || undefined,
-      image: selectedImage,
-    })
+
+    const payload: UpdateProfilePayload = {}
+
+    if (profileForm.firstName !== profile?.firstName) {
+      payload.firstName = profileForm.firstName
+    }
+
+    if (profileForm.lastName !== profile?.lastName) {
+      payload.lastName = profileForm.lastName
+    }
+
+    if (profileForm.phone !== profile?.phone) {
+      payload.phone = profileForm.phone
+    }
+
+    if (Object.keys(payload).length === 0) {
+      toast.info("No changes to update")
+      return
+    }
+
+    updateProfileMutation.mutate(payload)
   }
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -92,7 +108,7 @@ export default function SettingsPage() {
             {/* Avatar */}
             <div className="flex flex-col items-center gap-4">
               <Avatar className="h-28 w-28">
-                <AvatarImage src={imagePreview ||  ""} />
+                <AvatarImage src={imagePreview || ""} />
                 <AvatarFallback className="text-3xl">
                   {profile?.firstName?.charAt(0)}
                   {profile?.lastName?.charAt(0)}
