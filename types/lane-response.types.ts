@@ -1,6 +1,7 @@
 import { PaginationMeta } from "@/services/queries/meta"
 
 export interface Lane {
+  nextSlot: import("react/jsx-runtime").JSX.Element
   image: string | StaticImport
   imageAlt: string
   badge: string
