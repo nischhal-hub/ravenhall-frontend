@@ -6,7 +6,7 @@ import { heroStatus } from "@/components/pages/landing/data"
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-[#17355b] to-[#1e3a5f] px-4 pt-12 pb-12 text-white sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-[#17355b] to-[#1e3a5f] px-4 pt-12 pb-12 text-white sm:px-6 lg:px-8 bg-gre">
       <div className="absolute inset-0 opacity-25">
         <Image
           src="/images/landing/hero.jpg"

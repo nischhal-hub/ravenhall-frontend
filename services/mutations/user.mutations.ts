@@ -34,17 +34,10 @@ export interface ProfileResponse {
 const updateProfileRequest = async (
   payload: UpdateProfilePayload
 ): Promise<ProfileResponse> => {
-  const formData = new FormData()
-
-  if (payload.firstName) formData.append("firstName", payload.firstName)
-  if (payload.lastName) formData.append("lastName", payload.lastName)
-  if (payload.phone) formData.append("phone", payload.phone)
-  if (payload.image) formData.append("image", payload.image)
-
-  const response = await apiClient.patch("/user/profile", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+  const response = await apiClient.patch("/user/profile", {
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    phone: payload.phone,
   })
 
   return response.data
