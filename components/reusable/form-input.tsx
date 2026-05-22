@@ -27,8 +27,8 @@ type TFormInputProps<T extends FieldValues> = {
     | "url"
     | "file"
     | "textarea"
-    | "date"      // ← Added
-    | "time"      // ← Added
+    | "date" // ← Added
+    | "time" // ← Added
   placeholder?: string
   required?: boolean
   className?: string
@@ -49,7 +49,7 @@ export default function FormInput<T extends FieldValues>({
   return (
     <div className={className}>
       {label && (
-        <FormLabel className="mb-1 block text-sm">
+        <FormLabel className="mb-1 block text-xs capitalize">
           {label} {required && <span className="text-xs text-red-600">*</span>}
         </FormLabel>
       )}
@@ -79,11 +79,7 @@ export default function FormInput<T extends FieldValues>({
                   className="min-h-20 resize-y"
                 />
               ) : (
-                <Input
-                  type={type} 
-                  placeholder={placeholder} 
-                  {...field}
-                />
+                <Input type={type} placeholder={placeholder} {...field} />
               )}
             </FormControl>
 

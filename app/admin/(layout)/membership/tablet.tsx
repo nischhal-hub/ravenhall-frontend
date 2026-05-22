@@ -52,10 +52,8 @@ export default function MembershipPlansPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Membership Plans
-          </h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-lg font-bold tracking-tight">Membership Plans</h1>
+          <p className="text-sm text-muted-foreground">
             Configure available membership tiers and benefits
           </p>
         </div>
@@ -81,18 +79,16 @@ export default function MembershipPlansPage() {
       </div>
 
       {/* Table */}
-      <Card className="p-1">
-        <DataTable
-          columns={getMembershipColumns()}
-          data={plans}
-          functions={{
-            search: {
-              name: "plan",
-              placeholder: "Search membership plans...",
-            },
-          }}
-        />
-      </Card>
+      <DataTable
+        columns={getMembershipColumns()}
+        data={plans}
+        functions={{
+          search: {
+            name: "plan",
+            placeholder: "Search membership plans...",
+          },
+        }}
+      />
     </div>
   )
 }
