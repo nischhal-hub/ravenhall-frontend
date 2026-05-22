@@ -6,9 +6,9 @@ import { AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLaneByIdQuery } from "@/services/queries/lane.query"
 import { BookingPageSkeleton } from "./component/BookingPageSkeleton"
+import { Step1 } from "./component/Step1"
 import { Step2 } from "./component/Step2"
 import { Step3 } from "./component/Step3"
-import { Step1 } from "./component/Step1"
 
 export default function BookingPage() {
   const params = useParams()
@@ -22,6 +22,8 @@ export default function BookingPage() {
   const [bookingDuration, setBookingDuration] = useState<1 | 2 | 3>(1)
   const [appliedPromo, setAppliedPromo] = useState("")
   const [promoDiscount, setPromoDiscount] = useState(0)
+  // ✅ FIX 1: Store bookingId in state so Step3 can receive it
+  const [bookingId, setBookingId] = useState("")
 
   const lane = data?.data
 
@@ -32,9 +34,11 @@ export default function BookingPage() {
     setStep(2)
   }
 
-  const handleStep2Next = (promo: string, discount: number) => {
+  // ✅ FIX 2: Accept and store bookingId from Step2's onNext callback
+  const handleStep2Next = (promo: string, discount: number, id: string) => {
     setAppliedPromo(promo)
     setPromoDiscount(discount)
+    setBookingId(id)
     setStep(3)
   }
 
@@ -71,6 +75,7 @@ export default function BookingPage() {
                 onBack={() => setStep(1)}
               />
             )}
+            {/* ✅ FIX 3: Pass bookingId and onComplete to Step3 */}
             {step === 3 && bookingSlot && (
               <Step3
                 lane={lane}
@@ -79,6 +84,7 @@ export default function BookingPage() {
                 duration={bookingDuration}
                 promo={appliedPromo}
                 promoDiscount={promoDiscount}
+                bookingId={bookingId}
                 onBack={() => setStep(2)}
                 onComplete={() => setStep(4)}
               />

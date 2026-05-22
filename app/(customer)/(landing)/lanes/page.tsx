@@ -123,7 +123,7 @@ function LaneCard({ lane, index }: { lane: Lane; index: number }) {
           )}
         </div>
 
-        {lane.stats && lane.stats.length > 0 && (
+        {Array.isArray(lane.stats) && lane.stats.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {lane.stats.map((s) => (
               <Badge
@@ -183,9 +183,9 @@ export default function LanesPage() {
   })
 
   const lanes = data?.data?.lanes ?? []
-  const meta = data?.data?.meta ?? {}
-  const total = meta.total ?? 0
-  const totalPages = meta.totalPages ?? Math.ceil(total / ITEMS_PER_PAGE)
+  const meta = data?.data.meta
+  const total = meta?.total ?? 0
+  const totalPages = meta?.totalPages ?? Math.ceil(total / ITEMS_PER_PAGE)
 
   // Client-side sorting
   const sortedLanes = [...lanes].sort((a, b) => {

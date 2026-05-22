@@ -1,16 +1,16 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { CheckCircle, Calendar, Clock, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useBookingByIdQuery } from "@/services/queries/booking.query" // adjust path
+import { useBookingById } from "@/services/queries/bookings.query"
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const bookingId = searchParams.get("bookingId")
 
-  const { data: bookingData, isLoading } = useBookingByIdQuery(bookingId || "")
+  const { data: bookingData, isLoading } = useBookingById(bookingId || "")
 
   useEffect(() => {
     if (!bookingId) {
