@@ -1,58 +1,105 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
 } from "recharts"
+import { TrendingUp } from "lucide-react"
 
-export function SpendingChart({ data }: { data: any[] }) {
-  // Group by month for chart
-  const chartData = data
-    .reduce((acc: any[], booking) => {
-      const month = new Date(booking.createdAt).toLocaleString("default", {
-        month: "short",
-      })
-      const existing = acc.find((item) => item.month === month)
+interface Booking {
+  createdAt: string
+  finalAmount: number
+}
 
-      if (existing) {
-        existing.amount += booking.finalAmount
-      } else {
-        acc.push({ month, amount: booking.finalAmount })
-      }
-      return acc
-    }, [])
-    .slice(0, 6)
+function buildChartData(bookings: Booking[]) {
+  const map: Record<string, number> = {}
+  bookings.forEach((b) => {
+    const month = new Date(b.createdAt).toLocaleString("en-AU", {
+      month: "short",
+      year: "2-digit",
+    })
+    map[month] = (map[month] ?? 0) + b.finalAmount
+  })
+  return Object.entries(map)
+    .slice(-6)
+    .map(([month, amount]) => ({
+      month,
+      amount: Math.round(amount * 100) / 100,
+    }))
+}
+
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-xl border border-border bg-card px-4 py-2.5 shadow-lg">
+      <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+      <p className="text-base font-black text-primary">
+        {new Intl.NumberFormat("en-AU", {
+          style: "currency",
+          currency: "AUD",
+        }).format(payload[0].value)}
+      </p>
+    </div>
+  )
+}
+
+export function SpendingChart({ bookings }: { bookings: Booking[] }) {
+  const data = buildChartData(bookings)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Spending Trend</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip
-              formatter={(value) => [`$${Number(value ?? 0)}`, "Spent"]}
+    <div className="rounded-2xl border border-border bg-card p-6">
+      <div className="mb-6 flex items-center gap-2">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
+          <TrendingUp className="h-4 w-4 text-primary-foreground" />
+        </div>
+        <div>
+          <h2 className="font-bold text-foreground">Spending Trend</h2>
+          <p className="text-xs text-muted-foreground">Last 6 months</p>
+        </div>
+      </div>
+
+      {data.length === 0 ? (
+        <div className="flex h-56 items-center justify-center">
+          <p className="text-sm text-muted-foreground">No spending data yet.</p>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart
+            data={data}
+            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="var(--border)"
+              vertical={false}
             />
-            <Line
-              type="monotone"
+            <XAxis
+              dataKey="month"
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v) => `$${v}`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
               dataKey="amount"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              dot={{ r: 5 }}
+              fill="var(--primary)"
+              radius={[8, 8, 0, 0]} // Rounded top corners
+              maxBarSize={60}
             />
-          </LineChart>
+          </BarChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   )
 }

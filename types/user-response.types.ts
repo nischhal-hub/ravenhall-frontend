@@ -1,3 +1,4 @@
+// ==================== CORE USER TYPE ====================
 export interface User {
   id: string
   email: string
@@ -7,20 +8,23 @@ export interface User {
   role: "CUSTOMER" | "STAFF" | "ADMIN"
   isEmailVerified: boolean
   createdAt: string
-
-  membership: {
-    id: string
-    plan: "CASUAL" | "MONTHLY" | "ANNUAL"
-    discountPct: number
-    startDate: string
-    endDate: string
-    isActive: boolean
-  } | null
-
-  _count: {
+  updatedAt?: string
+  membership: Membership | null
+  _count?: {
     bookings: number
   }
 }
+
+export interface Membership {
+  id: string
+  plan: "CASUAL" | "MONTHLY" | "ANNUAL"
+  discountPct: number
+  startDate: string
+  endDate: string
+  isActive: boolean
+}
+
+// ==================== API RESPONSES ====================
 
 export interface UsersApiResponse {
   status: string
@@ -38,38 +42,44 @@ export interface UsersApiResponse {
   }
 }
 
+// Profile Response - Used in Settings, Dashboard, etc.
 export interface UserProfileResponse {
   success: boolean
   message?: string
-  data: {
+  data: UserProfileData
+}
+
+export interface UserProfileData {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  role: "CUSTOMER" | "STAFF" | "ADMIN"
+  isEmailVerified: boolean
+  createdAt: string
+  updatedAt: string
+  membership?: Membership
+  bookings?: Array<{
     id: string
-    email: string
-    firstName: string
-    lastName: string
-    phone?: string
-    role: "CUSTOMER" | "STAFF" | "ADMIN"
-    isEmailVerified: boolean
+    bookingRef: string
+    status: string
+    totalAmount: number
+    finalAmount: number
     createdAt: string
-    updatedAt: string
+  }>
+  notifications?: any[] // You can define a proper type later
+}
 
-    membership?: {
-      plan: string
-      discountPct: number
-      startDate: string
-      endDate: string
-      isActive: boolean
-    }
+// ==================== PAYLOADS ====================
+export interface UpdateProfilePayload {
+  firstName?: string
+  lastName?: string
+  phone?: string
+  image?: File | null
+}
 
-    bookings?: Array<{
-      id: string
-      bookingRef: string
-      status: string
-      totalAmount: number
-      finalAmount: number
-      createdAt: string
-      // ... add more fields as needed
-    }>
-
-    notifications?: Array<any>
-  }
+export interface ChangePasswordPayload {
+  oldPassword: string
+  newPassword: string
 }
