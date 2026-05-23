@@ -124,7 +124,7 @@ export default function MembershipSuccessPage() {
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/panel/membership")}
             className="w-full"
           >
             Go to Dashboard
