@@ -208,6 +208,7 @@ function PlanCard({
 export default function MembershipPlansPage() {
   const router = useRouter()
   const { data, isLoading, error } = useMembershipPlansQuery()
+  //   @ts-expect-error Server Component
   const plans: RawPlan[] = data?.data || []
 
   if (error) {
