@@ -20,11 +20,10 @@ import {
 } from "lucide-react"
 
 export const navLinks = [
-  { href: "#", label: "Home" },
+  { href: "/", label: "Home" },
   { href: "/lanes", label: "Lanes" },
-  { href: "#memberships", label: "Memberships" },
-  { href: "#about", label: "About" },
-  { href: "#contact", label: "Contact" },
+  { href: "/membership", label: "Memberships" },
+  { href: "/about", label: "About" },
 ]
 
 export const features = [
