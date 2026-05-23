@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { CalendarDays, Clock, MapPin, Hash } from "lucide-react"
 import { BookingStatusBadge } from "./Bookingstatusbadge"
 
@@ -32,14 +33,27 @@ function formatCurrency(amount: number) {
 
 interface BookingCardProps {
   booking: BookingItem
-  onClick?: (id: string) => void
+  /** Override the default route. Defaults to /bookings/:id */
+  detailPath?: (id: string) => string
 }
 
-export function BookingCard({ booking, onClick }: BookingCardProps) {
+export function BookingCard({
+  booking,
+  detailPath = (id) => `/panel/bookings/${id}`,
+}: BookingCardProps) {
+  const router = useRouter()
+
+  const handleClick = () => {
+    router.push(detailPath(booking.id))
+  }
+
   return (
     <div
-      onClick={() => onClick?.(booking.id)}
-      className={`group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${onClick ? "cursor-pointer" : ""}`}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
       {/* Left accent bar */}
       <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-primary" />
