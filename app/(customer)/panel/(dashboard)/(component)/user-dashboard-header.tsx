@@ -1,10 +1,11 @@
 "use client"
 
+import { MembershipPlan } from "@/types/membership-response.types"
 import { User } from "@/types/user-response.types"
 
 interface Props {
   user: User
-  membership: any
+  membership: MembershipPlan | null
 }
 
 export function UserDashboardHeader({ user, membership }: Props) {
