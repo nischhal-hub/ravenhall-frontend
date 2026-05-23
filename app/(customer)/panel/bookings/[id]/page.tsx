@@ -62,5 +62,5 @@ export default function BookingDetailRoute() {
   }
   //   @ts-expect-error Server Component
 
-  return <BookingDetailPage booking={booking.data} isAdmin={true} />
+  return <BookingDetailPage booking={booking.data} isAdmin={false} />
 }

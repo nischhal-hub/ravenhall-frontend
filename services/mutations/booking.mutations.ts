@@ -3,9 +3,13 @@ import { apiClient } from "../api/client"
 import { toast } from "sonner"
 import { CreateBookingPayload } from "@/schemas/booking"
 
+// ================== TYPES ==================
+export interface UpdateBookingPayload {
+  slotId?: string
+  notes?: string
+}
 
 // ================== REQUEST FUNCTIONS ==================
-
 export async function createBookingRequest(data: CreateBookingPayload) {
   const response = await apiClient.post("/bookings", data)
   return response.data
@@ -16,6 +20,17 @@ export async function cancelBookingRequest(id: string) {
   return response.data
 }
 
+export async function updateBookingRequest({
+  id,
+  data,
+}: {
+  id: string
+  data: UpdateBookingPayload
+}) {
+  const response = await apiClient.patch(`/bookings/${id}`, data)
+  return response.data
+}
+
 export async function updateBookingStatusRequest({
   id,
   status,
@@ -23,7 +38,9 @@ export async function updateBookingStatusRequest({
   id: string
   status: string
 }) {
-  const response = await apiClient.patch(`/admin/bookings/${id}/status`, { status })
+  const response = await apiClient.patch(`/admin/bookings/${id}/status`, {
+    status,
+  })
   return response.data
 }
 
@@ -33,7 +50,6 @@ export async function deleteBookingRequest(id: string) {
 }
 
 // ================== REUSABLE MUTATION HOOK ==================
-
 function useBookingMutation<TData, TVariables>(
   mutationKey: string[],
   mutationFn: (vars: TVariables) => Promise<TData>,
@@ -48,7 +64,6 @@ function useBookingMutation<TData, TVariables>(
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["bookings"] })
       queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
-
       toast.success(successMessage)
     },
     onError: (error: any) => {
@@ -62,7 +77,6 @@ function useBookingMutation<TData, TVariables>(
 }
 
 // ================== EXPORTED HOOKS ==================
-
 export function useCreateBookingMutation() {
   return useBookingMutation(
     ["bookings", "create"],
@@ -76,6 +90,15 @@ export function useCancelBookingMutation() {
     ["bookings", "cancel"],
     cancelBookingRequest,
     "Booking cancelled successfully"
+  )
+}
+
+/** New: Update Booking Mutation */
+export function useUpdateBookingMutation() {
+  return useBookingMutation(
+    ["bookings", "update"],
+    updateBookingRequest,
+    "Booking updated successfully"
   )
 }
 
