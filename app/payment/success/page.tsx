@@ -204,7 +204,7 @@ export default function PaymentSuccessPage() {
           {/* CTA buttons */}
           <div className="mt-5 space-y-2.5">
             <Button
-              onClick={() => router.push("/my-bookings")}
+              onClick={() => router.push(`/panel/bookings/${booking?.id}`)}
               className="h-12 w-full rounded-xl bg-[#0d3b2e] text-sm font-semibold text-white transition-colors hover:bg-[#0a2e24]"
             >
               View My Bookings →
