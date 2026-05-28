@@ -18,7 +18,6 @@ export default function PaymentSuccessPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const bookingId = searchParams.get("bookingId")
-  const paymentIntent = searchParams.get("payment_intent")
   const redirectStatus = searchParams.get("redirect_status")
 
   const { data: bookingData, isLoading } = useBookingById(bookingId || "")
