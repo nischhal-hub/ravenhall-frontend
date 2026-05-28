@@ -63,11 +63,24 @@ export interface BookingDetail {
   createdAt: string
   updatedAt: string
 
-  // Nested Relations
+  // ── added for payment success page ──
+  date: string
+  startTime: string
+  endTime: string
+  duration: number // hours; component multiplies × 60 for mins
+
+  lane: {
+    name: string
+    description: string | null
+    location: string | null
+  } | null
+  // ────────────────────────────────────
+
   user: {
     id: string
     firstName: string
     lastName: string
+    fullName: string | null // ← added (used in QR label)
     email: string
     phone: string | null
     role: string
@@ -94,7 +107,6 @@ export interface BookingDetail {
 
   discountCode: any | null
 }
-
 export interface BookingItem {
   id: string
   bookingId: string
