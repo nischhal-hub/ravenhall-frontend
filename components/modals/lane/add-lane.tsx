@@ -79,7 +79,7 @@ export default function CreateBookingForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {lanes.data.map((lane: any) => (
+                    {lanes?.map((lane) => (
                       <SelectItem key={lane.id} value={lane.id}>
                         <div className="flex flex-col">
                           <span className="font-medium">{lane.name}</span>

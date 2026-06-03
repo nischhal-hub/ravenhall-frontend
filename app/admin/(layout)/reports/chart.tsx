@@ -84,7 +84,19 @@ export function RevenueChart({
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis tickFormatter={(v: number) => `$${v}`} />
-            <Tooltip formatter={(value: number) => [`$${value}`, "Revenue"]} />
+            <Tooltip
+              formatter={(value) => {
+                const amount = Number(value ?? 0)
+
+                return [
+                  `$${amount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`,
+                  "Revenue",
+                ]
+              }}
+            />
             <Bar dataKey="revenue" radius={[8, 8, 0, 0]} name="Revenue" />
           </BarChart>
         </ResponsiveContainer>

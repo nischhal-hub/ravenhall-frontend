@@ -104,7 +104,7 @@ export default function SettingsPage() {
   const updateProfileMutation = useUpdateProfileMutation()
   const changePasswordMutation = useChangePasswordMutation()
 
-  const profile = data?.data ?? data
+  const profile = data?.data
 
   // Profile Form
   const [profileForm, setProfileForm] = useState({

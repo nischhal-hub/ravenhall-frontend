@@ -68,10 +68,10 @@ export default function UsersPage() {
             Refresh
           </Button>
 
-          <Button onClick={() => openModal({ key: "ADD_USER" })}>
+          {/* <Button onClick={() => openModal({ key: "ADD_USER" })}>
             <UserPlus className="mr-2 h-4 w-4" />
             Add User
-          </Button>
+          </Button> */}
         </div>
       </div>
 

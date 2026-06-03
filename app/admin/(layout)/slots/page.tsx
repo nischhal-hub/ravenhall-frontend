@@ -50,10 +50,10 @@ export default function SlotTable() {
             Refresh
           </Button>
 
-          <Button onClick={() => openModal({ key: "ADD_SLOT" })}>
+          {/* <Button onClick={() => openModal({ key: "ADD_SLOT" })}>
             <Plus className="mr-2 h-4 w-4" />
             Add Slot
-          </Button>
+          </Button> */}
         </div>
       </div>
 

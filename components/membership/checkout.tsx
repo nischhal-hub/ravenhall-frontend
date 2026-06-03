@@ -110,10 +110,9 @@ export default function MembershipCheckout({
         console.log("📦 Full Response from backend:", response)
 
         // Handle different possible response shapes
-        const secret =
-          response?.clientSecret ||
-          response?.data?.clientSecret ||
-          response?.data?.client_secret
+        const secret = response?.clientSecret
+        // response?.data?.clientSecret ||
+        // response?.data?.client_secret
 
         if (secret) {
           setClientSecret(secret)

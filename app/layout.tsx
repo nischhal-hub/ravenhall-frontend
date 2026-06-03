@@ -4,13 +4,12 @@ import { QueryProvider } from "@/components/providers/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
-//@ts-expect-error idk why this is needed
+//@ts-ignore
 import "./globals.css"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import ModalRoot from "@/components/ui/modal"
 import { MODAL_DATA } from "@/components/modals/data"
-import { SHEET_DATA } from "@/components/sheets/data"
-import SheetRoot from "@/components/ui/sheets"
+
 import { ModalProvider } from "@/components/context/modal-context"
 import { Toaster } from "@/components/ui/sonner"
 const geistHeading = Geist({ subsets: ["latin"], variable: "--font-heading" })
@@ -46,7 +45,7 @@ export default function RootLayout({
               <Toaster position="top-right" />
               <TooltipProvider>{children}</TooltipProvider>
               <ModalRoot data={MODAL_DATA} />
-              <SheetRoot data={SHEET_DATA} />
+              {/* <SheetRoot data={SHEET_DATA} /> */}
             </ModalProvider>
           </QueryProvider>
         </ThemeProvider>
