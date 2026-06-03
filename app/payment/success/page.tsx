@@ -9,7 +9,6 @@ import {
   Share2,
   Users,
   Camera,
-  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useBookingById } from "@/services/queries/bookings.query"
@@ -76,45 +75,119 @@ export default function PaymentSuccessPage() {
         <h1 className="text-4xl font-black tracking-tight text-emerald-400">
           Booking Confirmed!
         </h1>
-        <p className="mb-8 text-muted-foreground">
-          Your booking has been confirmed
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-emerald-200">
+          Your lane is prepped and ready for action. We&apos;ve sent all the
+          details to your inbox.
         </p>
+      </div>
 
-        {booking && (
-          <div className="mb-8 space-y-4 rounded-2xl bg-muted/50 p-6 text-left">
-            <div className="flex items-start gap-3">
-              <MapPin className="mt-1 size-5 text-muted-foreground" />
-              <div>
-                {/* @ts-expect-error types not properly defined */}
-                <p className="font-medium">{booking.lane?.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {/* @ts-expect-error types not properly defined*/}
-                  {booking.lane?.location}
-                </p>
+      {/* ── Main card ───────────────────────────────────── */}
+      <div className="mx-auto -mt-10 w-full max-w-lg px-4 pb-8">
+        <div className="rounded-2xl bg-white p-6 shadow-lg">
+          {/* Reference number */}
+          <p className="mb-1 text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
+            Reference Number
+          </p>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5">
+            <Hash className="h-3.5 w-3.5 text-gray-400" />
+            <span className="font-mono text-sm font-semibold text-gray-700">
+              {refNumber}
+            </span>
+          </div>
+
+          {/* Two-column: details + QR */}
+          <div className="flex items-stretch gap-4">
+            {/* Left: booking details */}
+            <div className="flex-1 space-y-3">
+              {/* Lane */}
+              <div className="flex items-start gap-3 rounded-xl bg-gray-50 px-3 py-3">
+                <div className="mt-0.5 shrink-0 rounded-md bg-white p-1.5 shadow-sm">
+                  <svg
+                    className="h-4 w-4 text-gray-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <line x1="12" y1="3" x2="12" y2="21" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm leading-tight font-semibold text-gray-800">
+                    {booking?.lane?.name ?? "Lane 04 – Premium Net"}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    {booking?.lane?.description ??
+                      "Professional bowling machine included"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Date + time */}
+              <div className="flex items-start gap-3 rounded-xl bg-gray-50 px-3 py-3">
+                <div className="mt-0.5 shrink-0 rounded-md bg-white p-1.5 shadow-sm">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                </div>
+                <div>
+                  <p className="text-sm leading-tight font-semibold text-gray-800">
+                    {formattedDate ?? "Saturday, October 24th, 2026"}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Session Time:{" "}
+                    {booking
+                      ? `${booking.startTime} — ${booking.endTime} (${durationMins} mins)`
+                      : "18:00 — 19:30 (90 mins)"}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Calendar className="size-5 text-muted-foreground" />
-              <p>
-                {/* @ts-expect-error types not properly defined*/}
-                {new Date(booking.date).toLocaleDateString("en-IN", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}
+            {/* Right: QR card — matches screenshot exactly */}
+            <div className="flex w-36 shrink-0 flex-col items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-4 shadow-inner">
+              {/* White inner card with QR */}
+              <div className="flex w-full flex-col items-center gap-2 rounded-xl bg-white p-3 shadow-sm">
+                <QRCode
+                  value={qrValue}
+                  size={96}
+                  bgColor="#ffffff"
+                  fgColor="#1a1a1a"
+                  level="H"
+                />
+                <p className="px-1 text-center text-[9px] leading-tight font-medium text-gray-500">
+                  {booking?.user?.fullName ?? "Digital Access Spine"}
+                </p>
+              </div>
+              {/* Label at bottom */}
+              <p className="mt-2 text-center text-[8px] font-bold tracking-[0.15em] text-gray-400 uppercase">
+                Digital Entry Pass
               </p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Clock className="size-5 text-muted-foreground" />
-              <p>
-                {/* @ts-expect-error types not properly defined*/}
-                {booking.startTime} — {booking.endTime} ({booking.duration} hour
-                {/* @ts-expect-error types not properly defined*/}
-                {booking.duration > 1 ? "s" : ""})
-              </p>
-            </div>
+          {/* Confirmation notice */}
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-3">
+            <svg
+              className="mt-0.5 h-4 w-4 shrink-0 text-blue-500"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <p className="text-xs leading-relaxed text-blue-700">
+              A confirmation email has been sent to{" "}
+              <span className="font-semibold">
+                {booking?.user?.email ?? "your@email.com"}
+              </span>
+              . Please check your spam folder if you don&apos;t see it within 5
+              minutes.
+            </p>
+          </div>
 
           {/* Amount */}
           {booking?.finalAmount != null && (
