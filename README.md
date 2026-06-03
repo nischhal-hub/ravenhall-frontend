@@ -1,4 +1,4 @@
-# Ravenhall Indoor Cricket Centre — Frontend
+# Ravenhall Indoor Cricket Centre : Frontend
 
 React.js + TypeScript + Vite + Tailwind CSS + shadcn/ui
 
