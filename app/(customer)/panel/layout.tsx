@@ -7,12 +7,14 @@ import {
   ReusableSidebarLayout,
 } from "@/components/ui/sidebar/index"
 import {
+  ArrowBigLeft,
   Bell,
   CalendarCheck2,
   Crown,
   LayoutDashboard,
   Settings,
 } from "lucide-react"
+import Link from "next/link"
 
 const webSidebarItems: ReusableSidebarItem[] = [
   {
@@ -33,12 +35,12 @@ const webSidebarItems: ReusableSidebarItem[] = [
     href: "/panel/membership",
     icon: <Crown />,
   },
-  {
-    id: "notifications",
-    label: "Notifications",
-    href: "/panel/notification",
-    icon: <Bell />,
-  },
+  // {
+  //   id: "notifications",
+  //   label: "Notifications",
+  //   href: "/panel/notification",
+  //   icon: <Bell />,
+  // },
   {
     id: "settings",
     label: "Settings",
@@ -55,7 +57,16 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
         collapsible="icon"
         defaultOpen
         header={({ isCollapsed }) => (
-          <WebSidebarHeader isCollapsed={isCollapsed} role="customer" />
+          <>
+            <WebSidebarHeader isCollapsed={isCollapsed} role="customer" />
+            <Link
+              href={"/"}
+              className="flex items-center gap-2 rounded-md bg-blue-400 px-2 py-2 text-xs text-white transition-colors hover:bg-blue-500"
+            >
+              <ArrowBigLeft size={14} />
+              {!isCollapsed && "Go to Landing Page"}
+            </Link>
+          </>
         )}
         footer={({ isCollapsed }) => (
           <WebSidebarFooter isCollapsed={isCollapsed} role="customer" />

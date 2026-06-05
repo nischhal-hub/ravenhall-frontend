@@ -101,7 +101,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
           </p>
         </div>
 
-        <div className="mt-3 flex gap-2 sm:mt-0">
+        {/* <div className="mt-3 flex gap-2 sm:mt-0">
           {RANGES.map((r) => (
             <button
               key={r}
@@ -115,7 +115,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
               {r}
             </button>
           ))}
-        </div>
+        </div> */}
       </CardHeader>
 
       <CardContent>

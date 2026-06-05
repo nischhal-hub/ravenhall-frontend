@@ -8,12 +8,15 @@ import { apiClient } from "../api/client"
 // ==================== CORE TYPES ====================
 export interface ProfileData {
   id: string
+  createdAt?: string
   firstName?: string
   lastName?: string
   email: string
   phone?: string
   imageUrl?: string
   isEmailVerified?: boolean
+  bookings?: any[]
+  notifications?: any[]
   membership?: {
     plan: string
     isActive: boolean

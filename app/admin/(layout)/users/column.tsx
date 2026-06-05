@@ -61,7 +61,7 @@ export function getUserColumns(): ColumnDef<User>[] {
       header: "Bookings",
       cell: ({ row }) => (
         <div className="text-center font-semibold">
-          {row.original._count.bookings}
+          {row.original._count?.bookings}
         </div>
       ),
     },
@@ -89,7 +89,7 @@ export function getUserColumns(): ColumnDef<User>[] {
       cell: ({ row }) => (
         <ActionButton<User>
           row={row.original}
-          edit={{ key: "EDIT_USER" }}
+          // edit={{ key: "EDIT_USER" }}
           delete={{ type: "user" }}
           view={{
             onPageUrl: `/admin/users`,

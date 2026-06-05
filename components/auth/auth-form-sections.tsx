@@ -17,6 +17,7 @@ import type {
   ForgotPasswordPayload,
   LoginPayload,
   RegisterFormValues,
+  ResetPasswordPayload,
 } from "@/schemas/auth"
 
 type RegisterFormState = Omit<RegisterFormValues, "terms"> & {
@@ -45,6 +46,12 @@ type ForgotPasswordSectionProps = {
 
 type VerifyEmailSectionProps = {
   form: UseFormReturn<{ token: string }>
+  onSubmit: (event?: BaseSyntheticEvent) => Promise<void>
+  isSubmitting: boolean
+}
+
+type ResetPasswordSectionProps = {
+  form: UseFormReturn<ResetPasswordPayload>
   onSubmit: (event?: BaseSyntheticEvent) => Promise<void>
   isSubmitting: boolean
 }
@@ -356,6 +363,69 @@ export function VerifyEmailFormSection({
           className="h-12 w-full rounded-xl bg-primary text-sm font-bold tracking-wide text-primary-foreground uppercase transition hover:bg-secondary"
         >
           {isSubmitting ? "Verifying email..." : "Verify email"}
+        </Button>
+      </form>
+    </Form>
+  )
+}
+
+export function ResetPasswordFormSection({
+  form,
+  onSubmit,
+  isSubmitting,
+}: ResetPasswordSectionProps) {
+  console.log(form.formState.errors)
+  return (
+    <Form {...form}>
+      <form className="space-y-4" onSubmit={onSubmit} noValidate>
+        <FormField
+          control={form.control}
+          name="body.token"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Reset code</FormLabel>
+              <FormControl>
+                <input
+                  {...field}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  required
+                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  placeholder="Enter 6-digit reset code"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="body.password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New password</FormLabel>
+              <FormControl>
+                <input
+                  {...field}
+                  type="password"
+                  required
+                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  placeholder="Enter new password"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-12 w-full rounded-xl bg-primary text-sm font-bold tracking-wide text-primary-foreground uppercase transition hover:bg-secondary"
+        >
+          {isSubmitting ? "Resetting password..." : "Reset password"}
         </Button>
       </form>
     </Form>

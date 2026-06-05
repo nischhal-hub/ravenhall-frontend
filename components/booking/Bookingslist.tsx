@@ -122,7 +122,7 @@ export function BookingsList({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {displayed.map((b) => (
-              <BookingCard key={b.id} booking={b} onClick={onBookingClick} />
+              <BookingCard key={b.id} booking={b} />
             ))}
           </div>
         )}

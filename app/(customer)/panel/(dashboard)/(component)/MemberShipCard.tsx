@@ -49,7 +49,7 @@ export function MembershipCard({
         </p>
         <Button
           className="mt-5 w-full rounded-xl bg-primary font-semibold text-primary-foreground"
-          onClick={() => router.push("/membership/plans")}
+          onClick={() => router.push("/membership")}
         >
           View Plans <ChevronRight className="ml-1 h-4 w-4" />
         </Button>

@@ -10,7 +10,10 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Bell, Zap, Calendar, ArrowLeft } from "lucide-react"
-import { useProfileQuery } from "@/services/queries/user.query"
+import {
+  useProfileQuery,
+  useProfilesQuery,
+} from "@/services/queries/user.query"
 import { useRouter } from "next/navigation"
 
 function formatDate(dateString?: string) {
@@ -29,7 +32,7 @@ function formatCurrency(amount?: number) {
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { data: response, isLoading, error } = useProfileQuery()
+  const { data: response, isLoading, error } = useProfilesQuery()
 
   const user = response?.data
 
@@ -123,14 +126,14 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
               {membership ? (
                 <>
-                  <div className="flex items-center justify-between">
+                  {/* <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
                       Discount
                     </span>
                     <Badge variant="default">
                       {membership.discountPct}% OFF
                     </Badge>
-                  </div>
+                  </div> */}
                   <div>
                     <p className="text-sm text-muted-foreground">Valid Until</p>
                     <p className="font-medium">
