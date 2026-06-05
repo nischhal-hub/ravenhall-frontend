@@ -3,14 +3,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import {
   Select,
   SelectContent,
@@ -18,132 +11,102 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useCreateBookingMutation } from "@/services/mutations/booking.mutations"
-import { useLaneQuery } from "@/services/queries/lane.query"
-import {
-  createBookingSchema,
-  type CreateBookingPayload,
-} from "@/schemas/booking"
+
+import { createLaneSchema, CreateLaneFormValues } from "@/schemas/lane"
 import FormInput from "@/components/reusable/form-input"
+import { useCreateLaneMutation } from "@/services/mutations/lane.mutations"
+import { useModalContext } from "@/components/context/modal-context"
+import { _ModalProps } from "@/types/types"
 
-export default function CreateBookingForm() {
-  const mutation = useCreateBookingMutation()
+export default function AddLane({}: _ModalProps) {
+  const { mutate: createLane, isPending } = useCreateLaneMutation()
+  const { closeModal } = useModalContext()
 
-  // Fixed data extraction
-  const { data: response, isLoading: lanesLoading } = useLaneQuery({})
-
-  // Extract lanes array safely
-  const lanes = response?.data?.lanes
-
-  const form = useForm<CreateBookingPayload>({
-    resolver: zodResolver(createBookingSchema),
+  const form = useForm({
+    resolver: zodResolver(createLaneSchema),
     defaultValues: {
-      laneId: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      numberOfPeople: 4,
-      specialRequests: "",
+      name: "",
+      type: "GENERAL",
+      description: "",
+      capacity: 1,
+      hourlyRate: 0,
+      imageUrl: "",
     },
   })
 
-  const onSubmit = (data: CreateBookingPayload) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        form.reset()
-      },
+  const onSubmit = (formData: CreateLaneFormValues) => {
+    createLane(formData, {
+      onSuccess: () => closeModal("ADD_LANE"),
     })
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mx-auto w-full max-w-md space-y-6 p-2"
+      >
+        <h2 className="text-center text-2xl font-bold">Add New Lane</h2>
+
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {/* Lane Selector - FIXED */}
-          <FormField
-            control={form.control}
-            name="laneId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Select Lane <span className="text-red-500">*</span>
-                </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          lanesLoading ? "Loading lanes..." : "Select a lane"
-                        }
-                      />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {lanes?.map((lane) => (
-                      <SelectItem key={lane.id} value={lane.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{lane.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {lane.type.toLowerCase()} • Capacity:{" "}
-                            {lane.capacity} • Rs{lane.hourlyRate}/hr
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+          <FormInput form={form} name="name" label="Lane Name" required />
+
+          {/* Type Dropdown */}
+          <FormInput
+            form={form}
+            name="type"
+            label="Lane Type"
+            required
+            render={(field) => (
+              <Select
+                onValueChange={(value: string) => field.onChange(value)}
+                defaultValue={field.value as string}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select lane type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GENERAL">GENERAL</SelectItem>
+                  <SelectItem value="BATTING">BATTING</SelectItem>
+                  <SelectItem value="BOWLING">BOWLING</SelectItem>
+                </SelectContent>
+              </Select>
             )}
           />
 
           <FormInput
             form={form}
-            name="date"
-            label="Booking Date"
-            type="date"
+            name="capacity"
+            label="Capacity"
+            type="number"
             required
           />
+
           <FormInput
             form={form}
-            name="startTime"
-            label="Start Time"
-            type="time"
-            required
-          />
-          <FormInput
-            form={form}
-            name="endTime"
-            label="End Time"
-            type="time"
-            required
-          />
-          <FormInput
-            form={form}
-            name="numberOfPeople"
-            label="Number of People"
+            name="hourlyRate"
+            label="Hourly Rate ($)"
             type="number"
             required
           />
 
           <div className="md:col-span-2">
+            <FormInput form={form} name="description" label="Description" />
+          </div>
+
+          <div className="md:col-span-2">
             <FormInput
               form={form}
-              name="specialRequests"
-              label="Special Requests (Optional)"
-              type="textarea"
-              placeholder="Any special requirements..."
-              rows={4}
+              name="imageUrl"
+              label="Image URL"
+              type="url"
+              placeholder="https://example.com/image.jpg"
             />
           </div>
         </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={mutation.isPending || lanesLoading}
-        >
-          {mutation.isPending ? "Creating Booking..." : "Create Booking"}
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Creating..." : "Create Lane"}
         </Button>
       </form>
     </Form>
