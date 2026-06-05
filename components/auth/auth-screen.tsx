@@ -14,12 +14,15 @@ import {
   ForgotPasswordFormSection,
   LoginFormSection,
   RegisterFormSection,
+  ResetPasswordFormSection,
   VerifyEmailFormSection,
 } from "@/components/auth/auth-form-sections"
 import {
   forgotPasswordSchema,
   loginFormSchema,
   registerFormSchema,
+  ResetPasswordPayload,
+  resetPasswordSchema,
   verifyEmailFormSchema,
   type ForgotPasswordPayload,
   type LoginPayload,
@@ -30,12 +33,19 @@ import {
   useForgotPasswordMutation,
   useLoginMutation,
   useRegisterMutation,
+  useResetPasswordMutation,
   useVerifyEmailMutation,
 } from "@/services/mutations/auth.mutations"
 import { setAuthTokens } from "@/services/auth/token-store"
 import { ApiError } from "@/types/response"
+import { toast } from "sonner"
 
-type AuthMode = "login" | "register" | "forgot-password" | "verify-email"
+type AuthMode =
+  | "login"
+  | "register"
+  | "forgot-password"
+  | "verify-email"
+  | "reset-password"
 type AuthRole = "customer" | "admin"
 
 type AuthScreenProps = {
@@ -77,6 +87,7 @@ function roleContent(role: AuthRole) {
       dashboardHref: "/admin",
       backHref: "/",
       backLabel: "Back to main site",
+      resetPasswordHref: "/admin/auth/reset-password",
     }
   }
 
@@ -91,6 +102,7 @@ function roleContent(role: AuthRole) {
     dashboardHref: "/panel",
     backHref: "/",
     backLabel: "Back to landing",
+    resetPasswordHref: "/auth/reset-password",
   }
 }
 
@@ -115,6 +127,12 @@ function screenMeta(mode: AuthMode) {
       footerText: "Already verified your account?",
     }
   }
+  if (mode === "reset-password") {
+    return {
+      eyebrow: "Reset password",
+      footerText: "Remembered your password?",
+    }
+  }
 
   return {
     eyebrow: "Welcome back",
@@ -126,6 +144,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   const isRegister = mode === "register"
   const isForgotPassword = mode === "forgot-password"
   const isVerifyEmail = mode === "verify-email"
+  const isResetPassword = mode === "reset-password"
 
   const roleInfo = roleContent(role)
   const meta = screenMeta(mode)
@@ -135,6 +154,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   const loginMutation = useLoginMutation()
   const forgotPasswordMutation = useForgotPasswordMutation()
   const verifyEmailMutation = useVerifyEmailMutation()
+  const resetPasswordMutation = useResetPasswordMutation()
 
   const [formError, setFormError] = useState("")
   const [formSuccess, setFormSuccess] = useState("")
@@ -170,11 +190,21 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
     },
   })
 
+  const resetPasswordForm = useForm<ResetPasswordPayload>({
+    defaultValues: {
+      body: {
+        token: "",
+        password: "",
+      },
+    },
+  })
+
   const isSubmitting =
     registerMutation.isPending ||
     loginMutation.isPending ||
     forgotPasswordMutation.isPending ||
-    verifyEmailMutation.isPending
+    verifyEmailMutation.isPending ||
+    resetPasswordMutation.isPending
 
   function clearMessages() {
     setFormError("")
@@ -245,6 +275,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       await registerMutation.mutateAsync(payload)
       setFormSuccess("Registration successful. Please verify your email.")
       registerForm.reset()
+      router.push("/auth/verify-email")
     } catch (error) {
       if (error instanceof ApiError) {
         setFormError(error.message)
@@ -330,6 +361,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         setFormSuccess(
           response.message ?? "Password reset email sent if account exists."
         )
+        router.push("/auth/reset-password")
       } catch (error) {
         if (error instanceof ApiError) {
           setFormError(error.message)
@@ -365,6 +397,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         )
         setFormSuccess(response.message ?? "Email verified successfully.")
         verifyEmailForm.reset()
+        toast.success("Email verified. You can now log in.")
         router.replace(roleInfo.switchToLoginHref)
       } catch (error) {
         if (error instanceof ApiError) {
@@ -380,7 +413,46 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       }
     }
   )
+  const handleResetPasswordSubmit = resetPasswordForm.handleSubmit(
+    async (values) => {
+      clearMessages()
+      resetPasswordForm.clearErrors()
 
+      const parsed = resetPasswordSchema.safeParse(values)
+
+      if (!parsed.success) {
+        applyZodFieldErrors(
+          resetPasswordForm.setError,
+          parsed.error.flatten().fieldErrors
+        )
+        return
+      }
+
+      try {
+        const response = await resetPasswordMutation.mutateAsync(
+          //@ts-ignore
+          parsed.data.body
+        )
+
+        setFormSuccess(response.message ?? "Password reset successfully.")
+        resetPasswordForm.reset()
+
+        toast.success("Password reset successfully. You can now log in.")
+        router.replace(roleInfo.switchToLoginHref)
+      } catch (error) {
+        if (error instanceof ApiError) {
+          setFormError(error.message)
+          applyServerFieldErrors(
+            resetPasswordForm.setError,
+            error.details?.errors
+          )
+          return
+        }
+
+        setFormError("Password reset failed. Please try again.")
+      }
+    }
+  )
   return (
     <main className="relative min-h-svh overflow-hidden bg-background px-4 py-6 sm:px-6 sm:py-10">
       <div
@@ -462,7 +534,13 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
               isSubmitting={isSubmitting}
             />
           ) : null}
-
+          {isResetPassword ? (
+            <ResetPasswordFormSection
+              form={resetPasswordForm}
+              onSubmit={handleResetPasswordSubmit}
+              isSubmitting={isSubmitting}
+            />
+          ) : null}
           <div className="mt-6 border-t border-border/70 pt-5 text-center text-sm text-muted-foreground">
             {meta.footerText}{" "}
             <Link

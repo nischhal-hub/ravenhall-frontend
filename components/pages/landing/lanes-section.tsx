@@ -137,7 +137,7 @@ export function LanesSection() {
                     {lane.name}
                   </h3>
                   <p className="shrink-0 text-xl font-black text-primary">
-                    {lane.price || "₹XX"}
+                    {lane.price || "$XX"}
                     <span className="text-xs font-medium text-muted-foreground">
                       {lane.period || "/hr"}
                     </span>

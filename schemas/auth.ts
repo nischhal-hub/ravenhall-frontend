@@ -63,4 +63,4 @@ export type RegisterFormValues = z.infer<typeof registerFormSchema>
 export type LoginPayload = z.infer<typeof loginSchema>["body"]
 export type ForgotPasswordPayload = z.infer<typeof forgotPasswordSchema>["body"]
 export type VerifyEmailFormValues = z.infer<typeof verifyEmailFormSchema>
-export type ResetPasswordPayload = z.infer<typeof resetPasswordSchema>["body"]
+export type ResetPasswordPayload = z.infer<typeof resetPasswordSchema>

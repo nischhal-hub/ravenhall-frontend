@@ -102,7 +102,7 @@ function LaneCard({ lane, index }: { lane: Lane; index: number }) {
           </h3>
           <div className="shrink-0 text-right">
             <span className="text-xl font-black text-foreground">
-              ₹{lane.hourlyRate}
+              ${lane.hourlyRate}
             </span>
             <span className="text-xs font-medium text-muted-foreground">
               /hr

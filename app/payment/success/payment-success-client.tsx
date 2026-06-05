@@ -206,7 +206,7 @@ export default function PaymentSuccessClient() {
               <span className="text-sm text-gray-500">Amount Paid</span>
 
               <span className="text-sm font-bold text-gray-800">
-                ₹{booking.finalAmount.toLocaleString()}
+                ${booking.finalAmount.toLocaleString()}
               </span>
             </div>
           )}
