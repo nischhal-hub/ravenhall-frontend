@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import {
   Elements,
@@ -29,10 +29,12 @@ function CheckoutForm({ plan }: { plan: string }) {
   const [loading, setLoading] = useState(false)
 
   const handlePay = async () => {
-    if (!stripe || !elements) return
+    if (!stripe || !elements || loading) return
 
     setLoading(true)
+
     const { error: submitError } = await elements.submit()
+
     if (submitError) {
       toast.error(submitError.message || "Invalid card details")
       setLoading(false)
@@ -46,8 +48,13 @@ function CheckoutForm({ plan }: { plan: string }) {
       },
     })
 
-    if (error) toast.error(error.message || "Payment failed")
-    setLoading(false)
+    if (error) {
+      toast.error(error.message || "Payment failed")
+      setLoading(false)
+    }
+
+    // Do not manually set loading false on success.
+    // Stripe redirects the user.
   }
 
   return (
@@ -56,10 +63,12 @@ function CheckoutForm({ plan }: { plan: string }) {
         <label className="mb-3 block text-xs font-semibold tracking-widest text-muted-foreground uppercase">
           Card Details
         </label>
+
         <PaymentElement options={{ layout: "tabs" }} />
       </div>
 
       <Button
+        type="button"
         onClick={handlePay}
         disabled={!stripe || !elements || loading}
         className="h-12 w-full bg-emerald-600 hover:bg-emerald-700"
@@ -81,6 +90,7 @@ function CheckoutForm({ plan }: { plan: string }) {
         <span className="flex items-center gap-1">
           <ShieldCheck className="size-4" /> SSL Encrypted
         </span>
+
         <span className="flex items-center gap-1">
           <CheckCircle2 className="size-4" /> Stripe Secured
         </span>
@@ -98,40 +108,50 @@ export default function MembershipCheckout({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const hasInitializedRef = useRef(false)
+
   const createIntent = useCreateMembershipPaymentIntent()
 
   useEffect(() => {
+    if (!plan) return
+
+    // Prevent duplicate payment intent creation in React Strict Mode
+    if (hasInitializedRef.current) return
+    hasInitializedRef.current = true
+
     const initialize = async () => {
       try {
-        console.log("🔄 Creating payment intent for:", plan)
+        setIsLoading(true)
+        setError(null)
 
         const response = await createIntent.mutateAsync({ plan })
 
-        console.log("📦 Full Response from backend:", response)
-
-        // Handle different possible response shapes
         const secret =
-          response?.clientSecret ||
-          //@ts-ignore
-          response?.data?.clientSecret ||
-          //@ts-ignore
-          response?.data?.client_secret ||
-          //@ts-ignore
-          response?.body?.clientSecret ||
-          //@ts-ignore
+          response?.clientSecret ??
+          // @ts-expect-error depends on API wrapper response shape
+          response?.data?.clientSecret ??
+          // @ts-expect-error depends on API wrapper response shape
+          response?.data?.client_secret ??
+          // @ts-expect-error depends on API wrapper response shape
+          response?.body?.clientSecret ??
+          // @ts-expect-error depends on API wrapper response shape
           response?.body?.data?.clientSecret
 
-        if (secret) {
-          setClientSecret(secret)
-          console.log("✅ ClientSecret received")
-        } else {
-          console.error("❌ No clientSecret in response:", response)
-          setError("Invalid response from server (no clientSecret)")
+        if (!secret) {
+          console.error("No clientSecret in response:", response)
+          setError("Invalid response from server. Missing clientSecret.")
+          return
         }
+
+        setClientSecret(secret)
       } catch (err: any) {
-        console.error("❌ Error creating intent:", err)
+        console.error("Error creating payment intent:", err)
+
         const msg =
-          err?.response?.data?.message || err.message || "Unknown error"
+          err?.response?.data?.message ||
+          err?.message ||
+          "Failed to initialize payment."
+
         setError(msg)
         toast.error(msg)
       } finally {
@@ -140,7 +160,7 @@ export default function MembershipCheckout({
     }
 
     initialize()
-  }, [plan])
+  }, [plan, createIntent])
 
   if (isLoading) {
     return (
@@ -159,7 +179,9 @@ export default function MembershipCheckout({
         <p className="font-medium text-red-600">
           Payment Initialization Failed
         </p>
+
         <p className="mt-2 text-sm text-red-500">{error}</p>
+
         <Button onClick={() => window.location.reload()} className="mt-6">
           Try Again
         </Button>
@@ -167,19 +189,27 @@ export default function MembershipCheckout({
     )
   }
 
+  if (!clientSecret) {
+    return null
+  }
+
   return (
     <div className="mx-auto mt-10 max-w-lg">
       <div className="rounded-2xl border bg-card p-8 shadow-lg">
         <h1 className="mb-2 text-2xl font-bold">Complete Your Membership</h1>
+
         <p className="mb-6 text-muted-foreground">
           {planName} — ${price}
         </p>
 
         <Elements
+          key={clientSecret}
           stripe={stripePromise}
           options={{
-            clientSecret: clientSecret!,
-            appearance: { theme: "stripe" },
+            clientSecret,
+            appearance: {
+              theme: "stripe",
+            },
           }}
         >
           <CheckoutForm plan={plan} />
