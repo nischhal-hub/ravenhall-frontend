@@ -30,4 +30,5 @@ export interface TModalDataMap {
   EDIT_DISCOUNT: Discount
   EDIT_LANE: Lane
   EDIT_BOOKING_STATUS: Booking
+  ADD_BOOKING: Booking
 }

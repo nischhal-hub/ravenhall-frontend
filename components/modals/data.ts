@@ -2,11 +2,11 @@ import type { FC } from "react"
 import CreateDiscountCodeForm from "./discount/add-discount"
 import EditDiscount from "./discount/edit-discount"
 import DeleteModal from "./delete-modal"
-import AddLaneForm from "./lane/add-lane"
 import EditLane from "./lane/edit-lane"
 import CreateBookingForm from "./booking/add-booking"
 import UpdateBookingStatus from "./booking/edit-status"
 import { _ModalProps } from "@/types/types"
+import AddLane from "./lane/add-lane"
 
 export type TModalKeys =
   | "DELETE_ITEM"
@@ -40,7 +40,7 @@ export const MODAL_DATA: Record<TModalKeys, TModalValues> = {
   },
   ADD_LANE: {
     title: "Add Lane",
-    component: AddLaneForm,
+    component:  AddLane ,
   },
   EDIT_LANE: {
     title: "Edit Lane",
