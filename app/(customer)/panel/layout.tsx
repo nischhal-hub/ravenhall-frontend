@@ -35,12 +35,12 @@ const webSidebarItems: ReusableSidebarItem[] = [
     href: "/panel/membership",
     icon: <Crown />,
   },
-  {
-    id: "notifications",
-    label: "Notifications",
-    href: "/panel/notification",
-    icon: <Bell />,
-  },
+  // {
+  //   id: "notifications",
+  //   label: "Notifications",
+  //   href: "/panel/notification",
+  //   icon: <Bell />,
+  // },
   {
     id: "settings",
     label: "Settings",

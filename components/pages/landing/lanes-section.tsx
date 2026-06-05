@@ -6,13 +6,12 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import type { Lane } from "@/types/lane-response.types" // Adjust import if needed
 import { useLaneQuery } from "@/services/queries/lane.query"
+import Link from "next/link"
 
-// Fallback static images (since API doesn't provide images)
 const fallbackImages = [
   "/images/landing/lane-club.jpg",
   "/images/landing/lane-speed.jpg",
   "/images/landing/lane-opener.jpg",
-  // Add more images here if you have them in the landing folder
 ]
 
 export function LanesSection() {
@@ -20,19 +19,17 @@ export function LanesSection() {
 
   const { data, isLoading, error } = useLaneQuery({
     page: 1,
-    limit: 9, // Fetch enough for the grid
+    limit: 9,
     search: "",
-    // type: "indoor" // Uncomment if you want to filter by type
   })
 
-  // Assign random images to lanes (since API doesn't have images)
   useEffect(() => {
     if (data?.data) {
       const lanesWithImages = data.data.lanes.map((lane, index) => ({
         ...lane,
         image: fallbackImages[index % fallbackImages.length],
         imageAlt: `${lane.name || "Cricket Lane"} - Professional Indoor Lane`,
-        badge: "INDOOR", // You can make this dynamic if API provides type/category
+        badge: "INDOOR",
       }))
       setLanes(lanesWithImages)
     }
@@ -137,7 +134,7 @@ export function LanesSection() {
                     {lane.name}
                   </h3>
                   <p className="shrink-0 text-xl font-black text-primary">
-                    {lane.price || "$XX"}
+                    {`$${lane.hourlyRate}` || "$XX"}
                     <span className="text-xs font-medium text-muted-foreground">
                       {lane.period || "/hr"}
                     </span>
@@ -161,10 +158,11 @@ export function LanesSection() {
                     })}
                   </ul>
                 )}
-
-                <Button className="h-10 w-full text-sm font-semibold">
-                  Book Now
-                </Button>
+                <Link href={`/lanes/${lane.id}`} className="block">
+                  <Button className="h-10 w-full text-sm font-semibold">
+                    Book Now
+                  </Button>
+                </Link>
               </div>
             </article>
           ))}
