@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useBookingById } from "@/services/queries/bookings.query"
 import QRCode from "react-qr-code"
+import Link from "next/link"
 
 export default function PaymentSuccessClient() {
   const searchParams = useSearchParams()
@@ -213,20 +214,19 @@ export default function PaymentSuccessClient() {
 
           {/* CTA buttons */}
           <div className="mt-5 space-y-2.5">
-            <Button
-              onClick={() => router.push("/my-bookings")}
+            <Link
+              href={"/panel/bookings"}
               className="h-12 w-full rounded-xl bg-[#0d3b2e] text-sm font-semibold text-white transition-colors hover:bg-[#0a2e24]"
             >
               View My Bookings →
-            </Button>
+            </Link>
 
-            <Button
-              variant="outline"
-              onClick={() => router.push("/lanes")}
+            <Link
+              href={"/lanes"}
               className="h-12 w-full rounded-xl border-gray-200 text-sm font-semibold text-gray-700"
             >
               Book Another Lane
-            </Button>
+            </Link>
           </div>
         </div>
 
