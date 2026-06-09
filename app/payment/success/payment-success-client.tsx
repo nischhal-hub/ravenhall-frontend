@@ -214,18 +214,15 @@ export default function PaymentSuccessClient() {
 
           {/* CTA buttons */}
           <div className="mt-5 space-y-2.5">
-            <Link
-              href={"/panel/bookings"}
-              className="h-12 w-full rounded-xl bg-[#0d3b2e] text-sm font-semibold text-white transition-colors hover:bg-[#0a2e24]"
-            >
-              View My Bookings →
+            <Link href={"/panel/bookings"}>
+              <Button>View My Bookings →</Button>
             </Link>
 
             <Link
               href={"/lanes"}
               className="h-12 w-full rounded-xl border-gray-200 text-sm font-semibold text-gray-700"
             >
-              Book Another Lane
+              <Button variant={"outline"}>Book Another Lane</Button>
             </Link>
           </div>
         </div>
