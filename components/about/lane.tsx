@@ -8,7 +8,7 @@ const lanes = [
     type: "BATTING",
     label: "Batting",
     tag: "3 lanes",
-    color: "bg-primary text-white",
+    color: "bg-primary text-primary-foreground",
     accent: "border-primary/30",
     headline: "Dominate the crease.",
     description:
@@ -56,13 +56,10 @@ const lanes = [
 
 export function AboutLanes() {
   return (
-    <section className="bg-muted/40 px-4 py-20 sm:px-6 lg:py-28">
-      <div className="mx-auto max-w-5xl">
+    <section className="bg-muted/40 px-4 py-16 sm:px-6 lg:py-24">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
-          <p className="mb-3 font-mono text-xs font-semibold tracking-[0.3em] text-primary uppercase">
-            The Facility
-          </p>
-          <h2 className="font-heading text-4xl font-extrabold text-foreground sm:text-5xl">
+          <h2 className="font-heading text-3xl font-extrabold text-foreground sm:text-4xl">
             Three lane types.
             <br />
             <span className="text-primary">One world-class facility.</span>

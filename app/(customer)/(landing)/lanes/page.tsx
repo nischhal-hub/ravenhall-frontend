@@ -40,10 +40,10 @@ const FILTER_TABS = [
   { label: "General", value: "GENERAL" },
 ] as const
 
-const TYPE_STYLES: Record<string, { bg: string; text: string }> = {
-  BATTING: { bg: "bg-emerald-500", text: "text-white" },
-  BOWLING: { bg: "bg-orange-500", text: "text-white" },
-  GENERAL: { bg: "bg-sky-500", text: "text-white" },
+const TYPE_COLOR: Record<string, string> = {
+  BATTING: "var(--chart-1)",
+  BOWLING: "var(--chart-2)",
+  GENERAL: "var(--chart-3)",
 }
 
 const ITEMS_PER_PAGE = 6
@@ -72,9 +72,9 @@ function LaneCardSkeleton() {
 function LaneCard({ lane, index }: { lane: Lane; index: number }) {
   const router = useRouter()
   const typeKey = (lane.type ?? "GENERAL").toUpperCase()
-  const style = TYPE_STYLES[typeKey] ?? TYPE_STYLES.GENERAL
+  const typeColor = TYPE_COLOR[typeKey] ?? TYPE_COLOR.GENERAL
 
-  const image = lane.image ?? fallbackImages[index % fallbackImages.length]
+  const image = lane.imageUrl || fallbackImages[index % fallbackImages.length]
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
@@ -88,7 +88,8 @@ function LaneCard({ lane, index }: { lane: Lane; index: number }) {
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
         <span
-          className={`absolute top-3 left-3 ${style.bg} ${style.text} rounded-full px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase shadow`}
+          className="absolute top-3 left-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-widest text-white uppercase shadow"
+          style={{ background: typeColor }}
         >
           {typeKey}
         </span>
@@ -199,10 +200,10 @@ export default function LanesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="font-heading text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
             Browse Our Lanes
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">

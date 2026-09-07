@@ -7,7 +7,26 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
 import { useConfirmMembershipPayment } from "@/services/mutations/membership.mutations"
-import { useMyMembershipQuery } from "@/services/queries/membership.query"
+
+export function MembershipLoadingScreen({
+  message = "Loading...",
+  description,
+}: {
+  message?: string
+  description?: string
+}) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+        <h2 className="text-2xl font-semibold">{message}</h2>
+        {description && (
+          <p className="mt-2 text-muted-foreground">{description}</p>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function MembershipSuccessClient() {
   const searchParams = useSearchParams()
@@ -20,9 +39,6 @@ export default function MembershipSuccessClient() {
   const [isConfirming, setIsConfirming] = useState(true)
 
   const confirmMutation = useConfirmMembershipPayment()
-  const { data: membership } = useMyMembershipQuery()
-
-  console.log("Current membership data:", membership)
 
   const confirmPayment = useCallback(async () => {
     if (!paymentIntent) return
@@ -56,23 +72,18 @@ export default function MembershipSuccessClient() {
 
   if (isConfirming) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <h2 className="text-2xl font-semibold">
-            Activating your membership...
-          </h2>
-          <p className="mt-2 text-muted-foreground">Please wait a moment</p>
-        </div>
-      </div>
+      <MembershipLoadingScreen
+        message="Activating your membership..."
+        description="Please wait a moment"
+      />
     )
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-background to-muted/30 px-4 py-12">
       <Card className="w-full max-w-lg p-10 text-center shadow-xl">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/50">
-          <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-accent/15">
+          <CheckCircle2 className="h-12 w-12 text-accent" />
         </div>
 
         <h1 className="mb-3 text-4xl font-bold">Payment Successful!</h1>
@@ -91,7 +102,7 @@ export default function MembershipSuccessClient() {
 
           <div className="flex justify-between border-b py-3">
             <span className="text-muted-foreground">Status</span>
-            <span className="font-semibold text-emerald-600">Active</span>
+            <span className="font-semibold text-accent">Active</span>
           </div>
 
           <div className="flex justify-between py-3">
@@ -130,7 +141,7 @@ export default function MembershipSuccessClient() {
           <Button
             size="lg"
             onClick={() => router.push("/panel/membership")}
-            className="w-full"
+            className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
           >
             Go to Dashboard
             <ArrowRight className="ml-2 h-4 w-4" />

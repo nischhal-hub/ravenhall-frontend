@@ -1,13 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { format } from "date-fns"
 import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import PageHeader from "@/components/ui/page-header"
-import { BOOKING_STATUS_CONFIG } from "@/components/reusable/status-badge"
+import {
+  BOOKING_STATUS_CONFIG,
+  PaymentStatusBadge,
+} from "@/components/reusable/status-badge"
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -157,56 +160,11 @@ function statusConfig(status: string) {
   }
 }
 
-function paymentStatusConfig(status: string) {
-  switch (status.toUpperCase()) {
-    case "SUCCEEDED":
-    case "PAID":
-      return {
-        label: "Paid",
-        className:
-          "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800",
-      }
-    case "FAILED":
-      return {
-        label: "Failed",
-        className:
-          "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950 dark:text-rose-400 dark:border-rose-800",
-      }
-    case "REFUNDED":
-      return {
-        label: "Refunded",
-        className:
-          "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-400 dark:border-purple-800",
-      }
-    default:
-      return {
-        label: "Pending",
-        className:
-          "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800",
-      }
-  }
-}
-
-function formatDate(iso: string) {
-  return format(new Date(iso), "dd MMM yyyy")
-}
-
-function formatDateTime(iso: string) {
-  return format(new Date(iso), "dd MMM yyyy, HH:mm")
-}
-
 function formatTime(time: string) {
   const [h, m] = time.split(":").map(Number)
   const suffix = h >= 12 ? "PM" : "AM"
   const hour = h % 12 || 12
   return `${hour}:${m.toString().padStart(2, "0")} ${suffix}`
-}
-
-function formatCurrency(amount: number, currency = "aud") {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(amount)
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -268,7 +226,6 @@ export function BookingDetailPage({
   booking,
   isAdmin,
 }: BookingDetailPageProps) {
-  console.log("📖 Booking details:", booking) // Debug log
   const router = useRouter()
   const [selectedStatus, setSelectedStatus] = useState(booking.status)
 
@@ -324,7 +281,7 @@ export function BookingDetailPage({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 gap-1.5 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                    className="h-8 gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
                   >
                     <XCircle className="h-3.5 w-3.5" />
                     Cancel booking
@@ -342,7 +299,7 @@ export function BookingDetailPage({
                     <AlertDialogCancel>Keep it</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleCancel}
-                      className="bg-rose-600 hover:bg-rose-700"
+                      className="bg-destructive hover:bg-destructive/90"
                     >
                       {cancelMutation.isPending ? "Cancelling…" : "Yes, cancel"}
                     </AlertDialogAction>
@@ -358,7 +315,7 @@ export function BookingDetailPage({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 gap-1.5 text-muted-foreground hover:bg-rose-50 hover:text-rose-600"
+                    className="h-8 gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Delete
@@ -367,7 +324,7 @@ export function BookingDetailPage({
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-rose-500" />
+                      <AlertCircle className="h-4 w-4 text-destructive" />
                       Delete booking?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
@@ -380,7 +337,7 @@ export function BookingDetailPage({
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
-                      className="bg-rose-600 hover:bg-rose-700"
+                      className="bg-destructive hover:bg-destructive/90"
                     >
                       {deleteMutation.isPending
                         ? "Deleting…"
@@ -436,7 +393,7 @@ export function BookingDetailPage({
                     className={`h-1 rounded-full transition-colors ${
                       isActive
                         ? isCancelled && s === "CANCELLED"
-                          ? "bg-rose-500"
+                          ? "bg-destructive"
                           : statusCfg.bar
                         : "bg-muted"
                     }`}
@@ -470,10 +427,7 @@ export function BookingDetailPage({
                       {booking.user.role.toLowerCase()}
                     </span>
                     {booking.user.isEmailVerified && (
-                      <Badge
-                        variant="outline"
-                        className="gap-1 border-emerald-200 bg-emerald-50 px-1.5 py-0 text-[10px] text-emerald-700"
-                      >
+                      <Badge variant="default" className="gap-1 px-1.5 py-0 text-[10px]">
                         <ShieldCheck className="h-2.5 w-2.5" />
                         Verified
                       </Badge>
@@ -537,12 +491,7 @@ export function BookingDetailPage({
                   <span className="text-sm text-muted-foreground">
                     Payment status
                   </span>
-                  <Badge
-                    variant="outline"
-                    className={`text-xs ${paymentStatusConfig(payment.status).className}`}
-                  >
-                    {paymentStatusConfig(payment.status).label}
-                  </Badge>
+                  <PaymentStatusBadge status={payment.status} />
                 </div>
                 <Separator className="mb-3" />
                 <InfoRow
@@ -614,7 +563,7 @@ export function BookingDetailPage({
                       <Tag className="h-3 w-3" />
                       Discount
                     </span>
-                    <span className="font-medium text-emerald-600">
+                    <span className="font-medium text-accent">
                       −{" "}
                       {formatCurrency(
                         booking.discountAmount,

@@ -1,6 +1,8 @@
 "use client"
 
 import { MapPin, CalendarDays, Clock } from "lucide-react"
+import { BookingStatusBadge } from "@/components/reusable/status-badge"
+import { formatCurrency } from "@/lib/utils"
 
 interface BookingItem {
   id: string
@@ -13,20 +15,6 @@ interface BookingItem {
   items?: { laneName: string }[]
 }
 
-const STATUS_STYLES: Record<string, string> = {
-  CONFIRMED: "bg-accent text-accent-foreground",
-  PENDING: "bg-secondary text-secondary-foreground",
-  CANCELLED: "bg-destructive text-white",
-  COMPLETED: "bg-muted text-muted-foreground",
-}
-
-function formatCurrency(v: number) {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
-  }).format(v)
-}
-
 function formatDate(iso?: string) {
   if (!iso) return "—"
   return new Date(iso).toLocaleDateString("en-AU", {
@@ -37,8 +25,6 @@ function formatDate(iso?: string) {
 }
 
 export function BookingRow({ booking }: { booking: BookingItem }) {
-  const statusCls =
-    STATUS_STYLES[booking.status] ?? "bg-muted text-muted-foreground"
   const lanes = booking.items?.map((i) => i.laneName).join(", ")
 
   return (
@@ -75,11 +61,7 @@ export function BookingRow({ booking }: { booking: BookingItem }) {
 
       {/* Right */}
       <div className="flex shrink-0 flex-col items-end gap-1.5">
-        <span
-          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusCls}`}
-        >
-          {booking.status.charAt(0) + booking.status.slice(1).toLowerCase()}
-        </span>
+        <BookingStatusBadge status={booking.status} />
         <span className="text-sm font-black text-primary">
           {formatCurrency(booking.finalAmount)}
         </span>

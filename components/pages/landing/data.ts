@@ -1,10 +1,7 @@
 import {
-  Bot,
   CalendarDays,
   Check,
-  CheckCircle2,
   Clock3,
-  Gauge,
   Globe,
   Camera,
   LockKeyhole,
@@ -12,10 +9,7 @@ import {
   MapPin,
   Phone,
   Repeat,
-  Ruler,
   ShieldCheck,
-  Users,
-  Video,
   Zap,
 } from "lucide-react"
 
@@ -53,47 +47,6 @@ export const features = [
   },
 ]
 
-export const lanes = [
-  {
-    name: "Lane 01 - The Opener",
-    badge: "Batting Specialized",
-    price: "$45",
-    period: "/hr",
-    image: "/images/landing/lane-opener.jpg",
-    imageAlt:
-      "Professional cricket batting lane with synthetic turf and bowling machine.",
-    stats: [
-      { label: "Machine Included", icon: Bot },
-      { label: "LED Max", icon: Zap },
-    ],
-  },
-  {
-    name: "Lane 04 - Speed Star",
-    badge: "Bowling Optimized",
-    price: "$40",
-    period: "/hr",
-    image: "/images/landing/lane-speed.jpg",
-    imageAlt:
-      "Indoor bowling lane with marked crease and performance lighting.",
-    stats: [
-      { label: "Run-up Tracking", icon: Gauge },
-      { label: "HD Replay", icon: Video },
-    ],
-  },
-  {
-    name: "Lane 07 - The Clubman",
-    badge: "General Practice",
-    price: "$35",
-    period: "/hr",
-    image: "/images/landing/lane-club.jpg",
-    imageAlt: "Wide indoor cricket lane with full pitch and safety nets.",
-    stats: [
-      { label: "Up to 6 Players", icon: Users },
-      { label: "22 Yards", icon: Ruler },
-    ],
-  },
-]
-
 export const bookingSteps = [
   {
     id: "01",
@@ -112,44 +65,6 @@ export const bookingSteps = [
     description:
       "Get instant confirmation and be match-ready before you arrive.",
     complete: true,
-  },
-]
-
-export const plans = [
-  {
-    name: "Casual",
-    price: "$0",
-    period: "/month",
-    cta: "Get Started",
-    featured: false,
-    points: ["Standard lane rates", "Book 7 days ahead", "No lane discounts"],
-  },
-  {
-    name: "Monthly Pro",
-    price: "$49",
-    period: "/month",
-    cta: "Subscribe Now",
-    featured: true,
-    highlight: "Save 15% on all bookings",
-    points: [
-      "15% off all lanes",
-      "Priority lane access",
-      "Free coaching session (1/mo)",
-      "Member-only events",
-    ],
-  },
-  {
-    name: "Annual Master",
-    price: "$450",
-    period: "/year",
-    cta: "Get Started",
-    featured: false,
-    highlight: "Best value: 2 months free",
-    points: [
-      "25% off all lanes",
-      "Unlimited guest passes",
-      "Complimentary kit storage locker",
-    ],
   },
 ]
 
@@ -185,4 +100,3 @@ export const heroStatus = [
 ]
 
 export const planPointIcon = Check
-export const completeStepIcon = CheckCircle2

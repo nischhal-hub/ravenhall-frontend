@@ -31,7 +31,7 @@ export function SiteHeader() {
   const isCustomer = normalizeRole(user?.role) === "customer"
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-50/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -45,7 +45,7 @@ export function SiteHeader() {
             <Link
               key={link.label}
               href={link.href}
-              className="text-sm font-semibold text-slate-600 transition hover:text-primary"
+              className="text-sm font-semibold text-muted-foreground transition hover:text-primary"
             >
               {link.label}
             </Link>
@@ -86,13 +86,13 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div className="border-t border-slate-200 bg-slate-50 px-4 py-4 md:hidden">
+        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
           <nav className="space-y-3">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="block rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                className="block rounded-xl px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
                 onClick={() => setOpen(false)}
               >
                 {link.label}

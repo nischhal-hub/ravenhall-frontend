@@ -8,6 +8,7 @@ import {
   ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/reusable/empty-state"
 import { BookingCardSkeleton } from "./Bookingcardskeleton"
 import { BookingCard } from "./Bookingcard"
 
@@ -108,17 +109,16 @@ export function BookingsList({
             ))}
           </div>
         ) : displayed.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <Search className="h-7 w-7 text-muted-foreground" />
-            </div>
-            <p className="font-semibold text-foreground">No bookings found</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {search
+          <EmptyState
+            icon={Search}
+            title="No bookings found"
+            description={
+              search
                 ? `No results for "${search}"`
-                : "You have no bookings in this category yet."}
-            </p>
-          </div>
+                : "You have no bookings in this category yet."
+            }
+            className="py-16"
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {displayed.map((b) => (

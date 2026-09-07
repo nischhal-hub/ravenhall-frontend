@@ -45,7 +45,6 @@ interface Step3Props {
   /** ✅ FIX: bookingId created in Step2 must be passed in */
   bookingId: string
   onBack: () => void
-  onComplete: () => void
 }
 
 // ─────────────────────────────────────────────
@@ -114,7 +113,7 @@ function CheckoutForm({
         type="button"
         onClick={handlePay}
         disabled={!stripe || !elements || loading}
-        className="h-12 w-full rounded-xl bg-emerald-500 text-base font-bold hover:bg-emerald-600 disabled:opacity-60"
+        className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
       >
         {loading ? (
           <>
@@ -130,16 +129,17 @@ function CheckoutForm({
       </Button>
 
       <p className="text-center text-xs text-muted-foreground">
-        You won't be charged until you confirm
+        You won&apos;t be charged until you confirm
       </p>
 
       {/* Trust badges */}
       <div className="flex items-center justify-center gap-5 border-t border-border pt-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <ShieldCheck className="size-3.5 text-emerald-500" /> SSL Encrypted
+          <ShieldCheck className="size-3.5 text-accent" /> SSL Secured
         </span>
         <span className="flex items-center gap-1">
-          <CheckCircle2 className="size-3.5 text-emerald-500" /> Stripe Verified
+          <CheckCircle2 className="size-3.5 text-accent" /> Instant
+          Confirmation
         </span>
       </div>
     </div>
@@ -158,7 +158,6 @@ export function Step3({
   promoDiscount,
   bookingId,
   onBack,
-  onComplete,
 }: Step3Props) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
@@ -221,7 +220,7 @@ export function Step3({
         clientSecret,
         appearance: {
           theme: "stripe" as const,
-          variables: { colorPrimary: "#10b981" },
+          variables: { colorPrimary: "#22c55e" },
         },
       }
     : undefined
@@ -231,8 +230,8 @@ export function Step3({
       {/* ── Left: Payment Form ── */}
       <div className="space-y-5 lg:col-span-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-widest text-emerald-500 uppercase">
-            Current Step
+          <p className="mb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Step 3 of 3
           </p>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
             Payment Details
@@ -248,8 +247,8 @@ export function Step3({
           {isInitializing || !clientSecret ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className="relative">
-                <div className="size-14 rounded-full border-4 border-emerald-100 dark:border-emerald-900" />
-                <Loader2 className="absolute inset-0 m-auto size-8 animate-spin text-emerald-500" />
+                <div className="size-14 rounded-full border-4 border-accent/15" />
+                <Loader2 className="absolute inset-0 m-auto size-8 animate-spin text-accent" />
               </div>
               <p className="mt-4 text-sm font-medium text-foreground">
                 Preparing secure payment...
@@ -269,17 +268,17 @@ export function Step3({
       {/* ── Right: Booking Summary ── */}
       <div className="lg:col-span-2">
         <div className="sticky top-6 space-y-4">
-          <div className="overflow-hidden rounded-2xl bg-foreground text-background shadow-xl">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
             {/* Header */}
             <div className="px-6 pt-6 pb-4">
-              <p className="text-xs font-semibold tracking-widest text-background/50 uppercase">
+              <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                 Booking Summary
               </p>
             </div>
 
             {/* Booking meta */}
-            <div className="space-y-2 px-6 pb-4 text-sm text-background/60">
-              <p className="font-semibold text-background">{lane.name}</p>
+            <div className="space-y-2 px-6 pb-4 text-sm text-muted-foreground">
+              <p className="font-semibold text-foreground">{lane.name}</p>
               <div className="flex items-center gap-1.5">
                 <CalendarDays className="size-3.5 shrink-0" />
                 <span>
@@ -300,54 +299,56 @@ export function Step3({
               </div>
             </div>
 
-            <div className="mx-6 border-t border-white/10" />
+            <div className="mx-6 border-t border-border" />
 
             {/* Line items */}
             <div className="space-y-3 px-6 py-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-background/70">Lane Hire</span>
-                <span className="font-semibold">${laneHire.toFixed(2)}</span>
+                <span className="text-muted-foreground">Lane Hire</span>
+                <span className="font-semibold text-foreground">
+                  ${laneHire.toFixed(2)}
+                </span>
               </div>
-              <div className="flex justify-between text-emerald-400">
+              <div className="flex justify-between text-accent">
                 <span>Member Discount (15%)</span>
                 <span className="font-semibold">-${memberDisc.toFixed(2)}</span>
               </div>
               {promoDiscount > 0 && (
-                <div className="flex justify-between text-emerald-400">
+                <div className="flex justify-between text-accent">
                   <span>Promo ({promo})</span>
                   <span className="font-semibold">
                     -${promoDiscount.toFixed(2)}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-background/70">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Equipment Fee</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-foreground">
                   ${EQUIPMENT_FEE.toFixed(2)}
                 </span>
               </div>
             </div>
 
-            <div className="mx-6 border-t border-white/10" />
+            <div className="mx-6 border-t border-border" />
 
             {/* Total */}
             <div className="px-6 py-5">
               <div className="flex items-end justify-between">
-                <span className="text-sm font-semibold text-background/70">
+                <span className="text-sm font-semibold text-muted-foreground">
                   TOTAL AMOUNT
                 </span>
-                <span className="text-3xl font-black tracking-tight">
+                <span className="text-3xl font-black tracking-tight text-foreground">
                   ${total.toFixed(2)}
                 </span>
               </div>
-              <p className="mt-0.5 text-right text-xs text-background/40">
+              <p className="mt-0.5 text-right text-xs text-muted-foreground">
                 Includes GST
               </p>
             </div>
 
             {/* Cancellation note */}
-            <div className="mx-6 mb-5 rounded-xl bg-white/5 px-4 py-3 text-xs text-background/50">
-              <span className="font-semibold text-background/70">
+            <div className="mx-6 mb-5 rounded-xl bg-muted px-4 py-3 text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">
                 Free cancellation
               </span>{" "}
               up to 24 hours before your session starts.

@@ -22,15 +22,12 @@ const values = [
 
 export function AboutMission() {
   return (
-    <section className="bg-background px-4 py-20 sm:px-6 lg:py-28">
-      <div className="mx-auto max-w-5xl">
+    <section className="bg-background px-4 py-16 sm:px-6 lg:py-24">
+      <div className="mx-auto max-w-7xl">
         {/* Asymmetric heading block */}
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-20">
           <div>
-            <p className="mb-3 font-mono text-xs font-semibold tracking-[0.3em] text-primary uppercase">
-              Our Mission
-            </p>
-            <h2 className="font-heading text-4xl leading-tight font-extrabold text-foreground sm:text-5xl">
+            <h2 className="font-heading text-3xl font-extrabold text-foreground sm:text-4xl">
               Cricket that fits
               <br />
               <span className="text-primary">your schedule.</span>

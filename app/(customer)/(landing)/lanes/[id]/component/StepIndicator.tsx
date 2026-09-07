@@ -21,7 +21,7 @@ export function StepIndicator({ step }: StepIndicatorProps) {
               className={cn(
                 "flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-bold transition-all",
                 step > s.n
-                  ? "border-emerald-500 bg-emerald-500 text-white"
+                  ? "border-accent bg-accent text-accent-foreground"
                   : step === s.n
                     ? "border-foreground bg-foreground text-background"
                     : "border-border bg-background text-muted-foreground"
@@ -42,7 +42,7 @@ export function StepIndicator({ step }: StepIndicatorProps) {
             <div
               className={cn(
                 "mx-1 mb-4 h-0.5 w-16 transition-colors sm:w-24",
-                step > s.n ? "bg-emerald-500" : "bg-border"
+                step > s.n ? "bg-accent" : "bg-border"
               )}
             />
           )}

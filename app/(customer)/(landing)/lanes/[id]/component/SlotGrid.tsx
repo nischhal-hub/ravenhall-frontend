@@ -14,11 +14,11 @@ export function SlotGrid({ slots, selectedSlot, onSelect }: SlotGridProps) {
         <h3 className="font-bold text-foreground">Available Slots</h3>
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />{" "}
+            <span className="inline-block h-2 w-2 rounded-full bg-accent" />{" "}
             Available
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-red-500" />{" "}
+            <span className="inline-block h-2 w-2 rounded-full bg-destructive" />{" "}
             Booked
           </span>
         </div>
@@ -45,7 +45,7 @@ export function SlotGrid({ slots, selectedSlot, onSelect }: SlotGridProps) {
                     "cursor-not-allowed border-border bg-muted text-muted-foreground/40",
                   !isBooked &&
                     !isSelected &&
-                    "border-border bg-background text-foreground hover:border-emerald-400 hover:bg-emerald-50",
+                    "border-border bg-background text-foreground hover:border-accent hover:bg-accent/10",
                   isSelected &&
                     "border-foreground bg-foreground text-background"
                 )}
@@ -57,8 +57,8 @@ export function SlotGrid({ slots, selectedSlot, onSelect }: SlotGridProps) {
                     isSelected
                       ? "text-background/70"
                       : isBooked
-                        ? "text-red-400"
-                        : "text-emerald-500"
+                        ? "text-destructive"
+                        : "text-accent"
                   )}
                 >
                   {isSelected ? "Selected" : isBooked ? "Booked" : "Available"}
