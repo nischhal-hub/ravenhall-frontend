@@ -6,7 +6,7 @@ import { heroStatus } from "@/components/pages/landing/data"
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-[#17355b] to-[#1e3a5f] px-4 py-16 text-primary-foreground sm:px-6 lg:px-8 lg:py-24">
+    <section className="relative overflow-hidden bg-linear-to-br from-primary via-[#17355b] to-[#1e3a5f] px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
       <div className="absolute inset-0 opacity-25">
         <Image
           src="/images/landing/hero.jpg"
@@ -30,7 +30,7 @@ export function HeroSection() {
             Indoor Cricket Centre
           </h1>
 
-          <p className="max-w-xl text-sm leading-relaxed text-primary-foreground/80 sm:text-base">
+          <p className="max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
             lighting, high-performance turf, and instant digital booking.
           </p>
 
@@ -44,16 +44,16 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="h-11 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+              className="h-11 border-white/30 bg-white/10 text-white hover:bg-white/20"
             >
               View Membership Plans
             </Button>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-primary-foreground/15 bg-primary-foreground/10 p-5 backdrop-blur-xl sm:p-6 lg:ml-auto lg:w-[30rem]">
-          <div className="mb-4 flex items-center justify-between border-b border-primary-foreground/10 pb-3">
-            <p className="font-semibold text-primary-foreground">Live Status</p>
+        <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl sm:p-6 lg:ml-auto lg:w-120">
+          <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
+            <p className="font-semibold text-white">Live Status</p>
             <span className="inline-flex items-center gap-2 text-sm text-accent">
               <span className="size-2 rounded-full bg-accent" />
               Open Now
@@ -65,14 +65,9 @@ export function HeroSection() {
               const Icon = item.icon
 
               return (
-                <div
-                  key={item.label}
-                  className="rounded-2xl bg-primary-foreground/10 p-4"
-                >
-                  <p className="text-xs text-primary-foreground/70">
-                    {item.label}
-                  </p>
-                  <p className="mt-1 text-lg font-bold text-primary-foreground sm:text-2xl">
+                <div key={item.label} className="rounded-2xl bg-white/10 p-4">
+                  <p className="text-xs text-white/70">{item.label}</p>
+                  <p className="mt-1 text-lg font-bold text-white sm:text-2xl">
                     {item.value}
                   </p>
                   <Icon className="mt-2 size-4 text-accent" />
@@ -83,7 +78,7 @@ export function HeroSection() {
 
           <div className="mt-4 flex items-center gap-3 rounded-2xl bg-accent/10 p-3">
             <Star className="size-4 text-accent" />
-            <p className="text-xs text-primary-foreground/90 sm:text-sm">
+            <p className="text-xs text-white/90 sm:text-sm">
               Join 200+ active members training at Ravenhall weekly.
             </p>
           </div>
