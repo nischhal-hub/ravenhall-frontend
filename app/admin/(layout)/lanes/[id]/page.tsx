@@ -55,7 +55,7 @@ export default function LaneDetail() {
 
       <Card className="overflow-hidden py-0">
         {/* HEADER */}
-        <div className="relative h-64 bg-gradient-to-br from-primary to-secondary">
+        <div className="relative h-64 bg-linear-to-br from-primary to-secondary">
           {lane.imageUrl ? (
             <img
               src={lane.imageUrl}

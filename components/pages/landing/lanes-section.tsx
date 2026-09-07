@@ -27,7 +27,7 @@ export function LanesSection() {
     if (data?.data) {
       const lanesWithImages = data.data.lanes.map((lane, index) => ({
         ...lane,
-        image: fallbackImages[index % fallbackImages.length],
+        image: lane.imageUrl || fallbackImages[index % fallbackImages.length],
         imageAlt: `${lane.name || "Cricket Lane"} - Professional Indoor Lane`,
         badge: "INDOOR",
       }))

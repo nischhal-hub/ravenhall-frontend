@@ -26,12 +26,13 @@ export function BookingSummaryCard({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="relative h-36 bg-gradient-to-br from-primary to-secondary">
+      <div className="relative h-36 bg-linear-to-br from-primary to-secondary">
         {lane.imageUrl ? (
           <Image
             src={lane.imageUrl}
             alt={lane.name}
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/60 p-4">

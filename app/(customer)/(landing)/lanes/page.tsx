@@ -74,7 +74,7 @@ function LaneCard({ lane, index }: { lane: Lane; index: number }) {
   const typeKey = (lane.type ?? "GENERAL").toUpperCase()
   const typeColor = TYPE_COLOR[typeKey] ?? TYPE_COLOR.GENERAL
 
-  const image = lane.image ?? fallbackImages[index % fallbackImages.length]
+  const image = lane.imageUrl || fallbackImages[index % fallbackImages.length]
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg">
