@@ -52,10 +52,6 @@ export default function EditBookingStatus({
         onSubmit={form.handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-md space-y-6 p-2"
       >
-        <h2 className="text-center text-2xl font-bold">
-          Update Booking Status
-        </h2>
-
         <FormField
           control={form.control}
           name="status"

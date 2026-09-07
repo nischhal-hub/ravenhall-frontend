@@ -7,14 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { BookingStatusBadge } from "@/components/reusable/status-badge"
+import PageHeader from "@/components/ui/page-header"
 import { CheckCircle, Bell, Zap, Calendar, ArrowLeft } from "lucide-react"
 import {
   useProfileQuery,
   useProfilesQuery,
 } from "@/services/queries/user.query"
 import { useRouter } from "next/navigation"
+import { formatCurrency } from "@/lib/utils"
 
 function formatDate(dateString?: string) {
   if (!dateString) return "N/A"
@@ -25,9 +29,17 @@ function formatDate(dateString?: string) {
   })
 }
 
-function formatCurrency(amount?: number) {
-  if (amount == null) return "Rs0"
-  return `Rs${amount.toLocaleString()}`
+function PageSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+      <Skeleton className="h-8 w-64" />
+      <div className="grid gap-6 md:grid-cols-2">
+        <Skeleton className="h-48 w-full rounded-lg" />
+        <Skeleton className="h-48 w-full rounded-lg" />
+      </div>
+      <Skeleton className="h-64 w-full rounded-lg" />
+    </div>
+  )
 }
 
 export default function ProfilePage() {
@@ -36,18 +48,14 @@ export default function ProfilePage() {
 
   const user = response?.data
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Loading profile...
-      </div>
-    )
-  }
+  if (isLoading) return <PageSkeleton />
 
   if (error || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-red-500">
-        Failed to load profile
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load profile.</AlertDescription>
+        </Alert>
       </div>
     )
   }
@@ -64,27 +72,20 @@ export default function ProfilePage() {
   } = user
 
   return (
-    <main className="min-h-screen bg-background pb-12">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => router.back()}
-          className="mb-6 flex items-center gap-2 text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-5 w-5" />
-          Back
-        </Button>
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        Back
+      </Button>
 
-        {/* Header */}
-        <div className="mb-8 space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">
-            {firstName} {lastName}
-          </h1>
-          <p className="text-muted-foreground">{email}</p>
-        </div>
+      <PageHeader size="lg" title={`${firstName} ${lastName}`} description={email} />
 
-        {/* Personal Info & Membership */}
+      {/* Personal Info & Membership */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Personal Information */}
           <Card>
@@ -186,15 +187,7 @@ export default function ProfilePage() {
                           {formatCurrency(booking.finalAmount)}
                         </p>
                       </div>
-                      <Badge
-                        variant={
-                          booking.status === "CONFIRMED"
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
-                        {booking.status}
-                      </Badge>
+                      <BookingStatusBadge status={booking.status} />
                     </div>
                   </div>
                 ))}
@@ -237,7 +230,6 @@ export default function ProfilePage() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </main>
+    </div>
   )
 }

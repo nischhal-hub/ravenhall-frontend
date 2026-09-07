@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useModalContext } from "@/components/context/modal-context"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import PageHeader from "@/components/ui/page-header"
 import { useState } from "react"
 import { useSlots } from "@/services/queries/slot.query"
 import { getslotColumns } from "./column"
@@ -33,29 +34,37 @@ export default function SlotTable() {
   if (error) {
     return (
       <Alert variant="destructive">
-        <AlertDescription>Failed to load slots</AlertDescription>
+        <AlertDescription>
+          Failed to load slots. Please try again.
+        </AlertDescription>
+        <Button onClick={handleRefresh} className="mt-3" variant="outline">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Retry
+        </Button>
       </Alert>
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Time Slots</h1>
+      <PageHeader
+        size="lg"
+        title="Time Slots"
+        description="View and manage lane time slot availability"
+        actions={
+          <>
+            <Button onClick={handleRefresh} size="sm" variant="outline">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Refresh
+            </Button>
 
-        <div className="flex gap-2">
-          <Button onClick={handleRefresh} size="sm" variant="outline">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-
-          {/* <Button onClick={() => openModal({ key: "ADD_SLOT" })}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Slot
-          </Button> */}
-        </div>
-      </div>
+            {/* <Button onClick={() => openModal({ key: "ADD_SLOT" })}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Slot
+            </Button> */}
+          </>
+        }
+      />
 
       {/* Table with ServerFilterDataTable */}
       <Card className="p-6">

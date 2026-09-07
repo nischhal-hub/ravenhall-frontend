@@ -1,5 +1,5 @@
 import React from "react"
-import MembershipPlansPage from "./tablet"
+import MembershipPlansPage from "./table"
 
 const Page = () => {
   return <MembershipPlansPage />

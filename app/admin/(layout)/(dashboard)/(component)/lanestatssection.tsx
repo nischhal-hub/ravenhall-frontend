@@ -1,5 +1,6 @@
 "use client"
 
+import { formatCurrency } from "@/lib/utils"
 import {
   BarChart,
   Bar,
@@ -50,7 +51,7 @@ const CustomBarTooltip = ({ active, payload }: any) => {
       <p className="text-xs text-muted-foreground">
         Revenue:{" "}
         <span className="font-semibold text-foreground">
-          ${d.revenue.toLocaleString()}
+          {formatCurrency(d.revenue)}
         </span>
       </p>
     </div>
@@ -62,8 +63,6 @@ export function LaneStatsSection({ lanes, laneStats }: Props) {
     name: type,
     value: count,
   }))
-  console.log("LaneStatsSection render", { lanes, laneStats, pieData })
-
   const shortName = (name: string) =>
     name.replace("Lane ", "L").replace(" —", "")
 

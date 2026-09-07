@@ -21,10 +21,13 @@ import {
 import { Button } from "../ui/button"
 import { useState } from "react"
 import { Input } from "../ui/input"
+import { Skeleton } from "../ui/skeleton"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  isLoading?: boolean
   functions?: {
     search?: {
       name?: string
@@ -36,9 +39,20 @@ interface DataTableProps<TData, TValue> {
   }
 }
 
+const TableSkeletonRow = ({ columns }: { columns: unknown[] }) => (
+  <TableRow>
+    {columns.map((_, i) => (
+      <TableCell key={i} className="py-4">
+        <Skeleton className="h-5 w-full max-w-45 rounded" />
+      </TableCell>
+    ))}
+  </TableRow>
+)
+
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false,
   functions,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -84,55 +98,77 @@ export function DataTable<TData, TValue>({
         </div>
         {functions && functions.add && functions.add.node}
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+      <div className="overflow-hidden rounded-xl border border-none bg-card shadow-none">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-muted/40">
+              {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  key={headerGroup.id}
+                  className="border-b hover:bg-muted/50"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className="h-12 px-4 text-left text-sm font-semibold whitespace-nowrap text-foreground/90"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableSkeletonRow key={i} columns={columns} />
+                ))
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row, i) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className={cn(
+                      "border-b transition-colors last:border-0",
+                      i % 2 === 0 ? "bg-background" : "bg-muted/20",
+                      "hover:bg-muted/60"
+                    )}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="px-4 py-4 text-sm">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-48 text-center text-muted-foreground"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <p className="text-lg font-medium">No results found</p>
+                      <p className="text-sm">
+                        Try adjusting your search or filters
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex-1 text-sm text-muted-foreground">

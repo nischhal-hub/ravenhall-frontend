@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import { Form, FormField } from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -94,90 +94,78 @@ export default function CreateDiscountCodeForm() {
           </div>
 
           {/* Valid From */}
-          <div>
-            <label className="mb-2 block text-sm">
-              Valid From <span className="text-red-600">*</span>
-            </label>
-            <FormField
-              control={form.control}
-              name="validFrom"
-              render={({ field }) => (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value
-                        ? format(new Date(field.value), "PPP")
-                        : "Pick start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) =>
-                        field.onChange(date?.toISOString().split("T")[0])
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
-              )}
-            />
-            {form.formState.errors.validFrom && (
-              <p className="mt-1 text-[10px] text-red-600">
-                {form.formState.errors.validFrom.message}
-              </p>
+          <FormInput
+            form={form}
+            name="validFrom"
+            label="Valid From"
+            required
+            render={(field) => (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {field.value
+                      ? format(new Date(field.value as string), "PPP")
+                      : "Pick start date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      field.value ? new Date(field.value as string) : undefined
+                    }
+                    onSelect={(date) =>
+                      field.onChange(date?.toISOString().split("T")[0])
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
             )}
-          </div>
+          />
 
           {/* Valid To */}
-          <div>
-            <label className="mb-2 block text-sm">
-              Valid To <span className="text-red-600">*</span>
-            </label>
-            <FormField
-              control={form.control}
-              name="validTo"
-              render={({ field }) => (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value
-                        ? format(new Date(field.value), "PPP")
-                        : "Pick end date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) =>
-                        field.onChange(date?.toISOString().split("T")[0])
-                      }
-                    />
-                  </PopoverContent>
-                </Popover>
-              )}
-            />
-            {form.formState.errors.validTo && (
-              <p className="mt-1 text-[10px] text-red-600">
-                {form.formState.errors.validTo.message}
-              </p>
+          <FormInput
+            form={form}
+            name="validTo"
+            label="Valid To"
+            required
+            render={(field) => (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {field.value
+                      ? format(new Date(field.value as string), "PPP")
+                      : "Pick end date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={
+                      field.value ? new Date(field.value as string) : undefined
+                    }
+                    onSelect={(date) =>
+                      field.onChange(date?.toISOString().split("T")[0])
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
             )}
-          </div>
+          />
         </div>
 
         <Button type="submit" className="w-full" disabled={mutation.isPending}>

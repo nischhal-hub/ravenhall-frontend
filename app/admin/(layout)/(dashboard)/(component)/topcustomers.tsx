@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { formatCurrency } from "@/lib/utils"
 import type { CustomerSummary } from "@/types/dashboard-response"
 import { Trophy } from "lucide-react"
 
@@ -88,7 +89,7 @@ export function TopCustomers({ customers }: Props) {
               {/* Stats */}
               <div className="flex flex-col items-end gap-0.5">
                 <span className="text-sm font-bold text-foreground tabular-nums">
-                  ${c.totalSpent.toLocaleString("en-AU")}
+                  {formatCurrency(c.totalSpent)}
                 </span>
                 <Badge variant="secondary" className="text-[10px]">
                   {c.bookings} booking{c.bookings !== 1 ? "s" : ""}

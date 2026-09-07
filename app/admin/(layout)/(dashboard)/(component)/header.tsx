@@ -1,6 +1,7 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import PageHeader from "@/components/ui/page-header"
 import { Activity } from "lucide-react"
 
 interface Props {
@@ -19,30 +20,26 @@ export function DashboardHeader({ lastUpdated }: Props) {
     : null
 
   return (
-    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight text-foreground">
-          Dashboard
-        </h1>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          Ravenhall Cricket Centre · Admin overview
-        </p>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Badge
-          variant="outline"
-          className="gap-1.5 border-chart-3 text-chart-3"
-        >
-          <Activity className="h-3 w-3 animate-pulse" />
-          Live
-        </Badge>
-        {formatted && (
-          <span className="text-xs text-muted-foreground">
-            Updated {formatted}
-          </span>
-        )}
-      </div>
-    </div>
+    <PageHeader
+      size="lg"
+      title="Dashboard"
+      description="Ravenhall Cricket Centre · Admin overview"
+      actions={
+        <>
+          <Badge
+            variant="outline"
+            className="gap-1.5 border-chart-3 text-chart-3"
+          >
+            <Activity className="h-3 w-3 animate-pulse" />
+            Live
+          </Badge>
+          {formatted && (
+            <span className="text-xs text-muted-foreground">
+              Updated {formatted}
+            </span>
+          )}
+        </>
+      }
+    />
   )
 }

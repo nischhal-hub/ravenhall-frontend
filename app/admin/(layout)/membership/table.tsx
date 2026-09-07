@@ -1,19 +1,23 @@
 "use client"
 
-import { Plus, RefreshCw } from "lucide-react"
+import { RefreshCw, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import PageHeader from "@/components/ui/page-header"
 import { DataTable } from "@/components/reusable/data-table"
-import { useModalContext } from "@/components/context/modal-context"
-import { useDiscountsQuery } from "@/services/queries/discount.query"
-import { getDiscountColumns } from "./column"
+import { useMembershipPlansQuery } from "@/services/queries/membership.query"
+import { getMembershipColumns } from "./column"
 
-export default function DiscountsPage() {
-  const { openModal } = useModalContext()
-  const { data, isLoading, error, refetch, isRefetching } = useDiscountsQuery()
+export default function MembershipPlansPage() {
+  const { data, isLoading, error, refetch, isRefetching } =
+    useMembershipPlansQuery()
 
-  const discounts = data?.data || []
+  const plans = data?.data || []
 
   const handleRefresh = async () => {
     await refetch()
@@ -23,7 +27,7 @@ export default function DiscountsPage() {
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          Failed to load discounts. Please try again.
+          Failed to load membership plans. Please try again.
         </AlertDescription>
         <Button onClick={handleRefresh} className="mt-3" variant="outline">
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -37,8 +41,8 @@ export default function DiscountsPage() {
     <div className="space-y-6">
       <PageHeader
         size="lg"
-        title="Discount Codes"
-        description="Manage promotional and staff discount codes"
+        title="Membership Plans"
+        description="Configure available membership tiers and benefits"
         actions={
           <>
             <Button
@@ -53,23 +57,30 @@ export default function DiscountsPage() {
               Refresh
             </Button>
 
-            <Button onClick={() => openModal({ key: "ADD_DISCOUNT" })}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Discount
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button disabled>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Plan
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
           </>
         }
       />
 
       {/* Table */}
       <DataTable
-        columns={getDiscountColumns()}
-        data={discounts}
+        columns={getMembershipColumns()}
+        data={plans}
         isLoading={isLoading}
         functions={{
           search: {
-            name: "code",
-            placeholder: "Search discount codes...",
+            name: "plan",
+            placeholder: "Search membership plans...",
           },
         }}
       />

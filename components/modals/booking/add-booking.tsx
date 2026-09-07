@@ -4,15 +4,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import {
   Select,
   SelectContent,
@@ -36,6 +28,7 @@ import { z } from "zod"
 import { useLaneQuery } from "@/services/queries/lane.query"
 import { useSlots } from "@/services/queries/slot.query"
 import { useCreateBookingMutation } from "@/services/mutations/booking.mutations"
+import FormInput from "@/components/reusable/form-input"
 
 // Simple schema - only lane and slot
 const bookingSchema = z.object({
@@ -104,10 +97,10 @@ export default function CreateAdminBooking() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6 rounded-lg">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold">Create New Booking</h2>
-        <p className="text-slate-600 dark:text-slate-400">
+    <div className="mx-auto w-full max-w-md space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold">Create New Booking</h2>
+        <p className="text-sm text-muted-foreground">
           Select a lane, choose a date and time slot
         </p>
       </div>
@@ -115,20 +108,20 @@ export default function CreateAdminBooking() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* LANE SELECTION */}
-          <FormField
-            control={form.control}
+          <FormInput
+            form={form}
             name="laneId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base font-semibold">
-                  Select Lane *
-                </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="h-11">
-                      <SelectValue placeholder="Choose a lane" />
-                    </SelectTrigger>
-                  </FormControl>
+            label="Select Lane"
+            required
+            render={(field) => (
+              <div className="space-y-1.5">
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value as string}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a lane" />
+                  </SelectTrigger>
                   <SelectContent>
                     {lanesLoading ? (
                       <SelectItem value="loading" disabled>
@@ -150,23 +143,26 @@ export default function CreateAdminBooking() {
                     )}
                   </SelectContent>
                 </Select>
-                <FormDescription>Choose which lane to book</FormDescription>
-                <FormMessage />
-              </FormItem>
+                <p className="text-xs text-muted-foreground">
+                  Choose which lane to book
+                </p>
+              </div>
             )}
           />
 
           {/* DATE SELECTION */}
           {selectedLaneId && (
-            <div className="space-y-2">
-              <label className="text-base font-semibold">Select Date *</label>
+            <div>
+              <label className="mb-1 block text-xs capitalize">
+                Select Date <span className="text-xs text-destructive">*</span>
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "h-11 w-full justify-start text-left font-normal",
-                      !selectedDate && "text-slate-500"
+                      "w-full justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -187,20 +183,20 @@ export default function CreateAdminBooking() {
 
           {/* SLOT SELECTION */}
           {selectedLaneId && selectedDate && (
-            <FormField
-              control={form.control}
+            <FormInput
+              form={form}
               name="slotId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-base font-semibold">
-                    Select Time Slot *
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Choose a time slot" />
-                      </SelectTrigger>
-                    </FormControl>
+              label="Select Time Slot"
+              required
+              render={(field) => (
+                <div className="space-y-1.5">
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value as string}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a time slot" />
+                    </SelectTrigger>
                     <SelectContent>
                       {slotsLoading ? (
                         <SelectItem value="loading" disabled>
@@ -232,12 +228,11 @@ export default function CreateAdminBooking() {
                       )}
                     </SelectContent>
                   </Select>
-                  <FormDescription>
+                  <p className="text-xs text-muted-foreground">
                     Showing available slots for{" "}
                     {selectedDate && format(selectedDate, "MMM dd, yyyy")}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+                  </p>
+                </div>
               )}
             />
           )}

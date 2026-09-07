@@ -5,6 +5,14 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { updateLaneSchema } from "@/schemas/lane"
 import FormInput from "@/components/reusable/form-input"
@@ -51,11 +59,30 @@ export default function EditLane({
         onSubmit={form.handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-md space-y-6 p-2"
       >
-        <h2 className="text-center text-2xl font-bold">Edit Lane</h2>
-
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormInput form={form} name="name" label="Lane Name" required />
-          <FormInput form={form} name="type" label="Lane Type" required />
+
+          <FormInput
+            form={form}
+            name="type"
+            label="Lane Type"
+            required
+            render={(field) => (
+              <Select
+                onValueChange={(value: string) => field.onChange(value)}
+                defaultValue={field.value as string}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select lane type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GENERAL">GENERAL</SelectItem>
+                  <SelectItem value="BATTING">BATTING</SelectItem>
+                  <SelectItem value="BOWLING">BOWLING</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
 
           <FormInput
             form={form}
@@ -112,11 +139,9 @@ export default function EditLane({
               name="isActive"
               label="Active"
               render={(field) => (
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={field.value as boolean}
-                  onChange={field.onChange}
-                  className="h-5 w-5"
+                  onCheckedChange={field.onChange}
                 />
               )}
             />

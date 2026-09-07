@@ -1,5 +1,6 @@
 "use client"
 
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useDashboardQuery } from "@/services/queries/dashboard.query"
 import { BookingStatusBreakdown } from "./(component)/bookingstatusbreakdown"
 import { DashboardHeader } from "./(component)/header"
@@ -15,48 +16,43 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Loading Dashboard...</div>
+      <div className="flex h-96 items-center justify-center text-muted-foreground">
+        Loading dashboard...
       </div>
     )
   }
 
   if (error || !data) {
     return (
-      <div className="flex h-screen items-center justify-center text-red-500">
-        Failed to load dashboard data
-      </div>
+      <Alert variant="destructive">
+        <AlertDescription>Failed to load dashboard data.</AlertDescription>
+      </Alert>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-screen-2xl space-y-6">
-        {/* Header */}
-        <DashboardHeader lastUpdated={new Date()} />
+    <div className="mx-auto max-w-screen-2xl space-y-6">
+      {/* Header */}
+      <DashboardHeader lastUpdated={new Date()} />
 
-        {/* KPI Stats Cards */}
-        <StatsCards
-          userStats={data.userStats}
-          bookingStats={data.bookingStats}
-        />
+      {/* KPI Stats Cards */}
+      <StatsCards userStats={data.userStats} bookingStats={data.bookingStats} />
 
-        {/* Revenue Chart */}
-        <RevenueChart data={data.revenueTimeline} />
+      {/* Revenue Chart */}
+      <RevenueChart data={data.revenueTimeline} />
 
-        {/* Lane Performance */}
-        <LaneStatsSection
-          lanes={data.mostBookedLanes}
-          laneStats={data.laneStats}
-        />
+      {/* Lane Performance */}
+      <LaneStatsSection
+        lanes={data.mostBookedLanes}
+        laneStats={data.laneStats}
+      />
 
-        {/* Bottom Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <UserStatsSection stats={data.userStats} />
-          <MembershipStatsSection stats={data.membershipStats} />
-          <BookingStatusBreakdown stats={data.bookingStats} />
-          <TopCustomers customers={data.topCustomers} />
-        </div>
+      {/* Bottom Grid */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <UserStatsSection stats={data.userStats} />
+        <MembershipStatsSection stats={data.membershipStats} />
+        <BookingStatusBreakdown stats={data.bookingStats} />
+        <TopCustomers customers={data.topCustomers} />
       </div>
     </div>
   )

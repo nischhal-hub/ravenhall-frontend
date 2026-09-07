@@ -12,6 +12,7 @@ export type _ModalProps<T extends object = object> = {
 export type TModalValues<T extends object = object> = {
   title: string
   component: React.FC<_ModalProps<T>>
+  contentClassName?: string
 }
 
 export type TSheetValues<T extends object = object> = {

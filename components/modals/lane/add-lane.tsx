@@ -48,8 +48,6 @@ export default function AddLane({}: _ModalProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-md space-y-6 p-2"
       >
-        <h2 className="text-center text-2xl font-bold">Add New Lane</h2>
-
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormInput form={form} name="name" label="Lane Name" required />
 

@@ -21,6 +21,7 @@ export type TModalKeys =
 export type TModalValues<T extends object = object> = {
   title: string
   component: FC<_ModalProps<T>>
+  contentClassName?: string
 }
 
 export const MODAL_DATA: Record<TModalKeys, TModalValues> = {
@@ -32,24 +33,29 @@ export const MODAL_DATA: Record<TModalKeys, TModalValues> = {
   ADD_DISCOUNT: {
     title: "Add Discount",
     component: CreateDiscountCodeForm,
+    contentClassName: "sm:max-w-lg",
   },
   EDIT_DISCOUNT: {
     title: "Edit Discount",
     // @ts-expect-error component type not properly defined
     component: EditDiscount,
+    contentClassName: "sm:max-w-lg",
   },
   ADD_LANE: {
     title: "Add Lane",
     component:  AddLane ,
+    contentClassName: "sm:max-w-lg",
   },
   EDIT_LANE: {
     title: "Edit Lane",
     // @ts-expect-error component type not properly defined
     component: EditLane,
+    contentClassName: "sm:max-w-lg",
   },
   ADD_BOOKING: {
     title: "Add Booking",
     component: CreateBookingForm,
+    contentClassName: "sm:max-w-lg",
   },
   EDIT_BOOKING_STATUS: {
     title: "Edit Booking Status",

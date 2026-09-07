@@ -1,8 +1,17 @@
 "use client"
 
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import PageHeader from "@/components/ui/page-header"
 import { useRevenueReport } from "@/services/queries/revenue.query"
 import { RevenueChart } from "./chart"
+
+const GROUP_BY_OPTIONS = [
+  { value: "day", label: "Day" },
+  { value: "week", label: "Week" },
+  { value: "month", label: "Month" },
+] as const
 
 export default function RevenueReportPage() {
   const [groupBy, setGroupBy] = useState<"day" | "week" | "month">("month")
@@ -11,48 +20,38 @@ export default function RevenueReportPage() {
     groupBy,
   })
 
-  if (isLoading) return <p>Loading...</p>
-  if (error) return <p>Failed to load revenue report</p>
-
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Revenue Report</h1>
-        <p className="text-muted-foreground">Revenue performance overview</p>
-      </div>
+      <PageHeader
+        size="lg"
+        title="Revenue Report"
+        description="Revenue performance overview"
+      />
 
-      {/* 🔥 FILTER BUTTONS */}
       <div className="flex gap-3">
-        <button
-          onClick={() => setGroupBy("day")}
-          className={`rounded-md border px-4 py-2 ${
-            groupBy === "day" ? "bg-black text-white" : ""
-          }`}
-        >
-          Day
-        </button>
-
-        <button
-          onClick={() => setGroupBy("week")}
-          className={`rounded-md border px-4 py-2 ${
-            groupBy === "week" ? "bg-black text-white" : ""
-          }`}
-        >
-          Week
-        </button>
-
-        <button
-          onClick={() => setGroupBy("month")}
-          className={`rounded-md border px-4 py-2 ${
-            groupBy === "month" ? "bg-black text-white" : ""
-          }`}
-        >
-          Month
-        </button>
+        {GROUP_BY_OPTIONS.map((option) => (
+          <Button
+            key={option.value}
+            variant={groupBy === option.value ? "default" : "outline"}
+            onClick={() => setGroupBy(option.value)}
+          >
+            {option.label}
+          </Button>
+        ))}
       </div>
 
-      {/* Chart */}
+      {isLoading && (
+        <div className="flex h-48 items-center justify-center text-muted-foreground">
+          Loading report...
+        </div>
+      )}
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load revenue report.</AlertDescription>
+        </Alert>
+      )}
+
       {data?.data?.data && <RevenueChart data={data.data.data} />}
     </div>
   )
