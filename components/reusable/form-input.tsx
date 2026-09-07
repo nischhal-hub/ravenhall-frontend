@@ -50,7 +50,7 @@ export default function FormInput<T extends FieldValues>({
     <div className={className}>
       {label && (
         <FormLabel className="mb-1 block text-xs capitalize">
-          {label} {required && <span className="text-xs text-red-600">*</span>}
+          {label} {required && <span className="text-xs text-destructive">*</span>}
         </FormLabel>
       )}
 

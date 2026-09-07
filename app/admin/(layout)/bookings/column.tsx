@@ -3,16 +3,9 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown, Eye } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
 import { ActionButton } from "@/components/reusable/action-btn"
+import { BookingStatusBadge } from "@/components/reusable/status-badge"
 import { Booking } from "@/types/booking-response.types"
-
-const statusConfig = {
-  CONFIRMED: { label: "Confirmed", variant: "default" as const },
-  PENDING: { label: "Pending", variant: "secondary" as const },
-  CANCELLED: { label: "Cancelled", variant: "destructive" as const },
-  COMPLETED: { label: "Completed", variant: "outline" as const },
-}
 
 export function getBookingColumns(): ColumnDef<Booking>[] {
   return [
@@ -87,19 +80,7 @@ export function getBookingColumns(): ColumnDef<Booking>[] {
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => {
-        const status = row.original.status
-        const config = statusConfig[status as keyof typeof statusConfig] || {
-          label: status,
-          variant: "secondary" as const,
-        }
-
-        return (
-          <Badge variant={config.variant} className="capitalize">
-            {config.label}
-          </Badge>
-        )
-      },
+      cell: ({ row }) => <BookingStatusBadge status={row.original.status} />,
     },
     {
       accessorKey: "createdAt",

@@ -86,7 +86,7 @@ function ReusableSidebarMenu({ items }: { items: ReusableSidebarItem[] }) {
               tooltip={item.label}
               className={cn(
                 isActive(item.href, item.isActive) &&
-                  "bg-primary text-white hover:bg-primary/90 hover:text-white"
+                  "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
               )}
             >
               {item.href ? (

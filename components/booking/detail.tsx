@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import PageHeader from "@/components/ui/page-header"
+import { BOOKING_STATUS_CONFIG } from "@/components/reusable/status-badge"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -126,40 +128,32 @@ interface BookingDetailPageProps {
 
 const BOOKING_STATUSES = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"]
 
+const STATUS_ICON: Record<string, React.ElementType> = {
+  CONFIRMED: CheckCircle2,
+  CANCELLED: XCircle,
+  COMPLETED: Activity,
+  PENDING: Timer,
+}
+
+const STATUS_BAR_COLOR: Record<string, string> = {
+  default: "bg-primary",
+  secondary: "bg-secondary",
+  destructive: "bg-destructive",
+  outline: "bg-foreground",
+}
+
 function statusConfig(status: string) {
-  switch (status.toUpperCase()) {
-    case "CONFIRMED":
-      return {
-        label: "Confirmed",
-        icon: CheckCircle2,
-        className:
-          "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-800",
-        bar: "bg-emerald-500",
-      }
-    case "CANCELLED":
-      return {
-        label: "Cancelled",
-        icon: XCircle,
-        className:
-          "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950 dark:text-rose-400 dark:border-rose-800",
-        bar: "bg-rose-500",
-      }
-    case "COMPLETED":
-      return {
-        label: "Completed",
-        icon: Activity,
-        className:
-          "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800",
-        bar: "bg-blue-500",
-      }
-    default:
-      return {
-        label: "Pending",
-        icon: Timer,
-        className:
-          "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-800",
-        bar: "bg-amber-500",
-      }
+  const key = status.toUpperCase()
+  const config = BOOKING_STATUS_CONFIG[key as keyof typeof BOOKING_STATUS_CONFIG] || {
+    label: status,
+    variant: "secondary" as const,
+  }
+
+  return {
+    label: config.label,
+    variant: config.variant,
+    icon: STATUS_ICON[key] || Timer,
+    bar: STATUS_BAR_COLOR[config.variant],
   }
 }
 
@@ -401,30 +395,29 @@ export function BookingDetailPage({
       </div>
 
       {/* ── Page body ── */}
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         {/* ── Hero header ── */}
         <div className="mb-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Booking Detail
-              </h1>
-              <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                <Hash className="h-3.5 w-3.5" />
-                <span className="font-mono font-semibold">
-                  {booking.bookingRef}
-                </span>
-                <span>·</span>
-                <span>Created {formatDateTime(booking.createdAt)}</span>
-              </div>
-            </div>
-            <Badge
-              variant="outline"
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium ${statusCfg.className}`}
-            >
-              <StatusIcon className="h-3.5 w-3.5" />
-              {statusCfg.label}
-            </Badge>
+          <PageHeader
+            size="lg"
+            title="Booking Detail"
+            actions={
+              <Badge
+                variant={statusCfg.variant}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
+              >
+                <StatusIcon className="h-3.5 w-3.5" />
+                {statusCfg.label}
+              </Badge>
+            }
+          />
+          <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+            <Hash className="h-3.5 w-3.5" />
+            <span className="font-mono font-semibold">
+              {booking.bookingRef}
+            </span>
+            <span>·</span>
+            <span>Created {formatDateTime(booking.createdAt)}</span>
           </div>
 
           {/* Status progress bar */}

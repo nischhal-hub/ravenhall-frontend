@@ -1,9 +1,18 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { updateLaneSchema } from "@/schemas/lane"
 import FormInput from "@/components/reusable/form-input"
@@ -16,6 +25,9 @@ export default function EditLane({
 }: _ModalProps<TModalDataMap["EDIT_LANE"]>) {
   const { mutate: updateLane, isPending } = useUpdateLaneMutation()
   const { closeModal } = useModalContext()
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    data?.imageUrl || null
+  )
 
   const form = useForm({
     resolver: zodResolver(updateLaneSchema),
@@ -25,7 +37,7 @@ export default function EditLane({
       description: data?.description || "",
       capacity: data?.capacity || 1,
       hourlyRate: data?.hourlyRate || 0,
-      imageUrl: data?.imageUrl || "",
+      image: undefined,
       isActive: data?.isActive ?? true,
     },
   })
@@ -47,11 +59,30 @@ export default function EditLane({
         onSubmit={form.handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-md space-y-6 p-2"
       >
-        <h2 className="text-center text-2xl font-bold">Edit Lane</h2>
-
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <FormInput form={form} name="name" label="Lane Name" required />
-          <FormInput form={form} name="type" label="Lane Type" required />
+
+          <FormInput
+            form={form}
+            name="type"
+            label="Lane Type"
+            required
+            render={(field) => (
+              <Select
+                onValueChange={(value: string) => field.onChange(value)}
+                defaultValue={field.value as string}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select lane type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="GENERAL">GENERAL</SelectItem>
+                  <SelectItem value="BATTING">BATTING</SelectItem>
+                  <SelectItem value="BOWLING">BOWLING</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
 
           <FormInput
             form={form}
@@ -75,9 +106,30 @@ export default function EditLane({
           <div className="md:col-span-2">
             <FormInput
               form={form}
-              name="imageUrl"
-              label="Image URL"
-              type="url"
+              name="image"
+              label="Lane Image"
+              render={(field) => (
+                <div className="space-y-2">
+                  {imagePreview && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-24 w-40 rounded-md object-cover"
+                    />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      field.onChange(file)
+                      if (file) setImagePreview(URL.createObjectURL(file))
+                    }}
+                    className="block w-full text-sm"
+                  />
+                </div>
+              )}
             />
           </div>
 
@@ -87,11 +139,9 @@ export default function EditLane({
               name="isActive"
               label="Active"
               render={(field) => (
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={field.value as boolean}
-                  onChange={field.onChange}
-                  className="h-5 w-5"
+                  onCheckedChange={field.onChange}
                 />
               )}
             />

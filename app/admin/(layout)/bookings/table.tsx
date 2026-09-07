@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useModalContext } from "@/components/context/modal-context"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import PageHeader from "@/components/ui/page-header"
 import { useState } from "react"
 import { getBookingColumns } from "./column"
 import { useBookingsQuery } from "@/services/queries/bookings.query"
@@ -46,34 +47,31 @@ export default function BookingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">Bookings</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage all customer bookings and sessions
-          </p>
-        </div>
+      <PageHeader
+        size="lg"
+        title="Bookings"
+        description="Manage all customer bookings and sessions"
+        actions={
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefetching}
+            >
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${isRefetching ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefetching}
-          >
-            <RefreshCw
-              className={`mr-2 h-4 w-4 ${isRefetching ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
-
-          <Button onClick={() => openModal({ key: "ADD_BOOKING" })}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Booking
-          </Button>
-        </div>
-      </div>
+            <Button onClick={() => openModal({ key: "ADD_BOOKING" })}>
+              <Plus className="mr-2 h-4 w-4" />
+              New Booking
+            </Button>
+          </>
+        }
+      />
 
       {/* Table */}
       <Card className="p-6">

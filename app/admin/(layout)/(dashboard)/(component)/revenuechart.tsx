@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatCurrency } from "@/lib/utils"
 import {
   Line,
   XAxis,
@@ -96,7 +97,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
           <p className="mt-1 text-sm text-muted-foreground">
             Total Revenue:{" "}
             <span className="font-semibold text-foreground">
-              ${totalRevenue.toLocaleString()}
+              {formatCurrency(totalRevenue)}
             </span>
           </p>
         </div>
@@ -127,12 +128,20 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
             >
               <defs>
                 <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1e3a5f" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#1e3a5f" stopOpacity={0} />
+                  <stop
+                    offset="5%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0.35}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="var(--chart-1)"
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="date" tick={{ fontSize: 12 }} />
               <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12 }} />
 
@@ -143,7 +152,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
                 type="monotone"
                 dataKey="revenue"
                 name="Revenue"
-                stroke="#1e3a5f"
+                stroke="var(--chart-1)"
                 fill="url(#colorRevenue)"
                 strokeWidth={3}
               />
@@ -152,7 +161,7 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
                 type="monotone"
                 dataKey="trend"
                 name="3-Period Trend"
-                stroke="#22c55e"
+                stroke="var(--chart-3)"
                 strokeWidth={2.5}
                 strokeDasharray="6 3"
                 dot={false}

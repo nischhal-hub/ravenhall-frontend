@@ -1,62 +1,61 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Clock, Users, CheckCircle, XCircle, Calendar } from "lucide-react"
+import { useParams } from "next/navigation"
+import { Clock, Users, Calendar } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ActiveBadge } from "@/components/reusable/status-badge"
+import PageHeader from "@/components/ui/page-header"
+import { useLaneByIdQuery } from "@/services/queries/lane.query"
 
-interface Lane {
-  id: string
-  name: string
-  type: string
-  description: string | null
-  capacity: number
-  hourlyRate: number
-  imageUrl: string | null
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
+function PageSkeleton() {
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Skeleton className="h-8 w-64" />
+      <Card className="overflow-hidden py-0">
+        <Skeleton className="h-64 w-full rounded-none" />
+        <CardContent className="space-y-6 px-8 py-8">
+          <Skeleton className="h-8 w-1/2" />
+          <Skeleton className="h-4 w-full" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-20 w-full rounded-2xl" />
+            <Skeleton className="h-20 w-full rounded-2xl" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
 
 export default function LaneDetail() {
-  const [lane, setLane] = useState<Lane | null>(null)
-  const [loading, setLoading] = useState(true)
+  const params = useParams()
+  const id = params?.id as string
 
-  useEffect(() => {
-    const fetchLane = async () => {
-      const mockData: Lane = {
-        id: "1",
-        name: "Lane 1 — Batting",
-        type: "BATTING",
-        description: null,
-        capacity: 6,
-        hourlyRate: 45,
-        imageUrl: null,
-        isActive: true,
-        createdAt: "2026-05-09T15:12:43.143Z",
-        updatedAt: "2026-05-09T15:12:43.143Z",
-      }
+  const { data, isLoading, isError } = useLaneByIdQuery(id)
+  const lane = data?.data
 
-      setLane(mockData)
-      setLoading(false)
-    }
+  if (isLoading) return <PageSkeleton />
 
-    fetchLane()
-  }, [])
-
-  if (loading) {
+  if (isError || !lane) {
     return (
-      <div className="flex h-96 items-center justify-center text-muted-foreground">
-        Loading lane details...
+      <div className="mx-auto max-w-4xl">
+        <Alert variant="destructive">
+          <AlertDescription>Lane not found.</AlertDescription>
+        </Alert>
       </div>
     )
   }
 
-  if (!lane) return <div>Lane not found</div>
-
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <div className="overflow-hidden rounded-3xl bg-card shadow-xl">
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader size="lg" title={lane.name} description={lane.type} />
+
+      <Card className="overflow-hidden py-0">
         {/* HEADER */}
-        <div className="relative h-80 bg-gradient-to-br from-primary to-secondary">
+        <div className="relative h-64 bg-gradient-to-br from-primary to-secondary">
           {lane.imageUrl ? (
             <img
               src={lane.imageUrl}
@@ -70,7 +69,7 @@ export default function LaneDetail() {
                   🏏
                 </div>
                 <p className="text-lg font-medium text-white/90">
-                  Batting Lane
+                  {lane.type}
                 </p>
               </div>
             </div>
@@ -78,37 +77,22 @@ export default function LaneDetail() {
 
           {/* STATUS */}
           <div className="absolute top-6 right-6">
-            <div
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
-                lane.isActive
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-destructive text-white"
-              }`}
-            >
-              {lane.isActive ? (
-                <CheckCircle size={18} />
-              ) : (
-                <XCircle size={18} />
-              )}
-              {lane.isActive ? "Active" : "Inactive"}
-            </div>
+            <ActiveBadge isActive={lane.isActive} />
           </div>
         </div>
 
         {/* CONTENT */}
-        <div className="p-8">
-          <div className="mb-6 flex items-start justify-between">
+        <CardContent className="space-y-8 px-8 py-8">
+          <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-foreground">
+              <h2 className="text-2xl font-semibold text-foreground">
                 {lane.name}
-              </h1>
-              <p className="mt-1 text-lg font-medium text-muted-foreground">
-                {lane.type}
-              </p>
+              </h2>
+              <p className="mt-1 text-muted-foreground">{lane.type}</p>
             </div>
 
             <div className="text-right">
-              <div className="text-5xl font-bold text-primary">
+              <div className="text-3xl font-bold text-primary">
                 ${lane.hourlyRate}
               </div>
               <p className="text-sm text-muted-foreground">per hour</p>
@@ -116,14 +100,13 @@ export default function LaneDetail() {
           </div>
 
           {lane.description && (
-            <p className="mb-8 text-lg leading-relaxed text-muted-foreground">
+            <p className="leading-relaxed text-muted-foreground">
               {lane.description}
             </p>
           )}
 
           {/* STATS */}
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {/* Capacity */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="flex items-center gap-4 rounded-2xl bg-muted p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                 <Users className="text-primary" size={26} />
@@ -134,7 +117,6 @@ export default function LaneDetail() {
               </div>
             </div>
 
-            {/* Rate */}
             <div className="flex items-center gap-4 rounded-2xl bg-muted p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
                 <Clock className="text-secondary" size={26} />
@@ -145,7 +127,6 @@ export default function LaneDetail() {
               </div>
             </div>
 
-            {/* Date */}
             <div className="flex items-center gap-4 rounded-2xl bg-muted p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/20">
                 <Calendar className="text-accent" size={26} />
@@ -160,17 +141,16 @@ export default function LaneDetail() {
           </div>
 
           {/* ACTIONS */}
-          <div className="mt-12 flex gap-4">
-            <button className="flex-1 rounded-2xl bg-primary py-4 text-lg font-semibold text-primary-foreground hover:opacity-90">
+          <div className="flex gap-4">
+            <Button className="flex-1" size="lg">
               Book This Lane
-            </button>
-
-            <button className="flex-1 rounded-2xl border border-border py-4 text-lg font-semibold hover:bg-muted">
+            </Button>
+            <Button variant="outline" className="flex-1" size="lg">
               View Availability
-            </button>
+            </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

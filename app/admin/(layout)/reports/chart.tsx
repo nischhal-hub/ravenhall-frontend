@@ -1,7 +1,7 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
-import { TrendingUp } from "lucide-react"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { TrendingUp, CalendarCheck, Receipt } from "lucide-react"
 import React from "react"
 import {
   BarChart,
@@ -52,32 +52,46 @@ export function RevenueChart({
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="mt-2 text-4xl font-bold">${totalRevenue}</p>
+              <p className="mt-2 text-2xl font-bold">${totalRevenue}</p>
             </div>
-            <div className="rounded-2xl bg-emerald-100 p-3 dark:bg-emerald-900">
-              <TrendingUp className="h-8 w-8 text-emerald-600" />
+            <div className="rounded-2xl bg-primary/10 p-3">
+              <TrendingUp className="h-8 w-8 text-primary" />
             </div>
           </div>
         </Card>
 
         <Card className="p-6">
-          <div>
-            <p className="text-sm text-muted-foreground">Total Bookings</p>
-            <p className="mt-2 text-4xl font-bold">{data?.count || 0}</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Bookings</p>
+              <p className="mt-2 text-2xl font-bold">{data?.count || 0}</p>
+            </div>
+            <div className="rounded-2xl bg-primary/10 p-3">
+              <CalendarCheck className="h-8 w-8 text-primary" />
+            </div>
           </div>
         </Card>
 
         <Card className="p-6">
-          <div>
-            <p className="text-sm text-muted-foreground">Avg. per Booking</p>
-            <p className="mt-2 text-4xl font-bold">${avgPerBooking}</p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Avg. per Booking
+              </p>
+              <p className="mt-2 text-2xl font-bold">${avgPerBooking}</p>
+            </div>
+            <div className="rounded-2xl bg-primary/10 p-3">
+              <Receipt className="h-8 w-8 text-primary" />
+            </div>
           </div>
         </Card>
       </div>
 
       {/* Chart */}
       <Card className="p-8">
-        <h3 className="mb-6 text-xl font-semibold">{title}</h3>
+        <CardHeader className="p-0 pb-6">
+          <CardTitle className="text-xl">{title}</CardTitle>
+        </CardHeader>
 
         <ResponsiveContainer width="100%" height={380}>
           <BarChart data={chartData}>

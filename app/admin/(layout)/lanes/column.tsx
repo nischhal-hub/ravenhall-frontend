@@ -4,6 +4,7 @@ import { type ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { ActionButton } from "@/components/reusable/action-btn"
+import { ActiveBadge } from "@/components/reusable/status-badge"
 import { Lane } from "@/types/lane-response.types"
 
 export function getLaneColumns(): ColumnDef<Lane>[] {
@@ -46,15 +47,7 @@ export function getLaneColumns(): ColumnDef<Lane>[] {
     {
       accessorKey: "isActive",
       header: "Status",
-      cell: ({ row }) => (
-        <span
-          className={`font-medium ${
-            row.original.isActive ? "text-green-600" : "text-red-500"
-          }`}
-        >
-          {row.original.isActive ? "Active" : "Inactive"}
-        </span>
-      ),
+      cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
     },
     {
       accessorKey: "createdAt",

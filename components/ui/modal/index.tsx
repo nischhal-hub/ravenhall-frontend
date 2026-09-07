@@ -16,7 +16,12 @@ export default function ModalRoot({
         const ModalContent = modal.component
 
         return (
-          <ModalComponent key={key} modalKey={key} title={modal.title}>
+          <ModalComponent
+            key={key}
+            modalKey={key}
+            title={modal.title}
+            contentClassName={modal.contentClassName}
+          >
             {(props) => <ModalContent {...props} />}
           </ModalComponent>
         )

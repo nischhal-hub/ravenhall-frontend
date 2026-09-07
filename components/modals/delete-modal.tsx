@@ -11,7 +11,7 @@ export default function DeleteModal({
   data,
 }: _ModalProps<TModalDataMap["DELETE_ITEM"]>) {
   const { closeModal } = useModalContext()
-  const deleteHandler = useDeleteItem()
+  const { deleteHandler, isPending } = useDeleteItem()
 
   return (
     <div className="flex w-full flex-col gap-6 rounded-xl p-6">
@@ -33,7 +33,9 @@ export default function DeleteModal({
       {/* Action Buttons */}
       <div className="flex gap-4">
         <Button
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-red-500 p-4 text-white"
+          variant="destructive"
+          className="flex-1"
+          disabled={isPending}
           onClick={() =>
             deleteHandler({
               initiatorName: initiatorName || "",
@@ -42,12 +44,13 @@ export default function DeleteModal({
           }
         >
           <Trash2 className="h-4 w-4" />
-          Delete
+          {isPending ? "Deleting..." : "Delete"}
         </Button>
 
         <Button
           variant="outline"
           className="flex-1"
+          disabled={isPending}
           onClick={() => closeModal("DELETE_ITEM")}
         >
           Cancel

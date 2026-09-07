@@ -61,7 +61,7 @@ export const useDeleteItem = () => {
     deleteMutation.mutate({ type, id: initiatorName })
   }
 
-  return deleteHandler
+  return { deleteHandler, isPending: deleteMutation.isPending }
 }
 
 function capitalize(str: string): string {

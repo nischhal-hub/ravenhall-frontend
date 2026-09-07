@@ -3,13 +3,8 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { ActionButton } from "@/components/reusable/action-btn"
+import { RoleBadge } from "@/components/reusable/status-badge"
 import { User } from "@/types/user-response.types"
-
-const roleColors = {
-  ADMIN: "bg-purple-600 text-white",
-  STAFF: "bg-blue-600 text-white",
-  CUSTOMER: "bg-emerald-600 text-white",
-}
 
 export function getUserColumns(): ColumnDef<User>[] {
   return [
@@ -35,11 +30,7 @@ export function getUserColumns(): ColumnDef<User>[] {
     {
       accessorKey: "role",
       header: "Role",
-      cell: ({ row }) => (
-        <Badge className={roleColors[row.original.role]}>
-          {row.original.role}
-        </Badge>
-      ),
+      cell: ({ row }) => <RoleBadge role={row.original.role} />,
     },
     {
       id: "membership",
