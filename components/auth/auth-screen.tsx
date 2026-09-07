@@ -39,6 +39,7 @@ import {
 import { setAuthTokens } from "@/services/auth/token-store"
 import { ApiError } from "@/types/response"
 import { toast } from "sonner"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 type AuthMode =
   | "login"
@@ -306,7 +307,6 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         password: parsed.data.password,
       })
       const authenticatedRole = normalizeRole(response.data.user?.role)
-      console.log(response)
       if (!authenticatedRole) {
         setFormError("Login succeeded but role information is missing.")
         return
@@ -430,7 +430,6 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
 
       try {
         const response = await resetPasswordMutation.mutateAsync(
-          //@ts-ignore
           parsed.data.body
         )
 
@@ -490,15 +489,19 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
           </header>
 
           {formError ? (
-            <p className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
-              {formError}
-            </p>
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription className="text-destructive">
+                {formError}
+              </AlertDescription>
+            </Alert>
           ) : null}
 
           {formSuccess ? (
-            <p className="mb-4 rounded-lg border border-accent/60 bg-accent/10 px-3 py-2 text-xs font-medium text-accent-foreground">
-              {formSuccess}
-            </p>
+            <Alert className="mb-4 border-accent/60 bg-accent/10">
+              <AlertDescription className="text-accent-foreground">
+                {formSuccess}
+              </AlertDescription>
+            </Alert>
           ) : null}
 
           {isRegister ? (
@@ -555,23 +558,6 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
             </Link>
           </div>
 
-          {isRegister ? (
-            <p className="mt-4 text-center text-[11px] text-muted-foreground/90">
-              Need to verify your account?{" "}
-              <Link
-                href={roleInfo.verifyEmailHref}
-                className="font-semibold text-primary hover:text-secondary"
-              >
-                Verify email
-              </Link>
-            </p>
-          ) : null}
-
-          {mode === "login" ? (
-            <p className="mt-5 text-center text-[11px] text-muted-foreground/90">
-              Secure access for {role} users.
-            </p>
-          ) : null}
         </section>
       </div>
     </main>

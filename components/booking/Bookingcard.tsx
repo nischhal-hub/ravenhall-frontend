@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { CalendarDays, Clock, MapPin, Hash } from "lucide-react"
-import { BookingStatusBadge } from "./Bookingstatusbadge"
+import { BookingStatusBadge } from "@/components/reusable/status-badge"
+import { formatCurrency } from "@/lib/utils"
 
 interface BookingItem {
   id: string
@@ -22,13 +23,6 @@ function formatDate(iso: string) {
     month: "short",
     year: "numeric",
   })
-}
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
-  }).format(amount)
 }
 
 interface BookingCardProps {

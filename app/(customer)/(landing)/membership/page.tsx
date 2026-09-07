@@ -91,7 +91,7 @@ function MembershipPageSkeleton() {
         <Skeleton className="h-8 w-20 rounded-lg" />
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {/* heading */}
         <div className="mx-auto mb-12 max-w-xl space-y-3 text-center">
           <Skeleton className="mx-auto h-10 w-64 rounded-xl" />
@@ -134,7 +134,7 @@ function PlanCard({
       className={cn(
         "relative flex h-full flex-col justify-between rounded-3xl p-7 transition-transform duration-200 hover:-translate-y-1",
         plan.featured
-          ? "bg-primary text-white shadow-[0_28px_60px_-24px_rgba(30,58,95,0.8)]"
+          ? "bg-primary text-primary-foreground shadow-[0_28px_60px_-24px_rgba(30,58,95,0.8)]"
           : "bg-muted text-foreground"
       )}
     >
@@ -151,7 +151,9 @@ function PlanCard({
           <span className="text-4xl font-black">{plan.price}</span>
           <span
             className={
-              plan.featured ? "text-slate-200" : "text-muted-foreground"
+              plan.featured
+                ? "text-primary-foreground/70"
+                : "text-muted-foreground"
             }
           >
             {plan.period}
@@ -163,7 +165,7 @@ function PlanCard({
             className={cn(
               "mt-5 rounded-xl px-3 py-2 text-center text-xs font-semibold",
               plan.featured
-                ? "bg-white/10 text-accent"
+                ? "bg-primary-foreground/10 text-accent"
                 : "bg-primary/10 text-primary"
             )}
           >
@@ -231,7 +233,7 @@ export default function MembershipPlansPage() {
     <div className="min-h-screen bg-background">
       {/* ── Sticky top bar ── */}
       <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center px-4 py-3 sm:px-6">
           <Button
             variant="ghost"
             size="sm"
@@ -245,7 +247,7 @@ export default function MembershipPlansPage() {
       </div>
 
       {/* ── Page body ── */}
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         {/* Heading */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <div className="mb-3 flex items-center justify-center gap-2 text-sm font-medium text-primary">
@@ -263,7 +265,7 @@ export default function MembershipPlansPage() {
 
         {/* Error banner */}
         {error && (
-          <div className="mb-8 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="mb-8 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             Failed to load plans. Please refresh the page.
           </div>
         )}

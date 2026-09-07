@@ -37,6 +37,50 @@ export function BookingStatusBadge({ status }: { status: string }) {
   )
 }
 
+// ================== PAYMENT STATUS ==================
+
+export const PAYMENT_STATUS_CONFIG: Record<
+  string,
+  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
+  SUCCEEDED: { label: "Paid", variant: "default" },
+  PAID: { label: "Paid", variant: "default" },
+  FAILED: { label: "Failed", variant: "destructive" },
+  REFUNDED: { label: "Refunded", variant: "outline" },
+  PENDING: { label: "Pending", variant: "secondary" },
+}
+
+export function PaymentStatusBadge({ status }: { status: string }) {
+  const config = PAYMENT_STATUS_CONFIG[status.toUpperCase()] || {
+    label: "Pending",
+    variant: "secondary" as const,
+  }
+
+  return <Badge variant={config.variant}>{config.label}</Badge>
+}
+
+// ================== MEMBERSHIP STATUS ==================
+
+export type MembershipStatus = "active" | "expiring" | "expired"
+
+const MEMBERSHIP_STATUS_CONFIG: Record<
+  MembershipStatus,
+  { label: string; variant: "default" | "secondary" | "destructive" }
+> = {
+  active: { label: "Active", variant: "default" },
+  expiring: { label: "Expiring soon", variant: "destructive" },
+  expired: { label: "Expired", variant: "destructive" },
+}
+
+export function MembershipStatusBadge({
+  status,
+}: {
+  status: MembershipStatus
+}) {
+  const config = MEMBERSHIP_STATUS_CONFIG[status]
+  return <Badge variant={config.variant}>{config.label}</Badge>
+}
+
 // ================== USER ROLE ==================
 
 export type UserRole = "CUSTOMER" | "STAFF" | "ADMIN"

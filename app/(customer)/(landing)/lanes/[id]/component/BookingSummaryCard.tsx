@@ -26,7 +26,7 @@ export function BookingSummaryCard({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="relative h-36 bg-linear-to-br from-emerald-900 to-emerald-700">
+      <div className="relative h-36 bg-gradient-to-br from-primary to-secondary">
         {lane.imageUrl ? (
           <Image
             src={lane.imageUrl}
@@ -35,10 +35,10 @@ export function BookingSummaryCard({
           />
         ) : (
           <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/60 p-4">
-            <Badge className="mb-1 w-fit border-0 bg-emerald-500 text-[10px]">
+            <Badge className="mb-1 w-fit border-0 bg-accent text-accent-foreground text-[10px]">
               {lane.type}
             </Badge>
-            <p className="text-lg leading-tight font-bold text-white">
+            <p className="text-lg leading-tight font-bold text-primary-foreground">
               {lane.name}
             </p>
           </div>
@@ -49,7 +49,7 @@ export function BookingSummaryCard({
         {selectedDate && (
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="size-3.5 text-emerald-500" />
+              <Calendar className="size-3.5 text-accent" />
               <span className="text-xs font-semibold tracking-wide uppercase">
                 Date
               </span>
@@ -66,7 +66,7 @@ export function BookingSummaryCard({
             {selectedSlot && (
               <>
                 <div className="mt-2 flex items-center gap-2 text-muted-foreground">
-                  <Clock className="size-3.5 text-emerald-500" />
+                  <Clock className="size-3.5 text-accent" />
                   <span className="text-xs font-semibold tracking-wide uppercase">
                     Time
                   </span>
@@ -84,10 +84,7 @@ export function BookingSummaryCard({
             <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Duration
             </span>
-            <Badge
-              variant="outline"
-              className="border-emerald-400 text-emerald-600"
-            >
+            <Badge variant="outline" className="border-accent text-accent">
               Recommended
             </Badge>
           </div>

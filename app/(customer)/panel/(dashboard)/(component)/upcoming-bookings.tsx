@@ -2,6 +2,7 @@
 
 import { CalendarCheck2, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/reusable/empty-state"
 import { useRouter } from "next/navigation"
 import { BookingRow } from "./Bookingrow"
 
@@ -40,15 +41,11 @@ export function UpcomingBookings({ bookings }: { bookings: Booking[] }) {
       </div>
 
       {bookings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-            <CalendarCheck2 className="h-6 w-6 text-muted-foreground" />
-          </div>
-          <p className="font-semibold text-foreground">No upcoming bookings</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Time to book your next lane session!
-          </p>
-        </div>
+        <EmptyState
+          icon={CalendarCheck2}
+          title="No upcoming bookings"
+          description="Time to book your next lane session!"
+        />
       ) : (
         <div className="space-y-3">
           {bookings.map((b) => (

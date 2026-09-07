@@ -2,6 +2,8 @@
 
 import { Shield, ChevronRight, CheckCircle2, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/reusable/empty-state"
+import { MembershipStatusBadge } from "@/components/reusable/status-badge"
 import { useRouter } from "next/navigation"
 
 interface Membership {
@@ -39,20 +41,20 @@ export function MembershipCard({
 
   if (!membership?.isActive) {
     return (
-      <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-          <Shield className="h-6 w-6 text-muted-foreground" />
-        </div>
-        <p className="font-bold text-foreground">No Membership</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Unlock discounts and priority access
-        </p>
-        <Button
-          className="mt-5 w-full rounded-xl bg-primary font-semibold text-primary-foreground"
-          onClick={() => router.push("/membership")}
-        >
-          View Plans <ChevronRight className="ml-1 h-4 w-4" />
-        </Button>
+      <div className="flex h-full flex-col justify-center rounded-2xl border border-dashed border-border bg-card p-8">
+        <EmptyState
+          icon={Shield}
+          title="No Membership"
+          description="Unlock discounts and priority access"
+          action={
+            <Button
+              className="w-full rounded-xl font-semibold"
+              onClick={() => router.push("/membership")}
+            >
+              View Plans <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          }
+        />
       </div>
     )
   }
@@ -74,8 +76,8 @@ export function MembershipCard({
           </p>
           <p className="font-black text-foreground">{membership.plan}</p>
         </div>
-        <span className="ml-auto rounded-full bg-accent px-2.5 py-0.5 text-xs font-semibold text-accent-foreground">
-          Active
+        <span className="ml-auto">
+          <MembershipStatusBadge status="active" />
         </span>
       </div>
 

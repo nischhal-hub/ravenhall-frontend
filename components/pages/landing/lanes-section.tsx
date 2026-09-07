@@ -39,7 +39,7 @@ export function LanesSection() {
     return (
       <section
         id="lanes"
-        className="bg-card px-4 py-14 sm:px-6 lg:px-8 lg:py-20"
+        className="bg-card px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
         <div className="mx-auto w-full max-w-7xl">
           <div className="mb-10">
@@ -64,7 +64,7 @@ export function LanesSection() {
     return (
       <section
         id="lanes"
-        className="bg-card px-4 py-14 sm:px-6 lg:px-8 lg:py-20"
+        className="bg-card px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
       >
         <div className="mx-auto w-full max-w-7xl text-center">
           <p className="text-destructive">
@@ -76,7 +76,7 @@ export function LanesSection() {
   }
 
   return (
-    <section id="lanes" className="bg-card px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+    <section id="lanes" className="bg-card px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -114,7 +114,7 @@ export function LanesSection() {
           {lanes.map((lane) => (
             <article
               key={lane.id || lane.name}
-              className="overflow-hidden rounded-3xl bg-background shadow-[0_16px_40px_-24px_rgba(25,28,30,0.35)]"
+              className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg"
             >
               <div className="relative h-56">
                 <Image
@@ -123,7 +123,7 @@ export function LanesSection() {
                   fill
                   className="object-cover"
                 />
-                <span className="absolute top-4 left-4 rounded-full bg-primary/80 px-3 py-1 text-[11px] font-semibold tracking-wider text-white uppercase backdrop-blur-sm">
+                <span className="absolute top-4 left-4 rounded-full bg-primary/80 px-3 py-1 text-[11px] font-semibold tracking-wider text-primary-foreground uppercase backdrop-blur-sm">
                   {lane.badge || "INDOOR"}
                 </span>
               </div>

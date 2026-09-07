@@ -2,7 +2,7 @@ import { features } from "@/components/pages/landing/data"
 
 export function FeaturesSection() {
   return (
-    <section className="bg-background px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+    <section className="bg-background px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
       <div className="mx-auto w-full max-w-7xl">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <h2 className="font-heading text-3xl font-extrabold text-primary sm:text-4xl">

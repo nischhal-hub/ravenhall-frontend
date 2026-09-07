@@ -20,6 +20,9 @@ import type {
   ResetPasswordPayload,
 } from "@/schemas/auth"
 
+const AUTH_INPUT_CLASS =
+  "h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+
 type RegisterFormState = Omit<RegisterFormValues, "terms"> & {
   terms: boolean
 }
@@ -110,7 +113,7 @@ export function RegisterFormSection({
                       type={field.type}
                       autoComplete={field.autoComplete}
                       required
-                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                      className={AUTH_INPUT_CLASS}
                     />
                   </FormControl>
                   <FormMessage />
@@ -136,7 +139,7 @@ export function RegisterFormSection({
                     type={field.type}
                     autoComplete={field.autoComplete}
                     required={field.id !== "phone"}
-                    className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                    className={AUTH_INPUT_CLASS}
                   />
                 </FormControl>
                 <FormMessage />
@@ -161,7 +164,7 @@ export function RegisterFormSection({
                       type={field.type}
                       autoComplete={field.autoComplete}
                       required
-                      className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                      className={AUTH_INPUT_CLASS}
                     />
                   </FormControl>
                   <FormMessage />
@@ -237,7 +240,7 @@ export function LoginFormSection({
                   type="email"
                   autoComplete="email"
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="name@example.com"
                 />
               </FormControl>
@@ -258,7 +261,7 @@ export function LoginFormSection({
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="********"
                 />
               </FormControl>
@@ -308,7 +311,7 @@ export function ForgotPasswordFormSection({
                   type="email"
                   autoComplete="email"
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="name@example.com"
                 />
               </FormControl>
@@ -348,7 +351,7 @@ export function VerifyEmailFormSection({
                   {...field}
                   type="text"
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="Paste your token"
                 />
               </FormControl>
@@ -374,7 +377,6 @@ export function ResetPasswordFormSection({
   onSubmit,
   isSubmitting,
 }: ResetPasswordSectionProps) {
-  console.log(form.formState.errors)
   return (
     <Form {...form}>
       <form className="space-y-4" onSubmit={onSubmit} noValidate>
@@ -391,7 +393,7 @@ export function ResetPasswordFormSection({
                   inputMode="numeric"
                   maxLength={6}
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="Enter 6-digit reset code"
                 />
               </FormControl>
@@ -411,7 +413,7 @@ export function ResetPasswordFormSection({
                   {...field}
                   type="password"
                   required
-                  className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground transition outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/25"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="Enter new password"
                 />
               </FormControl>

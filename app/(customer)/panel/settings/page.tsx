@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
+import { PanelHero } from "@/components/panel/panel-hero"
 
 function formatDate(iso?: string) {
   if (!iso) return "—"
@@ -114,6 +115,7 @@ export default function SettingsPage() {
   })
 
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   // Password Form
   const [passwordForm, setPasswordForm] = useState({
@@ -124,7 +126,10 @@ export default function SettingsPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) setImagePreview(URL.createObjectURL(file))
+    if (file) {
+      setImageFile(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
   }
 
   const handleProfileSubmit = (e: React.FormEvent) => {
@@ -138,6 +143,7 @@ export default function SettingsPage() {
       payload.lastName = profileForm.lastName
     if (profileForm.phone && profileForm.phone !== profile?.phone)
       payload.phone = profileForm.phone
+    if (imageFile) payload.image = imageFile
 
     if (Object.keys(payload).length === 0) {
       toast.info("No changes detected.")
@@ -178,24 +184,15 @@ export default function SettingsPage() {
     profile && "membership" in profile ? profile.membership : undefined
 
   return (
-    <div className="min-h-screen max-w-7xl bg-background pb-20">
-      {/* Header */}
-      <div className="bg-primary px-4 py-12 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-xs font-bold tracking-widest text-primary-foreground/70 uppercase">
-            ACCOUNT
-          </p>
-          <h1 className="text-4xl font-black tracking-tight text-primary-foreground">
-            Settings
-          </h1>
-          <p className="mt-1 text-primary-foreground/60">
-            Manage your profile and security settings
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background pb-20">
+      <PanelHero
+        eyebrow="Account"
+        title="Settings"
+        description="Manage your profile and security settings"
+      />
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl space-y-6 px-4 pt-8 sm:px-8">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 pt-8 sm:px-8">
         {/* Profile Section */}
         <Section
           icon={User}

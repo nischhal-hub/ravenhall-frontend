@@ -35,12 +35,12 @@ const webSidebarItems: ReusableSidebarItem[] = [
     href: "/panel/membership",
     icon: <Crown />,
   },
-  // {
-  //   id: "notifications",
-  //   label: "Notifications",
-  //   href: "/panel/notification",
-  //   icon: <Bell />,
-  // },
+  {
+    id: "notifications",
+    label: "Notifications",
+    href: "/panel/notification",
+    icon: <Bell />,
+  },
   {
     id: "settings",
     label: "Settings",
@@ -61,7 +61,7 @@ export default function WebLayout({ children }: { children: React.ReactNode }) {
             <WebSidebarHeader isCollapsed={isCollapsed} role="customer" />
             <Link
               href={"/"}
-              className="flex items-center gap-2 rounded-md bg-blue-400 px-2 py-2 text-xs text-white transition-colors hover:bg-blue-500"
+              className="flex items-center gap-2 rounded-md bg-secondary px-2 py-2 text-xs text-secondary-foreground transition-colors hover:bg-secondary/90"
             >
               <ArrowBigLeft size={14} />
               {!isCollapsed && "Go to Landing Page"}

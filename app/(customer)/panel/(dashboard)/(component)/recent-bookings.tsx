@@ -2,6 +2,7 @@
 
 import { Clock, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/reusable/empty-state"
 import { useRouter } from "next/navigation"
 import { BookingRow } from "./Bookingrow"
 
@@ -44,12 +45,11 @@ export function RecentBookings({ bookings }: { bookings: Booking[] }) {
       </div>
 
       {bookings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="font-semibold text-foreground">No bookings yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your booking history will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={Clock}
+          title="No bookings yet"
+          description="Your booking history will appear here."
+        />
       ) : (
         <div className="space-y-3">
           {bookings.map((b) => (

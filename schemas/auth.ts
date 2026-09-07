@@ -64,3 +64,5 @@ export type LoginPayload = z.infer<typeof loginSchema>["body"]
 export type ForgotPasswordPayload = z.infer<typeof forgotPasswordSchema>["body"]
 export type VerifyEmailFormValues = z.infer<typeof verifyEmailFormSchema>
 export type ResetPasswordPayload = z.infer<typeof resetPasswordSchema>
+/** Wire shape actually sent to the API (the schema's `body` is nested only for form field paths). */
+export type ResetPasswordRequestPayload = ResetPasswordPayload["body"]

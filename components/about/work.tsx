@@ -31,13 +31,10 @@ const steps = [
 
 export function AboutHowItWorks() {
   return (
-    <section className="bg-background px-4 py-20 sm:px-6 lg:py-28">
-      <div className="mx-auto max-w-5xl">
+    <section className="bg-background px-4 py-16 sm:px-6 lg:py-24">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-14 text-center">
-          <p className="mb-3 font-mono text-xs font-semibold tracking-[0.3em] text-primary uppercase">
-            How It Works
-          </p>
-          <h2 className="font-heading text-4xl font-extrabold text-foreground sm:text-5xl">
+          <h2 className="font-heading text-3xl font-extrabold text-foreground sm:text-4xl">
             From sign-up to
             <br />
             <span className="text-primary">first delivery.</span>
@@ -57,7 +54,7 @@ export function AboutHowItWorks() {
               {/* Step number bubble */}
               <div className="relative z-10 mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-primary bg-background">
                 <step.icon className="h-6 w-6 text-primary" />
-                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary font-mono text-[10px] font-black text-white">
+                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary font-mono text-[10px] font-black text-primary-foreground">
                   {i + 1}
                 </span>
               </div>

@@ -17,7 +17,7 @@ import {
   type ForgotPasswordPayload,
   type LoginPayload,
   type RegisterPayload,
-  type ResetPasswordPayload,
+  type ResetPasswordRequestPayload,
 } from "@/schemas/auth"
 import { ApiError } from "@/types/response"
 
@@ -43,7 +43,7 @@ export function useForgotPasswordMutation() {
 }
 
 export function useResetPasswordMutation() {
-  return useMutation<AuthApiResponse, ApiError, ResetPasswordPayload>({
+  return useMutation<AuthApiResponse, ApiError, ResetPasswordRequestPayload>({
     mutationKey: ["auth", "reset-password"],
     mutationFn: resetPasswordRequest,
   })

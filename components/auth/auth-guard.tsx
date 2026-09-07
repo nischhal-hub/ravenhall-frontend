@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
 
 import { useMeQuery } from "@/services/queries/auth"
 
@@ -32,7 +33,6 @@ function normalizeRole(value: unknown): GuardRole | null {
 export function AuthGuard({ role, children }: AuthGuardProps) {
   const router = useRouter()
   const { data: user, isLoading, isError } = useMeQuery()
-  console.log(user)
 
   const userRole = normalizeRole(user?.role)
   const isRoleMatch = userRole === role
@@ -54,7 +54,8 @@ export function AuthGuard({ role, children }: AuthGuardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
         Checking session...
       </div>
     )

@@ -16,6 +16,14 @@ import {
   RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { PanelHero } from "@/components/panel/panel-hero"
+import {
+  MembershipStatusBadge,
+  PaymentStatusBadge,
+} from "@/components/reusable/status-badge"
+import { formatCurrency } from "@/lib/utils"
 import { useMyMembershipQuery } from "@/services/queries/membership.query"
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,13 +36,6 @@ function formatDate(iso: string) {
     month: "long",
     year: "numeric",
   })
-}
-
-function formatCurrency(amount: number, currency = "AUD") {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency,
-  }).format(amount)
 }
 
 /** Returns days remaining (negative = expired) */
@@ -91,8 +92,7 @@ function DaysRing({ days, total }: { days: number; total: number }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span
-          className="text-3xl leading-none font-black tabular-nums"
-          style={{ color: urgent ? "var(--destructive)" : "var(--accent)" }}
+          className={`text-3xl leading-none font-black tabular-nums ${urgent ? "text-destructive" : "text-accent"}`}
         >
           {days}
         </span>
@@ -142,16 +142,10 @@ function StatTile({
         />
       )}
       <div
-        className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl"
-        style={{ background: accent ? "var(--accent)" : "var(--muted)" }}
+        className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${accent ? "bg-accent" : "bg-muted"}`}
       >
         <Icon
-          className="h-4 w-4"
-          style={{
-            color: accent
-              ? "var(--accent-foreground)"
-              : "var(--muted-foreground)",
-          }}
+          className={`h-4 w-4 ${accent ? "text-accent-foreground" : "text-muted-foreground"}`}
         />
       </div>
       <p className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
@@ -169,11 +163,8 @@ function StatTile({
 function PerkRow({ text }: { text: string }) {
   return (
     <li className="flex items-center gap-3 border-b border-border py-2.5 last:border-0">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--accent)/15">
-        <CheckCircle2
-          className="h-3.5 w-3.5"
-          style={{ color: "var(--accent)" }}
-        />
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15">
+        <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
       </div>
       <span className="text-sm text-foreground">{text}</span>
     </li>
@@ -183,13 +174,9 @@ function PerkRow({ text }: { text: string }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Skeleton
 // ─────────────────────────────────────────────────────────────────────────────
-function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-xl bg-muted ${className}`} />
-}
-
 function PageSkeleton() {
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-12">
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-12">
       <Skeleton className="h-8 w-48" />
       <Skeleton className="h-4 w-72" />
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -221,14 +208,7 @@ function NoMembership({ onJoin }: { onJoin: () => void }) {
         Join a membership plan to unlock discounts, priority booking, and
         exclusive lane access.
       </p>
-      <Button
-        onClick={onJoin}
-        className="mt-8 h-12 w-full rounded-xl text-base font-bold"
-        style={{
-          background: "var(--primary)",
-          color: "var(--primary-foreground)",
-        }}
-      >
+      <Button onClick={onJoin} className="mt-8 h-12 w-full rounded-xl text-base font-bold">
         View Plans <ChevronRight className="ml-1 h-4 w-4" />
       </Button>
     </div>
@@ -273,10 +253,7 @@ export default function MembershipPage() {
     }
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-        <XCircle
-          className="h-12 w-12"
-          style={{ color: "var(--destructive)" }}
-        />
+        <XCircle className="h-12 w-12 text-destructive" />
         <p className="text-lg font-semibold text-foreground">
           Failed to load membership
         </p>
@@ -328,91 +305,20 @@ export default function MembershipPage() {
       `}</style>
 
       <div className="min-h-screen bg-background pb-20">
-        {/* ── Header band ─────────────────────────────────────────────── */}
-        <div
-          className="relative overflow-hidden px-4 py-14"
-          style={{ background: "var(--primary)" }}
-        >
-          {/* subtle grid texture */}
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.06]"
-            style={{
-              backgroundImage:
-                "linear-gradient(var(--primary-foreground) 1px,transparent 1px),linear-gradient(90deg,var(--primary-foreground) 1px,transparent 1px)",
-              backgroundSize: "32px 32px",
-            }}
-          />
-          {/* glow */}
-          <div
-            className="pointer-events-none absolute -top-24 -right-24 h-80 w-80 rounded-full opacity-20 blur-3xl"
-            style={{ background: "var(--accent)" }}
-          />
-
-          <div className="relative mx-auto max-w-5xl">
-            <div className="anim d1 mb-4 flex items-center gap-2">
-              <div
-                className="flex h-8 w-8 items-center justify-center rounded-lg"
-                style={{ background: "var(--accent)" }}
-              >
-                <Shield
-                  className="h-4 w-4"
-                  style={{ color: "var(--accent-foreground)" }}
-                />
-              </div>
-              <span
-                className="text-xs font-bold tracking-widest uppercase"
-                style={{ color: "var(--accent)" }}
-              >
-                {membership.plan} MEMBER
-              </span>
-            </div>
-
-            <h1
-              className="anim d2 text-4xl font-black tracking-tight"
-              style={{ color: "var(--primary-foreground)" }}
-            >
-              Your Membership
-            </h1>
-            <p
-              className="anim d3 mt-2 text-sm"
-              style={{ color: "rgba(248,250,252,0.65)" }}
-            >
-              Member since {formatDate(membership.createdAt)}
-            </p>
-
-            {/* Status pill */}
-            <div className="anim d4 mt-5">
-              {isExpired ? (
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{ background: "var(--destructive)", color: "#fff" }}
-                >
-                  <XCircle className="h-3 w-3" /> Expired
-                </span>
-              ) : isUrgent ? (
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{ background: "var(--destructive)", color: "#fff" }}
-                >
-                  <Clock className="h-3 w-3" /> Expiring soon
-                </span>
-              ) : (
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{
-                    background: "var(--accent)",
-                    color: "var(--accent-foreground)",
-                  }}
-                >
-                  <CheckCircle2 className="h-3 w-3" /> Active
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+        <PanelHero
+          eyebrow={`${membership.plan} Member`}
+          eyebrowIcon={Shield}
+          title="Your Membership"
+          description={`Member since ${formatDate(membership.createdAt)}`}
+          actions={
+            <MembershipStatusBadge
+              status={isExpired ? "expired" : isUrgent ? "expiring" : "active"}
+            />
+          }
+        />
 
         {/* ── Body ──────────────────────────────────────────────────────── */}
-        <div className="mx-auto max-w-5xl space-y-6 px-4 pt-8">
+        <div className="mx-auto max-w-6xl space-y-6 px-4 pt-8">
           {/* ── Stat grid ─────────────────────────────────────────────── */}
           <div className="anim d3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatTile
@@ -465,12 +371,9 @@ export default function MembershipPage() {
                   </p>
                 </div>
                 {isUrgent && !isExpired && (
-                  <span
-                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold"
-                    style={{ background: "var(--destructive)", color: "#fff" }}
-                  >
+                  <Badge variant="destructive" className="gap-1">
                     <Clock className="h-3 w-3" /> Renew soon
-                  </span>
+                  </Badge>
                 )}
               </div>
 
@@ -488,22 +391,16 @@ export default function MembershipPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-xl bg-(--muted)/60 p-3">
+                    <div className="rounded-xl bg-muted/60 p-3">
                       <p className="text-xs text-muted-foreground">Started</p>
                       <p className="mt-0.5 font-semibold text-foreground">
                         {formatDate(membership.createdAt)}
                       </p>
                     </div>
-                    <div className="rounded-xl bg-(--muted)/60 p-3">
+                    <div className="rounded-xl bg-muted/60 p-3">
                       <p className="text-xs text-muted-foreground">Ends</p>
                       <p
-                        className="mt-0.5 font-semibold"
-                        style={{
-                          color:
-                            isUrgent || isExpired
-                              ? "var(--destructive)"
-                              : "var(--foreground)",
-                        }}
+                        className={`mt-0.5 font-semibold ${isUrgent || isExpired ? "text-destructive" : "text-foreground"}`}
                       >
                         {formatDate(membership.endDate)}
                       </p>
@@ -517,10 +414,6 @@ export default function MembershipPage() {
                 <Button
                   onClick={() => router.push("/membership/plans")}
                   className="mt-2 h-11 w-full rounded-xl font-bold"
-                  style={{
-                    background: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                  }}
                 >
                   {isExpired ? "Renew Membership" : "Renew Early"}
                   <ChevronRight className="ml-1 h-4 w-4" />
@@ -531,10 +424,7 @@ export default function MembershipPage() {
             {/* Perks card */}
             <div className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-4 flex items-center gap-2">
-                <Sparkles
-                  className="h-4 w-4"
-                  style={{ color: "var(--accent)" }}
-                />
+                <Sparkles className="h-4 w-4 text-accent" />
                 <h2 className="font-bold text-foreground">Your Benefits</h2>
               </div>
               <ul className="divide-y divide-border">
@@ -563,20 +453,12 @@ export default function MembershipPage() {
                     value: formatCurrency(membership.payment.amount),
                   },
                   {
-                    label: "Status",
-                    value: membership.payment.status,
-                    badge:
-                      membership.payment.status === "SUCCEEDED"
-                        ? "success"
-                        : "neutral",
-                  },
-                  {
                     label: "Paid at",
                     value: membership.payment.paidAt
                       ? formatDate(membership.payment.paidAt)
                       : "—",
                   },
-                ].map(({ label, value, mono, badge }) => (
+                ].map(({ label, value, mono }) => (
                   <div
                     key={label}
                     className="flex items-center justify-between bg-card px-4 py-3"
@@ -584,25 +466,17 @@ export default function MembershipPage() {
                     <span className="text-sm text-muted-foreground">
                       {label}
                     </span>
-                    {badge === "success" ? (
-                      <span
-                        className="flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                        style={{
-                          background: "var(--accent)",
-                          color: "var(--accent-foreground)",
-                        }}
-                      >
-                        <CheckCircle2 className="h-3 w-3" /> {value}
-                      </span>
-                    ) : (
-                      <span
-                        className={`text-sm font-semibold text-foreground ${mono ? "font-mono text-xs" : ""}`}
-                      >
-                        {value}
-                      </span>
-                    )}
+                    <span
+                      className={`text-sm font-semibold text-foreground ${mono ? "font-mono text-xs" : ""}`}
+                    >
+                      {value}
+                    </span>
                   </div>
                 ))}
+                <div className="flex items-center justify-between bg-card px-4 py-3">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <PaymentStatusBadge status={membership.payment.status} />
+                </div>
               </div>
             </div>
           )}
@@ -610,22 +484,22 @@ export default function MembershipPage() {
           {/* ── Footer actions ─────────────────────────────────────────── */}
           <div className="anim d6 flex flex-wrap gap-3 pt-2">
             <Button
+              variant="outline"
               onClick={() => router.push("/dashboard")}
               className="h-11 rounded-xl px-6 font-semibold"
-              style={{
-                background: "var(--primary)",
-                color: "var(--primary-foreground)",
-              }}
             >
               Go to Dashboard
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/membership/plans")}
-              className="h-11 rounded-xl px-6 font-semibold"
-            >
-              {isExpired ? "Renew Plan" : "Upgrade Plan"}
-            </Button>
+            {/* Renew/Upgrade already surfaced above when urgent or expired —
+                only offer it here as a secondary action otherwise. */}
+            {!isUrgent && !isExpired && (
+              <Button
+                onClick={() => router.push("/membership/plans")}
+                className="h-11 rounded-xl px-6 font-semibold"
+              >
+                Upgrade Plan
+              </Button>
+            )}
           </div>
         </div>
       </div>

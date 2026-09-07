@@ -2,7 +2,7 @@ import {
   type ForgotPasswordPayload,
   type LoginPayload,
   type RegisterPayload,
-  type ResetPasswordPayload,
+  type ResetPasswordRequestPayload,
 } from "@/schemas/auth"
 import { apiClient } from "@/services/api/client"
 
@@ -74,7 +74,9 @@ export async function forgotPasswordRequest(payload: ForgotPasswordPayload) {
   return response.data
 }
 
-export async function resetPasswordRequest(payload: ResetPasswordPayload) {
+export async function resetPasswordRequest(
+  payload: ResetPasswordRequestPayload
+) {
   const response = await apiClient.post<AuthApiResponse>(
     "/auth/reset-password",
     payload

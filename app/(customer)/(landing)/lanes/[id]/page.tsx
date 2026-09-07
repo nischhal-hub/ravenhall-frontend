@@ -16,7 +16,7 @@ export default function BookingPage() {
 
   const { data, isLoading, error } = useLaneByIdQuery(laneId)
 
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [bookingDate, setBookingDate] = useState("")
   const [bookingSlot, setBookingSlot] = useState<any>(null)
   const [bookingDuration, setBookingDuration] = useState<1 | 2 | 3>(1)
@@ -75,7 +75,7 @@ export default function BookingPage() {
                 onBack={() => setStep(1)}
               />
             )}
-            {/* ✅ FIX 3: Pass bookingId and onComplete to Step3 */}
+            {/* ✅ FIX 3: Pass bookingId to Step3 */}
             {step === 3 && bookingSlot && (
               <Step3
                 lane={lane}
@@ -86,7 +86,6 @@ export default function BookingPage() {
                 promoDiscount={promoDiscount}
                 bookingId={bookingId}
                 onBack={() => setStep(2)}
-                onComplete={() => setStep(4)}
               />
             )}
           </>

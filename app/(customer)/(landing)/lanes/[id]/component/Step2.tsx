@@ -116,8 +116,8 @@ export function Step2({
       <div className="space-y-5 lg:col-span-3">
         {/* Header */}
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-widest text-emerald-500 uppercase">
-            Current Step
+          <p className="mb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Step 2 of 3
           </p>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
             Review Booking
@@ -172,7 +172,7 @@ export function Step2({
           </div>
 
           {/* Duration badge */}
-          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
             <Clock className="size-3" />
             {duration} hour{duration > 1 ? "s" : ""} session
           </div>
@@ -183,12 +183,12 @@ export function Step2({
           <h2 className="font-bold text-foreground">Offers & Rewards</h2>
 
           {/* Member discount banner */}
-          <div className="flex gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/30">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
-              <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+          <div className="flex gap-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20">
+              <ShieldCheck className="size-4 text-accent" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+              <p className="text-sm font-semibold text-accent">
                 Member Discount Applied — 15% off
               </p>
               <p className="text-xs text-muted-foreground">
@@ -223,7 +223,7 @@ export function Step2({
             </div>
 
             {promoSuccess && (
-              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-accent">
                 <CheckCircle2 className="size-3.5" />
                 {promoSuccess}
               </p>
@@ -238,13 +238,13 @@ export function Step2({
       {/* ── Right Column — Order Summary ── */}
       <div className="lg:col-span-2">
         <div className="sticky top-6 space-y-4">
-          <div className="overflow-hidden rounded-2xl bg-foreground text-background shadow-xl">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
             {/* Header */}
             <div className="px-6 pt-6 pb-4">
-              <p className="text-xs font-semibold tracking-widest text-background/50 uppercase">
+              <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                 Order Summary
               </p>
-              <p className="mt-1 text-sm text-background/60">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Review your total before paying
               </p>
             </div>
@@ -252,45 +252,47 @@ export function Step2({
             {/* Line items */}
             <div className="space-y-3 px-6 pb-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-background/70">Lane Hire (Base)</span>
-                <span className="font-semibold">${laneHire.toFixed(2)}</span>
+                <span className="text-muted-foreground">Lane Hire (Base)</span>
+                <span className="font-semibold text-foreground">
+                  ${laneHire.toFixed(2)}
+                </span>
               </div>
-              <div className="flex justify-between text-emerald-400">
+              <div className="flex justify-between text-accent">
                 <span>Member Discount (15%)</span>
                 <span className="font-semibold">
                   -${memberDiscount.toFixed(2)}
                 </span>
               </div>
               {promoDiscount > 0 && (
-                <div className="flex justify-between text-emerald-400">
+                <div className="flex justify-between text-accent">
                   <span>Promo ({appliedPromo})</span>
                   <span className="font-semibold">
                     -${promoDiscount.toFixed(2)}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-background/70">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Equipment Rental</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-foreground">
                   ${EQUIPMENT_FEE.toFixed(2)}
                 </span>
               </div>
             </div>
 
             {/* Divider */}
-            <div className="mx-6 border-t border-white/10" />
+            <div className="mx-6 border-t border-border" />
 
             {/* Total */}
             <div className="px-6 py-4">
               <div className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold text-background/80">
+                <span className="text-sm font-semibold text-muted-foreground">
                   TOTAL TO PAY
                 </span>
-                <span className="text-3xl font-black tracking-tight">
+                <span className="text-3xl font-black tracking-tight text-foreground">
                   ${total.toFixed(2)}
                 </span>
               </div>
-              <p className="mt-0.5 text-right text-xs text-background/40">
+              <p className="mt-0.5 text-right text-xs text-muted-foreground">
                 Includes GST
               </p>
             </div>
@@ -300,7 +302,7 @@ export function Step2({
               <Button
                 onClick={handleProceed}
                 disabled={createBookingMutation.isPending}
-                className="h-12 w-full rounded-xl bg-emerald-500 text-base font-bold hover:bg-emerald-600 disabled:opacity-60"
+                className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
               >
                 {createBookingMutation.isPending ? (
                   <>
@@ -315,7 +317,7 @@ export function Step2({
               <button
                 type="button"
                 onClick={onBack}
-                className="mt-3 w-full text-center text-xs text-background/40 transition hover:text-background/70"
+                className="mt-3 w-full text-center text-xs text-muted-foreground transition hover:text-foreground"
               >
                 ← Back to Select Slot
               </button>
@@ -325,10 +327,10 @@ export function Step2({
           {/* Trust badges */}
           <div className="flex items-center justify-center gap-6 py-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="size-3.5 text-emerald-500" /> SSL Secured
+              <ShieldCheck className="size-3.5 text-accent" /> SSL Secured
             </span>
             <span className="flex items-center gap-1">
-              <CheckCircle2 className="size-3.5 text-emerald-500" /> Instant
+              <CheckCircle2 className="size-3.5 text-accent" /> Instant
               Confirmation
             </span>
           </div>

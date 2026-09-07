@@ -77,19 +77,15 @@ export function Step1({ lane, onNext }: Step1Props) {
           onClick={() =>
             selectedSlot && onNext(selectedDate, selectedSlot, duration)
           }
-          className="h-11 w-full rounded-xl bg-emerald-500 font-semibold text-white hover:bg-emerald-600"
+          className="h-11 w-full rounded-xl bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
         >
           Continue to Details →
         </Button>
 
-        <p className="text-center text-[11px] text-muted-foreground">
-          Cancellation free up to 24 hours before booking.
-        </p>
-
         <div className="flex gap-3 rounded-xl bg-foreground p-4 text-background">
-          <AlertCircle className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-accent" />
           <div>
-            <p className="mb-0.5 text-xs font-bold text-emerald-400">
+            <p className="mb-0.5 text-xs font-bold text-accent">
               Peak Hour Notice
             </p>
             <p className="text-xs text-background/70">

@@ -1,14 +1,17 @@
 "use client"
 
 import ComingSoonPage from "@/components/ui/coming-soon-page"
-import PageHeader from "@/components/ui/page-header"
+import { PanelHero } from "@/components/panel/panel-hero"
 
 export default function Page() {
   return (
     <div className="space-y-4">
-      <PageHeader title="Bookings" description="Preview all bookings" />
-      <div className="flex flex-wrap gap-2"></div>
-      <ComingSoonPage title={"Bookings"} />
+      <PanelHero
+        eyebrow="Account"
+        title="Notifications"
+        description="Stay on top of booking updates and offers"
+      />
+      <ComingSoonPage title="Notifications" />
     </div>
   )
 }
