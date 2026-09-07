@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,9 @@ export default function EditLane({
 }: _ModalProps<TModalDataMap["EDIT_LANE"]>) {
   const { mutate: updateLane, isPending } = useUpdateLaneMutation()
   const { closeModal } = useModalContext()
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    data?.imageUrl || null
+  )
 
   const form = useForm({
     resolver: zodResolver(updateLaneSchema),
@@ -25,7 +29,7 @@ export default function EditLane({
       description: data?.description || "",
       capacity: data?.capacity || 1,
       hourlyRate: data?.hourlyRate || 0,
-      imageUrl: data?.imageUrl || "",
+      image: undefined,
       isActive: data?.isActive ?? true,
     },
   })
@@ -75,9 +79,30 @@ export default function EditLane({
           <div className="md:col-span-2">
             <FormInput
               form={form}
-              name="imageUrl"
-              label="Image URL"
-              type="url"
+              name="image"
+              label="Lane Image"
+              render={(field) => (
+                <div className="space-y-2">
+                  {imagePreview && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-24 w-40 rounded-md object-cover"
+                    />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      field.onChange(file)
+                      if (file) setImagePreview(URL.createObjectURL(file))
+                    }}
+                    className="block w-full text-sm"
+                  />
+                </div>
+              )}
             />
           </div>
 

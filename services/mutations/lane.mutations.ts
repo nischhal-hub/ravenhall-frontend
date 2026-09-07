@@ -4,15 +4,40 @@ import { toast } from "sonner"
 
 import { CreateLanePayload, UpdateLanePayload } from "@/schemas/lane"
 
+// ================== HELPERS ==================
+
+function buildLaneFormData(data: Record<string, unknown>) {
+  const formData = new FormData()
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === undefined || value === null) return
+
+    if (key === "image") {
+      if (value instanceof File) formData.append("image", value)
+      return
+    }
+
+    formData.append(key, String(value))
+  })
+
+  return formData
+}
+
 // ================== REQUEST FUNCTIONS ==================
 
 export async function createLaneRequest(data: CreateLanePayload) {
-  const response = await apiClient.post("/admin/lanes", data)
+  const formData = buildLaneFormData(data)
+  const response = await apiClient.post("/admin/lanes", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
   return response.data
 }
 
 export async function updateLaneRequest({ id, ...data }: UpdateLanePayload) {
-  const response = await apiClient.patch(`/admin/lanes/${id}`, data)
+  const formData = buildLaneFormData(data)
+  const response = await apiClient.patch(`/admin/lanes/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  })
   return response.data
 }
 

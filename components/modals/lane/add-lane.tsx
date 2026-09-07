@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -21,6 +22,7 @@ import { _ModalProps } from "@/types/types"
 export default function AddLane({}: _ModalProps) {
   const { mutate: createLane, isPending } = useCreateLaneMutation()
   const { closeModal } = useModalContext()
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const form = useForm({
     resolver: zodResolver(createLaneSchema),
@@ -30,7 +32,7 @@ export default function AddLane({}: _ModalProps) {
       description: "",
       capacity: 1,
       hourlyRate: 0,
-      imageUrl: "",
+      image: undefined,
     },
   })
 
@@ -97,10 +99,30 @@ export default function AddLane({}: _ModalProps) {
           <div className="md:col-span-2">
             <FormInput
               form={form}
-              name="imageUrl"
-              label="Image URL"
-              type="url"
-              placeholder="https://example.com/image.jpg"
+              name="image"
+              label="Lane Image"
+              render={(field) => (
+                <div className="space-y-2">
+                  {imagePreview && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-24 w-40 rounded-md object-cover"
+                    />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      field.onChange(file)
+                      if (file) setImagePreview(URL.createObjectURL(file))
+                    }}
+                    className="block w-full text-sm"
+                  />
+                </div>
+              )}
             />
           </div>
         </div>
