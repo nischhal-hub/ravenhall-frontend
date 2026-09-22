@@ -4,18 +4,7 @@ import { useRouter } from "next/navigation"
 import { CalendarDays, Clock, MapPin, Hash } from "lucide-react"
 import { BookingStatusBadge } from "@/components/reusable/status-badge"
 import { formatCurrency } from "@/lib/utils"
-
-interface BookingItem {
-  id: string
-  bookingRef: string
-  date: string
-  startTime: string
-  endTime: string
-  duration: number
-  status: string
-  finalAmount: number
-  lane?: { name: string }
-}
+import { Booking } from "@/types/booking-response.types"
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-AU", {
@@ -26,7 +15,7 @@ function formatDate(iso: string) {
 }
 
 interface BookingCardProps {
-  booking: BookingItem
+  booking: Booking
   /** Override the default route. Defaults to /bookings/:id */
   detailPath?: (id: string) => string
 }
@@ -40,6 +29,12 @@ export function BookingCard({
   const handleClick = () => {
     router.push(detailPath(booking.id))
   }
+
+  const items = booking.items ?? []
+  const firstItem = items[0]
+  const lastItem = items[items.length - 1]
+  const laneName = firstItem?.slot.lane.name
+  const hours = items.length
 
   return (
     <div
@@ -62,11 +57,11 @@ export function BookingCard({
                 {booking.bookingRef}
               </span>
             </div>
-            {booking.lane?.name && (
+            {laneName && (
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-sm font-semibold text-foreground">
-                  {booking.lane.name}
+                  {laneName}
                 </span>
               </div>
             )}
@@ -78,15 +73,19 @@ export function BookingCard({
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5" />
-            {formatDate(booking.date)}
+            {formatDate(booking.createdAt)}
           </span>
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
-            {booking.startTime} – {booking.endTime}
-          </span>
-          <span>
-            {booking.duration} hr{booking.duration !== 1 ? "s" : ""}
-          </span>
+          {firstItem && (
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              {firstItem.slot.startTime} – {lastItem.slot.endTime}
+            </span>
+          )}
+          {hours > 0 && (
+            <span>
+              {hours} hr{hours !== 1 ? "s" : ""}
+            </span>
+          )}
         </div>
 
         {/* Amount */}
