@@ -9,6 +9,7 @@ import { BookingsHeader } from "@/components/booking/Bookingsheader"
 import { BookingsStats } from "@/components/booking/Bookingsstats"
 import { BookingsList } from "@/components/booking/Bookingslist"
 import { useRouter } from "next/navigation"
+import { Booking } from "@/types/booking-response.types"
 
 export default function BookingsPage() {
   const router = useRouter()
@@ -20,11 +21,8 @@ export default function BookingsPage() {
     { page, limit, search }
   )
 
-  // Handle both flat { bookings, meta } and nested { data: { bookings, meta } }
-  // @ts-expect-error — response shape varies by sendSuccess wrapper
-  const bookings: Booking[] = data?.data?.bookings ?? data?.bookings ?? []
-  // @ts-expect-error fffff
-  const meta = data?.data?.meta ?? data?.meta
+  const bookings: Booking[] = data?.data?.bookings ?? []
+  const meta = data?.data?.meta
 
   if (error) {
     return (

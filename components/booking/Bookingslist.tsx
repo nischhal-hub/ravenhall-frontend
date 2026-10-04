@@ -11,18 +11,7 @@ import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/reusable/empty-state"
 import { BookingCardSkeleton } from "./Bookingcardskeleton"
 import { BookingCard } from "./Bookingcard"
-
-interface BookingItem {
-  id: string
-  bookingRef: string
-  date: string
-  startTime: string
-  endTime: string
-  duration: number
-  status: string
-  finalAmount: number
-  lane?: { name: string }
-}
+import { Booking } from "@/types/booking-response.types"
 
 interface Meta {
   total: number
@@ -32,7 +21,7 @@ interface Meta {
 }
 
 interface BookingsListProps {
-  bookings: BookingItem[]
+  bookings: Booking[]
   meta?: Meta
   isLoading: boolean
   search: string
