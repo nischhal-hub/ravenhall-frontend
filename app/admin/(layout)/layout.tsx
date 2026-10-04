@@ -13,6 +13,7 @@ import {
   Clock,
   Crown,
   LayoutDashboard,
+  Store,
   Users,
   Volleyball,
 } from "lucide-react"
@@ -23,6 +24,12 @@ const webSidebarItems: ReusableSidebarItem[] = [
     label: "Dashboard",
     href: "/admin",
     icon: <LayoutDashboard />,
+  },
+  {
+    id: "pos",
+    label: "POS Register",
+    href: "/admin/pos",
+    icon: <Store />,
   },
   {
     id: "bookings",

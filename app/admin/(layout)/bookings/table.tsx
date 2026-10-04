@@ -1,6 +1,7 @@
 "use client"
 
-import { Plus, RefreshCw } from "lucide-react"
+import { Plus, RefreshCw, Store } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useModalContext } from "@/components/context/modal-context"
 import { Card } from "@/components/ui/card"
@@ -63,6 +64,13 @@ export default function BookingsPage() {
                 className={`mr-2 h-4 w-4 ${isRefetching ? "animate-spin" : ""}`}
               />
               Refresh
+            </Button>
+
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/admin/pos">
+                <Store className="mr-2 h-4 w-4 text-primary" />
+                POS Register
+              </Link>
             </Button>
 
             <Button onClick={() => openModal({ key: "ADD_BOOKING" })}>
