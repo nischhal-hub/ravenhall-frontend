@@ -23,6 +23,14 @@ const DELETE_CONFIG: Record<string, { endpoint: string; queryKey: string[] }> =
       endpoint: "/bookings",
       queryKey: ["bookings"],
     },
+    expenses: {
+      endpoint: "/expenses",
+      queryKey: ["expenses", "expense-summary", "revenue-report", "revenue-summary"],
+    },
+    "expense-categories": {
+      endpoint: "/expense-categories",
+      queryKey: ["expense-categories"],
+    },
   }
 
 export const useDeleteItem = () => {

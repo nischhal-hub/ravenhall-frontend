@@ -13,6 +13,7 @@ import {
   Clock,
   Crown,
   LayoutDashboard,
+  Receipt,
   Store,
   Users,
   Volleyball,
@@ -55,6 +56,12 @@ const webSidebarItems: ReusableSidebarItem[] = [
     label: "Users",
     href: "/admin/users",
     icon: <Users />,
+  },
+  {
+    id: "expenses",
+    label: "Expenses",
+    href: "/admin/expenses",
+    icon: <Receipt />,
   },
   {
     id: "reports",
