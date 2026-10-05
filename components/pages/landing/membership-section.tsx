@@ -1,14 +1,10 @@
-﻿"use client"
+"use client"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { planPointIcon } from "@/components/pages/landing/data"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useMembershipPlansQuery } from "@/services/queries/membership.query"
-import {
-  useCreateMembershipPaymentIntent,
-  useConfirmMembershipPayment,
-} from "@/services/mutations/membership.mutations" // Adjust path as needed
 import { useRouter } from "next/navigation"
 
 export function MembershipSection() {
@@ -17,9 +13,6 @@ export function MembershipSection() {
 
   const { data, isLoading, error } = useMembershipPlansQuery()
   const plans = data?.data || []
-
-  const createIntent = useCreateMembershipPaymentIntent()
-  const confirmPayment = useConfirmMembershipPayment()
 
   if (error) {
     console.error("Failed to load membership plans:", error)
@@ -149,9 +142,8 @@ export function MembershipSection() {
                 )}
                 variant={plan.featured ? "default" : "outline"}
                 onClick={() => handleSubscribe(plan)}
-                disabled={createIntent.isPending}
               >
-                {createIntent.isPending ? "Processing..." : plan.cta}
+                {plan.cta}
               </Button>
             </article>
           ))}
