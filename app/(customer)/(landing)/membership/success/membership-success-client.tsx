@@ -1,8 +1,15 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { CheckCircle2, Calendar, Award, ArrowRight } from "lucide-react"
+import {
+  CheckCircle2,
+  Calendar,
+  Award,
+  ArrowRight,
+  XCircle,
+  RefreshCw,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { toast } from "sonner"
@@ -28,6 +35,15 @@ export function MembershipLoadingScreen({
   )
 }
 
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string
+    }
+  }
+  message?: string
+}
+
 export default function MembershipSuccessClient() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -36,45 +52,93 @@ export default function MembershipSuccessClient() {
   const paymentIntent = searchParams.get("payment_intent")
   const redirectStatus = searchParams.get("redirect_status")
 
-  const [isConfirming, setIsConfirming] = useState(true)
-
-  const confirmMutation = useConfirmMembershipPayment()
-
-  const confirmPayment = useCallback(async () => {
-    if (!paymentIntent) return
-
-    try {
-      setIsConfirming(true)
-
-      await confirmMutation.mutateAsync({
-        paymentIntentId: paymentIntent,
-      })
-
-      toast.success("Membership activated successfully!")
-    } catch (error: any) {
-      console.error(error)
-      toast.error(
-        error?.response?.data?.message || "Failed to activate membership"
-      )
-    } finally {
-      setIsConfirming(false)
-    }
-  }, [paymentIntent, confirmMutation])
+  const hasTriggeredRef = useRef(false)
+  const { mutate, isSuccess, isError, error } = useConfirmMembershipPayment()
 
   useEffect(() => {
-    if (redirectStatus === "succeeded" && paymentIntent) {
-      confirmPayment()
-    } else {
+    if (!paymentIntent || redirectStatus !== "succeeded") {
       toast.error("Payment was not successful")
       router.push("/membership")
+      return
     }
-  }, [redirectStatus, paymentIntent, confirmPayment, router])
 
-  if (isConfirming) {
+    if (hasTriggeredRef.current) return
+    hasTriggeredRef.current = true
+
+    mutate({
+      paymentIntentId: paymentIntent,
+    })
+  }, [paymentIntent, redirectStatus, router, mutate])
+
+  const handleRetry = () => {
+    if (paymentIntent) {
+      mutate({
+        paymentIntentId: paymentIntent,
+      })
+    }
+  }
+
+  if (isError) {
+    const err = error as ApiErrorResponse | null
+    const errorMessage =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Failed to activate membership"
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-background to-muted/30 px-4 py-12">
+        <Card className="w-full max-w-lg p-10 text-center shadow-xl">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-destructive/15">
+            <XCircle className="h-12 w-12 text-destructive" />
+          </div>
+
+          <h1 className="mb-3 text-3xl font-bold">Activation Issue</h1>
+
+          <p className="mb-6 text-muted-foreground">{errorMessage}</p>
+
+          <p className="mb-8 text-xs text-muted-foreground">
+            If your card was charged, your payment is secure. You can retry activation or reach out to support with Payment ID:{" "}
+            <span className="font-mono font-semibold">
+              {paymentIntent?.slice(0, 16)}...
+            </span>
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <Button
+              size="lg"
+              onClick={handleRetry}
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Retry Activation
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => router.push("/panel/membership")}
+            >
+              Go to Dashboard
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => router.push("/membership")}
+            >
+              Back to Memberships
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!isSuccess) {
     return (
       <MembershipLoadingScreen
         message="Activating your membership..."
-        description="Please wait a moment"
+        description="Please wait a moment while we verify your payment."
       />
     )
   }
@@ -89,7 +153,13 @@ export default function MembershipSuccessClient() {
         <h1 className="mb-3 text-4xl font-bold">Payment Successful!</h1>
 
         <p className="mb-8 text-xl text-muted-foreground">
-          Welcome to the {plan === "ANNUAL" ? "Annual" : "Monthly"} Membership
+          Welcome to the{" "}
+          {plan.toUpperCase() === "ANNUAL"
+            ? "Annual"
+            : plan.toUpperCase() === "MONTHLY"
+              ? "Monthly"
+              : plan}{" "}
+          Membership
         </p>
 
         <div className="mb-8 rounded-2xl bg-muted/50 p-6 text-left">
@@ -119,7 +189,7 @@ export default function MembershipSuccessClient() {
             <div>
               <p className="font-semibold">Premium Benefits Unlocked</p>
               <p className="text-sm text-muted-foreground">
-                {plan === "ANNUAL"
+                {plan.toUpperCase() === "ANNUAL"
                   ? "20% discount + VIP access + Free guest passes"
                   : "10% discount + Priority booking"}
               </p>
