@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLaneByIdQuery } from "@/services/queries/lane.query"
@@ -26,6 +26,11 @@ export default function BookingPage() {
   const [bookingId, setBookingId] = useState("")
 
   const lane = data?.data
+
+  // Deep link from the chat assistant: ?date=YYYY-MM-DD&slotId=...
+  const searchParams = useSearchParams()
+  const initialDate = searchParams.get("date") ?? undefined
+  const initialSlotId = searchParams.get("slotId") ?? undefined
 
   const handleStep1Next = (date: string, slot: any, duration: 1 | 2 | 3) => {
     setBookingDate(date)
@@ -64,7 +69,14 @@ export default function BookingPage() {
 
         {!isLoading && lane && (
           <>
-            {step === 1 && <Step1 lane={lane} onNext={handleStep1Next} />}
+            {step === 1 && (
+              <Step1
+                lane={lane}
+                onNext={handleStep1Next}
+                initialDate={initialDate}
+                initialSlotId={initialSlotId}
+              />
+            )}
             {step === 2 && bookingSlot && (
               <Step2
                 lane={lane}

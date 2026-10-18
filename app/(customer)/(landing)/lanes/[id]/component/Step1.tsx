@@ -12,14 +12,29 @@ import { Lane, Slot } from "@/types/lane-response.types"
 interface Step1Props {
   lane: Lane
   onNext: (date: string, slot: Slot, duration: 1 | 2 | 3) => void
+  /** Pre-select a date / slot (used by deep links from the chat assistant). */
+  initialDate?: string
+  initialSlotId?: string
 }
 
-export function Step1({ lane, onNext }: Step1Props) {
+export function Step1({
+  lane,
+  onNext,
+  initialDate,
+  initialSlotId,
+}: Step1Props) {
   const today = new Date()
   const [selectedDate, setSelectedDate] = useState(
-    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+      ? initialDate
+      : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
   )
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(() => {
+    const match = initialSlotId
+      ? lane.slots.find((s) => s.id === initialSlotId)
+      : undefined
+    return match && match.isAvailable && !match.isBlocked ? match : null
+  })
   const [duration, setDuration] = useState<1 | 2 | 3>(1)
 
   const daySlots = useMemo(() => {
