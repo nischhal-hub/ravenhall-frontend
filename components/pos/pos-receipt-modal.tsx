@@ -168,9 +168,15 @@ export function PosReceiptModal({
               {/* Pricing Breakdown */}
               <div className="space-y-1.5 pt-2 text-[11px]">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Subtotal:</span>
-                  <span>${receipt.pricing.subtotal.toFixed(2)}</span>
+                  <span>Lane hire:</span>
+                  <span>${receipt.pricing.laneHire.toFixed(2)}</span>
                 </div>
+                {receipt.pricing.equipmentFee > 0 && (
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Equipment fee:</span>
+                    <span>${receipt.pricing.equipmentFee.toFixed(2)}</span>
+                  </div>
+                )}
                 {receipt.pricing.discount > 0 && (
                   <div className="flex justify-between text-accent font-medium">
                     <span>
