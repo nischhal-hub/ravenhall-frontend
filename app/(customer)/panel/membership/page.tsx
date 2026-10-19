@@ -24,6 +24,7 @@ import {
   PaymentStatusBadge,
 } from "@/components/reusable/status-badge"
 import { formatCurrency } from "@/lib/utils"
+import { MembershipPlans } from "@/components/membership/membership-plans"
 import { useMyMembershipQuery } from "@/services/queries/membership.query"
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -195,22 +196,22 @@ function PageSkeleton() {
 // ─────────────────────────────────────────────────────────────────────────────
 // No membership state
 // ─────────────────────────────────────────────────────────────────────────────
-function NoMembership({ onJoin }: { onJoin: () => void }) {
+function NoMembership() {
   return (
-    <div className="mx-auto max-w-md px-4 py-24 text-center">
-      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-border">
-        <Shield className="h-9 w-9 text-muted-foreground" />
+    <div className="min-h-screen bg-background pb-20">
+      <PanelHero
+        eyebrow="No Active Membership"
+        eyebrowIcon={Shield}
+        title="Your Membership"
+        description="Join a plan to unlock discounts, priority booking, and exclusive lane access."
+      />
+      <div className="mx-auto max-w-6xl px-4 pt-10">
+        <MembershipPlans />
+        <p className="mt-8 text-center text-xs text-muted-foreground">
+          All prices are in AUD and include GST. Cancel or change your plan at
+          any time.
+        </p>
       </div>
-      <h2 className="text-2xl font-bold text-foreground">
-        No Active Membership
-      </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Join a membership plan to unlock discounts, priority booking, and
-        exclusive lane access.
-      </p>
-      <Button onClick={onJoin} className="mt-8 h-12 w-full rounded-xl text-base font-bold">
-        View Plans <ChevronRight className="ml-1 h-4 w-4" />
-      </Button>
     </div>
   )
 }
@@ -244,13 +245,17 @@ export default function MembershipPage() {
   if (isLoading) return <PageSkeleton />
 
   // ── Error ────────────────────────────────────────────────────────────────
+  // No membership yet: the API answers 200 with `data: null`, or a 404.
+  const status = (error as { response?: { status?: number } } | null)?.response
+    ?.status
+  const msgText = error instanceof Error ? error.message.toLowerCase() : ""
+  const notFound =
+    status === 404 || msgText.includes("not found") || msgText.includes("404")
+  if (!membership && (!isError || notFound)) return <NoMembership />
+
   if (isError || !membership) {
     const msg =
       error instanceof Error ? error.message : "Could not load membership."
-    // If 404-ish, show the "no membership" state
-    if (msg.toLowerCase().includes("not found") || msg.includes("404")) {
-      return <NoMembership onJoin={() => router.push("/membership/plans")} />
-    }
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
         <XCircle className="h-12 w-12 text-destructive" />
@@ -412,7 +417,7 @@ export default function MembershipPage() {
               {/* Renew CTA */}
               {(isUrgent || isExpired) && (
                 <Button
-                  onClick={() => router.push("/membership/plans")}
+                  onClick={() => router.push("/membership")}
                   className="mt-2 h-11 w-full rounded-xl font-bold"
                 >
                   {isExpired ? "Renew Membership" : "Renew Early"}
@@ -485,7 +490,7 @@ export default function MembershipPage() {
           <div className="anim d6 flex flex-wrap gap-3 pt-2">
             <Button
               variant="outline"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/panel")}
               className="h-11 rounded-xl px-6 font-semibold"
             >
               Go to Dashboard
@@ -494,7 +499,7 @@ export default function MembershipPage() {
                 only offer it here as a secondary action otherwise. */}
             {!isUrgent && !isExpired && (
               <Button
-                onClick={() => router.push("/membership/plans")}
+                onClick={() => router.push("/membership")}
                 className="h-11 rounded-xl px-6 font-semibold"
               >
                 Upgrade Plan

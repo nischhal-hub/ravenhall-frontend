@@ -50,3 +50,18 @@ export const useMyMembershipQuery = () => {
     enabled: true,
   })
 }
+
+// Discount % the logged-in customer gets on lane hire (0 if no active plan).
+export const useMemberDiscount = () => {
+  const { data, isLoading } = useMyMembershipQuery()
+  // The API wraps the membership in `data`, which the query type doesn't model
+  const membership = (data as unknown as { data?: MyMembershipResponse })?.data
+  const active =
+    !!membership?.isActive && new Date(membership.endDate) > new Date()
+
+  return {
+    discountPct: active ? membership.discountPct : 0,
+    plan: active ? membership.plan : null,
+    isLoading,
+  }
+}

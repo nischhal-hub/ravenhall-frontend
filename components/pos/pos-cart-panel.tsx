@@ -150,7 +150,8 @@ export function PosCartPanel({
   ])
 
   // Effective display amounts
-  const subtotal = calculatedPrice ? calculatedPrice.totalAmount : rawSubtotal
+  const subtotal = calculatedPrice ? calculatedPrice.laneHire : rawSubtotal
+  const equipmentFee = calculatedPrice ? calculatedPrice.equipmentFee : 0
   const finalAmount = calculatedPrice ? calculatedPrice.finalAmount : rawSubtotal
   const totalDiscount = calculatedPrice ? calculatedPrice.discountBreakdown.totalDiscountAmount : 0
 
@@ -457,9 +458,16 @@ export function PosCartPanel({
         {selectedSlots.length > 0 && (
           <div className="rounded-lg bg-muted/40 p-3 space-y-1.5 text-xs border border-border">
             <div className="flex justify-between text-muted-foreground">
-              <span>Subtotal ({selectedSlots.length} sessions)</span>
+              <span>Lane hire ({selectedSlots.length} sessions)</span>
               <span className="font-mono">${subtotal.toFixed(2)}</span>
             </div>
+
+            {equipmentFee > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Equipment fee</span>
+                <span className="font-mono">${equipmentFee.toFixed(2)}</span>
+              </div>
+            )}
 
             {calculatedPrice?.discountBreakdown.membership.plan &&
               calculatedPrice.discountBreakdown.membership.discountPct > 0 && (

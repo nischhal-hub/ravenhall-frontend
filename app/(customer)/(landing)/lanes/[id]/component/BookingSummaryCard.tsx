@@ -4,13 +4,16 @@ import { cn } from "@/lib/utils"
 import { Lane, Slot } from "@/types/lane-response.types"
 import Image from "next/image"
 
-const EQUIPMENT_FEE = 10
+import { calculateBookingPrice } from "@/lib/booking"
 
 interface BookingSummaryCardProps {
   lane: Lane
   selectedDate: string
   selectedSlot: Slot | null
+  /** End of the whole session (start + duration); null until a slot is picked. */
+  endTime: string | null
   duration: 1 | 2 | 3
+  memberDiscountPct: number
   onDurationChange: (d: 1 | 2 | 3) => void
 }
 
@@ -18,11 +21,16 @@ export function BookingSummaryCard({
   lane,
   selectedDate,
   selectedSlot,
+  endTime,
   duration,
+  memberDiscountPct,
   onDurationChange,
 }: BookingSummaryCardProps) {
-  const laneHire = lane.hourlyRate * duration
-  const total = laneHire + EQUIPMENT_FEE
+  const price = calculateBookingPrice({
+    hourlyRate: lane.hourlyRate,
+    duration,
+    memberDiscountPct,
+  })
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
@@ -36,7 +44,7 @@ export function BookingSummaryCard({
           />
         ) : (
           <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/60 p-4">
-            <Badge className="mb-1 w-fit border-0 bg-accent text-accent-foreground text-[10px]">
+            <Badge className="mb-1 w-fit border-0 bg-accent text-[10px] text-accent-foreground">
               {lane.type}
             </Badge>
             <p className="text-lg leading-tight font-bold text-primary-foreground">
@@ -73,7 +81,7 @@ export function BookingSummaryCard({
                   </span>
                 </div>
                 <p className="pl-5 font-medium text-foreground">
-                  {selectedSlot.startTime} — {selectedSlot.endTime}
+                  {selectedSlot.startTime} — {endTime ?? selectedSlot.endTime}
                 </p>
               </>
             )}
@@ -110,15 +118,21 @@ export function BookingSummaryCard({
         <div className="space-y-2 border-t border-border pt-1 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>Lane Hire ({duration} Hr)</span>
-            <span>${laneHire.toFixed(2)}</span>
+            <span>${price.laneHire.toFixed(2)}</span>
           </div>
+          {memberDiscountPct > 0 && (
+            <div className="flex justify-between text-accent">
+              <span>Member Discount ({memberDiscountPct}%)</span>
+              <span>-${price.memberDiscount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-muted-foreground">
             <span>Equipment Fee</span>
-            <span>${EQUIPMENT_FEE.toFixed(2)}</span>
+            <span>${price.equipmentFee.toFixed(2)}</span>
           </div>
           <div className="flex justify-between border-t border-border pt-2 text-base font-bold text-foreground">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>${price.total.toFixed(2)}</span>
           </div>
         </div>
       </div>

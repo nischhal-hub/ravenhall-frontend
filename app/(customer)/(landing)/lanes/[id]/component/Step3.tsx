@@ -22,6 +22,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js"
 import { toast } from "sonner"
+import { calculateBookingPrice } from "@/lib/booking"
 
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 if (!stripeKey) {
@@ -32,14 +33,14 @@ if (!stripeKey) {
 }
 const stripePromise = loadStripe(stripeKey ?? "")
 
-const EQUIPMENT_FEE = 10
-const MEMBER_DISCOUNT = 0.15
-
 interface Step3Props {
   lane: Lane
   date: string
   slot: Slot
   duration: 1 | 2 | 3
+  /** End of the whole session (start + duration) */
+  endTime: string
+  memberDiscountPct: number
   promo: string
   promoDiscount: number
   /** ✅ FIX: bookingId created in Step2 must be passed in */
@@ -138,8 +139,7 @@ function CheckoutForm({
           <ShieldCheck className="size-3.5 text-accent" /> SSL Secured
         </span>
         <span className="flex items-center gap-1">
-          <CheckCircle2 className="size-3.5 text-accent" /> Instant
-          Confirmation
+          <CheckCircle2 className="size-3.5 text-accent" /> Instant Confirmation
         </span>
       </div>
     </div>
@@ -154,6 +154,8 @@ export function Step3({
   date,
   slot,
   duration,
+  endTime,
+  memberDiscountPct,
   promo,
   promoDiscount,
   bookingId,
@@ -164,10 +166,13 @@ export function Step3({
 
   const createPaymentIntentMutation = useCreatePaymentIntentMutation()
 
-  const laneHire = lane.hourlyRate * duration
-  const memberDisc = laneHire * MEMBER_DISCOUNT
-  const subtotal = laneHire - memberDisc - promoDiscount
-  const total = subtotal + EQUIPMENT_FEE
+  const price = calculateBookingPrice({
+    hourlyRate: lane.hourlyRate,
+    duration,
+    memberDiscountPct,
+    promoDiscount,
+  })
+  const total = price.total
 
   // ✅ FIX: bookingId is now correctly passed from BookingPage via props
   useEffect(() => {
@@ -293,7 +298,7 @@ export function Step3({
               <div className="flex items-center gap-1.5">
                 <Clock className="size-3.5 shrink-0" />
                 <span>
-                  {slot.startTime} — {slot.endTime} &nbsp;·&nbsp;{duration} hr
+                  {slot.startTime} — {endTime} &nbsp;·&nbsp;{duration} hr
                   {duration > 1 ? "s" : ""}
                 </span>
               </div>
@@ -304,27 +309,33 @@ export function Step3({
             {/* Line items */}
             <div className="space-y-3 px-6 py-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Lane Hire</span>
+                <span className="text-muted-foreground">
+                  Lane Hire ({duration} Hr)
+                </span>
                 <span className="font-semibold text-foreground">
-                  ${laneHire.toFixed(2)}
+                  ${price.laneHire.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between text-accent">
-                <span>Member Discount (15%)</span>
-                <span className="font-semibold">-${memberDisc.toFixed(2)}</span>
-              </div>
-              {promoDiscount > 0 && (
+              {memberDiscountPct > 0 && (
+                <div className="flex justify-between text-accent">
+                  <span>Member Discount ({memberDiscountPct}%)</span>
+                  <span className="font-semibold">
+                    -${price.memberDiscount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {price.promoDiscount > 0 && (
                 <div className="flex justify-between text-accent">
                   <span>Promo ({promo})</span>
                   <span className="font-semibold">
-                    -${promoDiscount.toFixed(2)}
+                    -${price.promoDiscount.toFixed(2)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-muted-foreground">
                 <span>Equipment Fee</span>
                 <span className="font-semibold text-foreground">
-                  ${EQUIPMENT_FEE.toFixed(2)}
+                  ${price.equipmentFee.toFixed(2)}
                 </span>
               </div>
             </div>
