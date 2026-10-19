@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from "next/navigation"
 import { AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useLaneByIdQuery } from "@/services/queries/lane.query"
+import { useMemberDiscount } from "@/services/queries/membership.query"
 import { BookingPageSkeleton } from "./component/BookingPageSkeleton"
 import { Step1 } from "./component/Step1"
 import { Step2 } from "./component/Step2"
@@ -20,22 +21,31 @@ export default function BookingPage() {
   const [bookingDate, setBookingDate] = useState("")
   const [bookingSlot, setBookingSlot] = useState<any>(null)
   const [bookingDuration, setBookingDuration] = useState<1 | 2 | 3>(1)
+  const [bookingEndTime, setBookingEndTime] = useState("")
   const [appliedPromo, setAppliedPromo] = useState("")
   const [promoDiscount, setPromoDiscount] = useState(0)
   // ✅ FIX 1: Store bookingId in state so Step3 can receive it
   const [bookingId, setBookingId] = useState("")
 
   const lane = data?.data
+  const { discountPct: memberDiscountPct, isLoading: isMemberLoading } =
+    useMemberDiscount()
 
   // Deep link from the chat assistant: ?date=YYYY-MM-DD&slotId=...
   const searchParams = useSearchParams()
   const initialDate = searchParams.get("date") ?? undefined
   const initialSlotId = searchParams.get("slotId") ?? undefined
 
-  const handleStep1Next = (date: string, slot: any, duration: 1 | 2 | 3) => {
+  const handleStep1Next = (
+    date: string,
+    slot: any,
+    duration: 1 | 2 | 3,
+    endTime: string
+  ) => {
     setBookingDate(date)
     setBookingSlot(slot)
     setBookingDuration(duration)
+    setBookingEndTime(endTime)
     setStep(2)
   }
 
@@ -72,6 +82,7 @@ export default function BookingPage() {
             {step === 1 && (
               <Step1
                 lane={lane}
+                memberDiscountPct={memberDiscountPct}
                 onNext={handleStep1Next}
                 initialDate={initialDate}
                 initialSlotId={initialSlotId}
@@ -83,6 +94,9 @@ export default function BookingPage() {
                 date={bookingDate}
                 slot={bookingSlot}
                 duration={bookingDuration}
+                endTime={bookingEndTime}
+                memberDiscountPct={memberDiscountPct}
+                isMemberLoading={isMemberLoading}
                 onNext={handleStep2Next}
                 onBack={() => setStep(1)}
               />
@@ -94,6 +108,8 @@ export default function BookingPage() {
                 date={bookingDate}
                 slot={bookingSlot}
                 duration={bookingDuration}
+                endTime={bookingEndTime}
+                memberDiscountPct={memberDiscountPct}
                 promo={appliedPromo}
                 promoDiscount={promoDiscount}
                 bookingId={bookingId}

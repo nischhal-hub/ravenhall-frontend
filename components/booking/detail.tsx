@@ -46,6 +46,7 @@ import {
   Mail,
   MapPin,
   Phone,
+  Loader2,
   RefreshCw,
   Tag,
   Timer,
@@ -147,7 +148,9 @@ const STATUS_BAR_COLOR: Record<string, string> = {
 
 function statusConfig(status: string) {
   const key = status.toUpperCase()
-  const config = BOOKING_STATUS_CONFIG[key as keyof typeof BOOKING_STATUS_CONFIG] || {
+  const config = BOOKING_STATUS_CONFIG[
+    key as keyof typeof BOOKING_STATUS_CONFIG
+  ] || {
     label: status,
     variant: "secondary" as const,
   }
@@ -220,6 +223,8 @@ function InfoRow({
   )
 }
 
+type CancelStage = "idle" | "processing" | "done" | "error"
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export function BookingDetailPage({
@@ -228,6 +233,12 @@ export function BookingDetailPage({
 }: BookingDetailPageProps) {
   const router = useRouter()
   const [selectedStatus, setSelectedStatus] = useState(booking.status)
+  const [cancelStage, setCancelStage] = useState<CancelStage>("idle")
+  const [cancelRefund, setCancelRefund] = useState<{
+    amount: number
+    currency: string
+  } | null>(null)
+  const [cancelError, setCancelError] = useState("")
 
   const cancelMutation = useCancelBookingMutation()
   const statusMutation = useUpdateBookingStatusMutation()
@@ -239,7 +250,11 @@ export function BookingDetailPage({
     booking.status.toUpperCase()
   )
 
-  const slot = booking.items[0]?.slot
+  const sortedSlots = booking.items
+    .map((item) => item.slot)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))
+  const slot = sortedSlots[0]
+  const endSlot = sortedSlots[sortedSlots.length - 1]
   const lane = slot?.lane
   const payment = booking.payment
 
@@ -249,7 +264,28 @@ export function BookingDetailPage({
   }
 
   const handleCancel = () => {
-    cancelMutation.mutate(booking.id)
+    // Snapshot now: the booking prop changes once the cancel goes through
+    const wasPaid = ["SUCCEEDED", "PAID"].includes(
+      payment?.status?.toUpperCase() ?? ""
+    )
+    setCancelRefund(
+      wasPaid && payment
+        ? { amount: payment.amount, currency: payment.currency }
+        : null
+    )
+    setCancelStage("processing")
+
+    cancelMutation.mutate(booking.id, {
+      onSuccess: () => setCancelStage("done"),
+      onError: (error: any) => {
+        setCancelError(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Something went wrong"
+        )
+        setCancelStage("error")
+      },
+    })
   }
 
   const handleDelete = () => {
@@ -260,6 +296,85 @@ export function BookingDetailPage({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* ── Cancel progress / result ── */}
+      <AlertDialog
+        open={cancelStage !== "idle"}
+        onOpenChange={(open) => {
+          // Can't be dismissed while the cancellation is in flight
+          if (!open && cancelStage !== "processing") setCancelStage("idle")
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              {cancelStage === "processing" && (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  Cancelling your booking…
+                </>
+              )}
+              {cancelStage === "done" && (
+                <>
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  Booking cancelled
+                </>
+              )}
+              {cancelStage === "error" && (
+                <>
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  Couldn&apos;t cancel booking
+                </>
+              )}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {cancelStage === "processing" && (
+                  <p>
+                    Please wait while we cancel{" "}
+                    <strong>{booking.bookingRef}</strong>
+                    {cancelRefund ? " and process your refund" : ""}. Don&apos;t
+                    close this page.
+                  </p>
+                )}
+                {cancelStage === "done" && (
+                  <>
+                    <p>
+                      Booking <strong>{booking.bookingRef}</strong> has been
+                      cancelled and the slot has been released.
+                    </p>
+                    {cancelRefund ? (
+                      <p>
+                        A refund of{" "}
+                        <strong>
+                          {formatCurrency(
+                            cancelRefund.amount,
+                            cancelRefund.currency
+                          )}
+                        </strong>{" "}
+                        has been issued to the original payment method. It can
+                        take 5–10 business days to appear on the statement.
+                      </p>
+                    ) : (
+                      <p>
+                        No payment was taken, so there is nothing to refund.
+                      </p>
+                    )}
+                  </>
+                )}
+                {cancelStage === "error" && <p>{cancelError}</p>}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {cancelStage !== "processing" && (
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {cancelStage === "done" ? "Done" : "Close"}
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* ── Top bar ── */}
       <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
@@ -301,7 +416,7 @@ export function BookingDetailPage({
                       onClick={handleCancel}
                       className="bg-destructive hover:bg-destructive/90"
                     >
-                      {cancelMutation.isPending ? "Cancelling…" : "Yes, cancel"}
+                      Yes, cancel
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -427,7 +542,10 @@ export function BookingDetailPage({
                       {booking.user.role.toLowerCase()}
                     </span>
                     {booking.user.isEmailVerified && (
-                      <Badge variant="default" className="gap-1 px-1.5 py-0 text-[10px]">
+                      <Badge
+                        variant="default"
+                        className="gap-1 px-1.5 py-0 text-[10px]"
+                      >
                         <ShieldCheck className="h-2.5 w-2.5" />
                         Verified
                       </Badge>
@@ -467,7 +585,7 @@ export function BookingDetailPage({
                 <InfoRow
                   icon={Clock}
                   label="Time"
-                  value={`${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}`}
+                  value={`${formatTime(slot.startTime)} – ${formatTime(endSlot.endTime)}`}
                 />
                 <InfoRow
                   icon={User}
@@ -549,7 +667,9 @@ export function BookingDetailPage({
             <SectionCard icon={DollarSign} title="Pricing">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Unit price</span>
+                  <span className="text-muted-foreground">
+                    Unit price{booking.items.length > 1 && ` × ${booking.items.length} hrs`}
+                  </span>
                   <span className="font-medium">
                     {formatCurrency(
                       booking.items[0]?.unitPrice ?? 0,
