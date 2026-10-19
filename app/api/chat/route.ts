@@ -6,7 +6,7 @@ import { buildSystemPrompt } from "@/lib/chatbot/system-prompt"
 
 export const maxDuration = 30
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash"
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash"
 const THINKING_LEVEL = (process.env.GEMINI_THINKING_LEVEL || "low") as
   | "minimal"
   | "low"
@@ -125,5 +125,12 @@ export async function POST(req: Request) {
     },
   })
 
-  return result.toUIMessageStreamResponse()
+  return result.toUIMessageStreamResponse({
+    // The default message hides everything. Log the real cause (bad key, retired
+    // model, quota...) to the server logs, but keep the client message generic.
+    onError: (error) => {
+      console.error(`[chat] model "${MODEL}" failed:`, error)
+      return "The assistant is unavailable right now. Please try again."
+    },
+  })
 }
