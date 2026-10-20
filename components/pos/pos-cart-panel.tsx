@@ -45,6 +45,7 @@ import {
 } from "@/services/mutations/pos.mutations"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { EQUIPMENT_FEE } from "@/lib/booking"
 
 interface PosCartPanelProps {
   selectedSlots: SelectedSlotInfo[]
@@ -92,6 +93,7 @@ export function PosCartPanel({
 
   // Real-time backend price calculation result
   const [calculatedPrice, setCalculatedPrice] = useState<PosPriceCalculation | null>(null)
+  const [priceError, setPriceError] = useState(false)
 
   const { mutate: calculatePrice, isPending: isCalculating } = useCalculatePosPriceMutation()
   const { mutate: createBooking, isPending: isBooking } = useCreatePosBookingMutation()
@@ -101,22 +103,24 @@ export function PosCartPanel({
     return selectedSlots.reduce((acc, s) => acc + s.hourlyRate, 0)
   }, [selectedSlots])
 
+  // Parsed staff override; a percentage is clamped to 0-100 (the API rejects more)
+  const customDiscount = useMemo(() => {
+    const val = parseFloat(customDiscountVal)
+    if (!(val > 0)) return { customPct: undefined, customFlat: undefined }
+    return customDiscountType === "PCT"
+      ? { customPct: Math.min(val, 100), customFlat: undefined }
+      : { customPct: undefined, customFlat: val }
+  }, [customDiscountType, customDiscountVal])
+
   // Recalculate price when slots, customer, promo code, or custom discounts change
   useEffect(() => {
     if (selectedSlots.length === 0) {
       setCalculatedPrice(null)
+      setPriceError(false)
       return
     }
 
-    const customPct =
-      customDiscountType === "PCT" && parseFloat(customDiscountVal) > 0
-        ? parseFloat(customDiscountVal)
-        : undefined
-
-    const customFlat =
-      customDiscountType === "FLAT" && parseFloat(customDiscountVal) > 0
-        ? parseFloat(customDiscountVal)
-        : undefined
+    const { customPct, customFlat } = customDiscount
 
     calculatePrice(
       {
@@ -130,12 +134,16 @@ export function PosCartPanel({
       {
         onSuccess: (data) => {
           setCalculatedPrice(data)
+          setPriceError(false)
         },
-        onError: (err) => {
-          // If promo code failed, clear promo code
+        onError: () => {
+          // The mutation hook already toasts the server message. Drop the stale
+          // price so we never show (or charge) a total for a different selection.
+          setCalculatedPrice(null)
+          setPriceError(true)
           if (appliedPromoCode) {
-            toast.error("Invalid or expired discount code")
             setAppliedPromoCode("")
+            setDiscountCodeInput("")
           }
         },
       }
@@ -144,20 +152,50 @@ export function PosCartPanel({
     selectedSlots,
     customerSelection,
     appliedPromoCode,
-    customDiscountType,
-    customDiscountVal,
+    customDiscount,
     calculatePrice,
   ])
 
-  // Effective display amounts
-  const subtotal = calculatedPrice ? calculatedPrice.laneHire : rawSubtotal
-  const equipmentFee = calculatedPrice ? calculatedPrice.equipmentFee : 0
-  const finalAmount = calculatedPrice ? calculatedPrice.finalAmount : rawSubtotal
-  const totalDiscount = calculatedPrice ? calculatedPrice.discountBreakdown.totalDiscountAmount : 0
+  // Effective display amounts.
+  // The API may omit fields (e.g. an older backend without equipmentFee/laneHire),
+  // so fall back to safe values instead of crashing on `.toFixed`. Until the
+  // server price arrives, show a provisional total that already includes the
+  // flat equipment fee so the figure doesn't jump.
+  const discountBreakdown = calculatedPrice?.discountBreakdown
+  const equipmentFee = calculatedPrice ? calculatedPrice.equipmentFee ?? 0 : EQUIPMENT_FEE
+  const totalDiscount = discountBreakdown?.totalDiscountAmount ?? 0
+  const subtotal =
+    calculatedPrice?.laneHire ??
+    (calculatedPrice?.totalAmount != null
+      ? calculatedPrice.totalAmount - equipmentFee
+      : rawSubtotal)
+  const finalAmount =
+    calculatedPrice?.finalAmount ?? Math.max(0, subtotal + equipmentFee - totalDiscount)
+  const pctDiscountAmount = discountBreakdown?.pctDiscountAmount ?? 0
+  const flatDiscountAmount = discountBreakdown?.flatDiscountAmount ?? 0
+
+  // Only the single highest percentage applies (membership > promo > staff on ties)
+  const membershipPct = discountBreakdown?.membership?.discountPct ?? 0
+  const promoPct = discountBreakdown?.discountCode?.discountPct ?? 0
+  const staffPct = discountBreakdown?.customDiscount?.pct ?? 0
+  const pctSource: "membership" | "promo" | "staff" | null =
+    pctDiscountAmount <= 0
+      ? null
+      : membershipPct >= promoPct && membershipPct >= staffPct
+        ? "membership"
+        : promoPct >= staffPct
+          ? "promo"
+          : "staff"
+  const appliedPctValue = Math.max(membershipPct, promoPct, staffPct)
 
   // Cash change calculation
   const tenderedNum = parseFloat(cashTendered) || 0
   const changeDue = Math.max(0, tenderedNum - finalAmount)
+  // Cash entered but not enough to cover a "Paid Now" sale
+  const cashShortfall =
+    paymentMethod === "CASH" && paymentStatus === "SUCCEEDED" && tenderedNum > 0
+      ? Math.round((finalAmount - tenderedNum) * 100) / 100
+      : 0
 
   // Apply promo code action
   const handleApplyPromo = () => {
@@ -178,15 +216,7 @@ export function PosCartPanel({
       return
     }
 
-    const customPct =
-      customDiscountType === "PCT" && parseFloat(customDiscountVal) > 0
-        ? parseFloat(customDiscountVal)
-        : undefined
-
-    const customFlat =
-      customDiscountType === "FLAT" && parseFloat(customDiscountVal) > 0
-        ? parseFloat(customDiscountVal)
-        : undefined
+    const { customPct, customFlat } = customDiscount
 
     const payload = {
       slotIds: selectedSlots.map((s) => s.slotId),
@@ -195,7 +225,8 @@ export function PosCartPanel({
       discountCode: appliedPromoCode || undefined,
       customDiscountPct: customPct,
       customDiscountAmount: customFlat,
-      discountReason: discountReason.trim() || undefined,
+      discountReason:
+        customPct || customFlat ? discountReason.trim() || undefined : undefined,
       notes: notes.trim() || undefined,
       customerId:
         customerSelection.type === "EXISTING" ? customerSelection.customer?.id : undefined,
@@ -457,6 +488,11 @@ export function PosCartPanel({
         {/* Section 4: Pricing Breakdown */}
         {selectedSlots.length > 0 && (
           <div className="rounded-lg bg-muted/40 p-3 space-y-1.5 text-xs border border-border">
+            {priceError && (
+              <p className="text-[11px] font-semibold text-destructive">
+                Couldn&apos;t price this selection — adjust the slots or discounts and try again.
+              </p>
+            )}
             <div className="flex justify-between text-muted-foreground">
               <span>Lane hire ({selectedSlots.length} sessions)</span>
               <span className="font-mono">${subtotal.toFixed(2)}</span>
@@ -469,38 +505,27 @@ export function PosCartPanel({
               </div>
             )}
 
-            {calculatedPrice?.discountBreakdown.membership.plan &&
-              calculatedPrice.discountBreakdown.membership.discountPct > 0 && (
-                <div className="flex justify-between text-accent font-medium">
-                  <span>
-                    Membership Discount ({calculatedPrice.discountBreakdown.membership.plan}{" "}
-                    {calculatedPrice.discountBreakdown.membership.discountPct}%)
-                  </span>
-                  <span className="font-mono">
-                    -${calculatedPrice.discountBreakdown.pctDiscountAmount.toFixed(2)}
-                  </span>
-                </div>
-              )}
-
-            {appliedPromoCode && calculatedPrice?.discountBreakdown.discountCode && (
+            {pctSource && (
               <div className="flex justify-between text-accent font-medium">
-                <span>Promo Code ({appliedPromoCode})</span>
-                <span className="font-mono">
-                  -${calculatedPrice.discountBreakdown.pctDiscountAmount.toFixed(2)}
+                <span>
+                  {pctSource === "membership"
+                    ? `Membership Discount (${discountBreakdown?.membership?.plan} ${appliedPctValue}%)`
+                    : pctSource === "promo"
+                      ? `Promo Code (${appliedPromoCode} ${appliedPctValue}%)`
+                      : `Staff Discount (${appliedPctValue}%)`}
                 </span>
+                <span className="font-mono">-${pctDiscountAmount.toFixed(2)}</span>
               </div>
             )}
 
-            {calculatedPrice && calculatedPrice.discountBreakdown.flatDiscountAmount > 0 && (
+            {flatDiscountAmount > 0 && (
               <div className="flex justify-between text-accent font-medium">
                 <span>Staff Flat Discount</span>
-                <span className="font-mono">
-                  -${calculatedPrice.discountBreakdown.flatDiscountAmount.toFixed(2)}
-                </span>
+                <span className="font-mono">-${flatDiscountAmount.toFixed(2)}</span>
               </div>
             )}
 
-            {totalDiscount > 0 && (
+            {pctDiscountAmount > 0 && flatDiscountAmount > 0 && (
               <div className="flex justify-between text-xs font-semibold text-accent pt-1 border-t border-dashed border-border/80">
                 <span>Total Discount Saved</span>
                 <span className="font-mono">-${totalDiscount.toFixed(2)}</span>
@@ -584,6 +609,12 @@ export function PosCartPanel({
                   </div>
                 </div>
 
+                {cashShortfall > 0 && (
+                  <p className="text-[11px] font-semibold text-destructive">
+                    Short by ${cashShortfall.toFixed(2)} — tendered cash doesn&apos;t cover the total.
+                  </p>
+                )}
+
                 {/* Quick Cash preset pills */}
                 <div className="flex gap-1 overflow-x-auto pt-0.5">
                   {[20, 50, 100].map((preset) => (
@@ -665,7 +696,9 @@ export function PosCartPanel({
         <Button
           type="button"
           onClick={handleCheckout}
-          disabled={selectedSlots.length === 0 || isBooking || isCalculating}
+          disabled={
+            selectedSlots.length === 0 || isBooking || isCalculating || priceError || cashShortfall > 0
+          }
           className="w-full h-12 text-sm font-bold gap-2 shadow-md bg-primary hover:bg-primary/95 text-primary-foreground"
         >
           {isBooking ? (
