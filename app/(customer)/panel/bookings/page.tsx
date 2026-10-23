@@ -4,6 +4,7 @@ import { useState } from "react"
 import { RefreshCw } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useOwnBookingsQuery } from "@/services/queries/bookings.query"
 import { BookingsHeader } from "@/components/booking/Bookingsheader"
 import { BookingsStats } from "@/components/booking/Bookingsstats"
@@ -63,7 +64,16 @@ export default function BookingsPage() {
       {/* ── Body ─────────────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-6 px-4 pt-8 sm:px-8">
         <div className="bp-1">
-          <BookingsStats bookings={bookings} />
+          {/* Never render counts until this user's bookings have loaded */}
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-28 rounded-2xl" />
+              ))}
+            </div>
+          ) : (
+            <BookingsStats bookings={bookings} />
+          )}
         </div>
 
         <div className="bp-2">

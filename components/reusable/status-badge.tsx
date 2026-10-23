@@ -24,6 +24,23 @@ export const BOOKING_STATUS_CONFIG: Record<
   COMPLETED: { label: "Completed", variant: "outline" },
 }
 
+// Mirrors the backend's allowed transitions. CANCELLED is deliberately excluded:
+// cancelling has its own action (confirmation + reason + customer notification).
+const BOOKING_STATUS_UPDATES: Record<BookingStatus, BookingStatus[]> = {
+  PENDING: ["CONFIRMED"],
+  CONFIRMED: ["COMPLETED"],
+  CANCELLED: [],
+  COMPLETED: [],
+}
+
+export function getStatusUpdateOptions(status: string): BookingStatus[] {
+  return BOOKING_STATUS_UPDATES[status.toUpperCase() as BookingStatus] ?? []
+}
+
+export function isBookingCancellable(status: string) {
+  return ["PENDING", "CONFIRMED"].includes(status.toUpperCase())
+}
+
 export function BookingStatusBadge({ status }: { status: string }) {
   const config = BOOKING_STATUS_CONFIG[status as BookingStatus] || {
     label: status,

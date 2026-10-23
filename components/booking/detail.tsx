@@ -9,7 +9,10 @@ import PageHeader from "@/components/ui/page-header"
 import {
   BOOKING_STATUS_CONFIG,
   PaymentStatusBadge,
+  getStatusUpdateOptions,
+  isBookingCancellable,
 } from "@/components/reusable/status-badge"
+import { Textarea } from "@/components/ui/textarea"
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils"
 import {
   AlertDialog,
@@ -30,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  useAdminCancelBookingMutation,
   useCancelBookingMutation,
   useUpdateBookingStatusMutation,
   useDeleteBookingMutation,
@@ -69,6 +73,8 @@ export interface Booking {
   discountAmount: number
   finalAmount: number
   notes: string | null
+  cancelledAt?: string | null
+  cancellationReason?: string | null
   discountCodeId: string | null
   createdAt: string
   updatedAt: string
@@ -227,29 +233,39 @@ export function BookingDetailPage({
   isAdmin,
 }: BookingDetailPageProps) {
   const router = useRouter()
-  const [selectedStatus, setSelectedStatus] = useState(booking.status)
+  const statusOptions = getStatusUpdateOptions(booking.status)
+  const [selectedStatus, setSelectedStatus] = useState("")
+  const [cancelReason, setCancelReason] = useState("")
 
-  const cancelMutation = useCancelBookingMutation()
+  // One cancel action for both portals; admins hit the staff endpoint, which
+  // can cancel any booking and notifies the customer
+  const customerCancelMutation = useCancelBookingMutation()
+  const adminCancelMutation = useAdminCancelBookingMutation()
+  const cancelMutation = isAdmin ? adminCancelMutation : customerCancelMutation
   const statusMutation = useUpdateBookingStatusMutation()
   const deleteMutation = useDeleteBookingMutation()
 
   const statusCfg = statusConfig(booking.status)
   const StatusIcon = statusCfg.icon
-  const isCancellable = !["CANCELLED", "COMPLETED"].includes(
-    booking.status.toUpperCase()
-  )
+  const isCancellable = isBookingCancellable(booking.status)
 
   const slot = booking.items[0]?.slot
   const lane = slot?.lane
   const payment = booking.payment
 
   const handleStatusUpdate = () => {
-    if (selectedStatus === booking.status) return
-    statusMutation.mutate({ id: booking.id, status: selectedStatus })
+    if (!selectedStatus) return
+    statusMutation.mutate(
+      { id: booking.id, status: selectedStatus },
+      { onSuccess: () => setSelectedStatus("") }
+    )
   }
 
   const handleCancel = () => {
-    cancelMutation.mutate(booking.id)
+    cancelMutation.mutate(
+      { id: booking.id, reason: cancelReason.trim() || undefined },
+      { onSuccess: () => setCancelReason("") }
+    )
   }
 
   const handleDelete = () => {
@@ -292,13 +308,39 @@ export function BookingDetailPage({
                     <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
                     <AlertDialogDescription>
                       Booking <strong>{booking.bookingRef}</strong> will be
-                      cancelled. This action cannot be undone.
+                      cancelled and its slot released. Online payments are
+                      refunded automatically.{" "}
+                      {isAdmin
+                        ? "The customer will be notified in-app and by email."
+                        : "You'll receive a confirmation email."}{" "}
+                      This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="cancel-reason"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Reason (optional
+                      {isAdmin ? ", shared with the customer" : ""})
+                    </label>
+                    <Textarea
+                      id="cancel-reason"
+                      value={cancelReason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      maxLength={500}
+                      placeholder={
+                        isAdmin
+                          ? "e.g. Lane closed for maintenance"
+                          : "e.g. Can no longer make it"
+                      }
+                    />
+                  </div>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Keep it</AlertDialogCancel>
+                    <AlertDialogCancel>Keep booking</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleCancel}
+                      disabled={cancelMutation.isPending}
                       className="bg-destructive hover:bg-destructive/90"
                     >
                       {cancelMutation.isPending ? "Cancelling…" : "Yes, cancel"}
@@ -379,7 +421,7 @@ export function BookingDetailPage({
 
           {/* Status progress bar */}
           <div className="mt-6 grid grid-cols-4 gap-1.5">
-            {BOOKING_STATUSES.map((s, i) => {
+            {BOOKING_STATUSES.map((s) => {
               const steps = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]
               const currentIndex = steps.indexOf(booking.status.toUpperCase())
               const stepIndex = steps.indexOf(s)
@@ -533,6 +575,24 @@ export function BookingDetailPage({
               </SectionCard>
             )}
 
+            {/* Cancellation */}
+            {booking.status.toUpperCase() === "CANCELLED" && (
+              <SectionCard icon={XCircle} title="Cancellation">
+                {booking.cancelledAt && (
+                  <InfoRow
+                    icon={Calendar}
+                    label="Cancelled on"
+                    value={formatDateTime(booking.cancelledAt)}
+                  />
+                )}
+                <InfoRow
+                  icon={ReceiptText}
+                  label="Reason"
+                  value={booking.cancellationReason || "No reason given"}
+                />
+              </SectionCard>
+            )}
+
             {/* Notes */}
             {booking.notes && (
               <SectionCard icon={ReceiptText} title="Notes">
@@ -598,8 +658,8 @@ export function BookingDetailPage({
               </div>
             </SectionCard>
 
-            {/* Admin: update status */}
-            {isAdmin && (
+            {/* Admin: update status (cancelling uses the Cancel action above) */}
+            {isAdmin && statusOptions.length > 0 && (
               <SectionCard icon={Activity} title="Update Status">
                 <div className="space-y-3">
                   <Select
@@ -607,10 +667,10 @@ export function BookingDetailPage({
                     onValueChange={setSelectedStatus}
                   >
                     <SelectTrigger className="h-9 w-full text-sm">
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Move to…" />
                     </SelectTrigger>
                     <SelectContent>
-                      {BOOKING_STATUSES.map((s) => (
+                      {statusOptions.map((s) => (
                         <SelectItem key={s} value={s} className="text-sm">
                           {s.charAt(0) + s.slice(1).toLowerCase()}
                         </SelectItem>
@@ -621,10 +681,7 @@ export function BookingDetailPage({
                     size="sm"
                     className="h-9 w-full"
                     onClick={handleStatusUpdate}
-                    disabled={
-                      selectedStatus === booking.status ||
-                      statusMutation.isPending
-                    }
+                    disabled={!selectedStatus || statusMutation.isPending}
                   >
                     {statusMutation.isPending ? (
                       <>

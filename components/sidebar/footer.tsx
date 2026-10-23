@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/popover"
 import { useMeQuery } from "@/services/queries/auth"
 import { useLogoutMutation } from "@/services/mutations/auth.mutations"
-import { clearAuthTokens, getRefreshToken } from "@/services/auth/token-store"
+import { getRefreshToken } from "@/services/auth/token-store"
+import { endSession } from "@/services/auth/session"
+import { useQueryClient } from "@tanstack/react-query"
 
 type WebSidebarFooterProps = {
   isCollapsed: boolean
@@ -48,6 +50,7 @@ export default function WebSidebarFooter({
   const router = useRouter()
   const { data: user } = useMeQuery()
   const logoutMutation = useLogoutMutation()
+  const queryClient = useQueryClient()
   const { resolvedTheme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -73,12 +76,13 @@ export default function WebSidebarFooter({
       await logoutMutation.mutateAsync(
         refreshToken ? { refreshToken } : undefined
       )
-    } catch (error) {
+    } catch {
       // Ignore server logout errors to ensure local session is cleared.
     } finally {
-      clearAuthTokens()
       setOpen(false)
       router.replace(role === "admin" ? "/admin/auth" : "/auth")
+      // Clears tokens and every cached user-specific query
+      await endSession(queryClient)
       setIsLoggingOut(false)
     }
   }

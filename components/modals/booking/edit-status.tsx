@@ -20,22 +20,39 @@ import {
 import { useUpdateBookingStatusMutation } from "@/services/mutations/booking.mutations"
 import { useModalContext } from "@/components/context/modal-context"
 import { _ModalProps, TModalDataMap } from "@/types/types"
-import { updateBookingStatusSchema } from "@/schemas/booking"
+import {
+  updateBookingStatusSchema,
+  type UpdateBookingStatusPayload,
+} from "@/schemas/booking"
+import {
+  BOOKING_STATUS_CONFIG,
+  getStatusUpdateOptions,
+} from "@/components/reusable/status-badge"
 
 export default function EditBookingStatus({
   data,
 }: _ModalProps<TModalDataMap["EDIT_BOOKING_STATUS"]>) {
   const { mutate: updateStatus, isPending } = useUpdateBookingStatusMutation()
   const { closeModal } = useModalContext()
+  const options = getStatusUpdateOptions(data?.status ?? "")
 
   const form = useForm({
     resolver: zodResolver(updateBookingStatusSchema),
     defaultValues: {
-      status: data?.status || "PENDING",
+      status: options[0],
     },
   })
 
-  const onSubmit = (formData: any) => {
+  if (options.length === 0) {
+    return (
+      <p className="p-2 text-sm text-muted-foreground">
+        This booking is {data?.status?.toLowerCase()} and its status can no
+        longer be changed.
+      </p>
+    )
+  }
+
+  const onSubmit = (formData: UpdateBookingStatusPayload) => {
     if (!data?.id) return
 
     updateStatus(
@@ -65,12 +82,16 @@ export default function EditBookingStatus({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                  {options.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {BOOKING_STATUS_CONFIG[s].label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                To cancel, open the booking and use “Cancel booking”.
+              </p>
               <FormMessage />
             </FormItem>
           )}

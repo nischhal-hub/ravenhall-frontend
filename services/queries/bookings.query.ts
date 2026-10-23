@@ -20,7 +20,7 @@ export const useBookingsQuery = ({
   order?: "asc" | "desc"
 }) => {
   return useQuery<BookingApiResponse>({
-    queryKey: ["bookings", page, limit, search, sortBy, order],
+    queryKey: ["bookings", "all", page, limit, search, sortBy, order],
     queryFn: async () => {
       const res = await apiClient.get<BookingApiResponse>("/bookings", {
         params: {
@@ -51,7 +51,8 @@ export const useOwnBookingsQuery = ({
   order?: "asc" | "desc"
 }) => {
   return useQuery<BookingApiResponse>({
-    queryKey: ["bookings", page, limit, search, sortBy, order],
+    // Must differ from the admin list key: both used to share one cache entry
+    queryKey: ["bookings", "my", page, limit, search, sortBy, order],
     queryFn: async () => {
       const res = await apiClient.get<BookingApiResponse>("/bookings/my", {
         params: {
@@ -65,7 +66,8 @@ export const useOwnBookingsQuery = ({
       return res.data
     },
     retry: 2,
-    staleTime: 1000 * 60 * 3,
+    staleTime: 1000 * 30,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -79,6 +81,7 @@ export const useBookingById = (bookingId: string) => {
       return res.data
     },
     enabled: !!bookingId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30,
+    refetchOnWindowFocus: true,
   })
 }
