@@ -362,6 +362,13 @@ export function BookingDetailPage({
     (!payment.paidAt &&
       !payment.refundAmount &&
       payment.status.toUpperCase() !== "SUCCEEDED")
+  // Opening the payment step creates a PENDING payment before anything is
+  // charged; leaving without paying keeps it. That isn't a payment to show.
+  const checkoutUnfinished =
+    !!payment &&
+    payment.status.toUpperCase() === "PENDING" &&
+    !payment.paidAt &&
+    !payment.refundAmount
   const customerName = `${booking.user.firstName} ${booking.user.lastName}`
 
   const handleStatusUpdate = () => {
@@ -756,7 +763,7 @@ export function BookingDetailPage({
               />
 
               <Separator className="my-4" />
-              {payment ? (
+              {payment && !checkoutUnfinished ? (
                 <InfoList columns={1}>
                   <InfoRow
                     label="Payment status"
@@ -808,9 +815,13 @@ export function BookingDetailPage({
                   icon={CreditCard}
                   title="No payment yet"
                   description={
-                    isAdmin
-                      ? "No payment has been recorded for this booking."
-                      : "You haven't been charged for this booking."
+                    checkoutUnfinished
+                      ? isAdmin
+                        ? "Checkout was started but not completed. Nothing was charged."
+                        : "You started checkout but didn't finish, so you haven't been charged."
+                      : isAdmin
+                        ? "No payment has been recorded for this booking."
+                        : "You haven't been charged for this booking."
                   }
                   className="py-2"
                 />

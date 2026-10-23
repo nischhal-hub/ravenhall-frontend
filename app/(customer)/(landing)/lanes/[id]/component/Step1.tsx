@@ -8,7 +8,8 @@ import { BookingSummaryCard } from "./BookingSummaryCard"
 import { Button } from "@/components/ui/button"
 import { AlertCircle } from "lucide-react"
 import { Lane, Slot } from "@/types/lane-response.types"
-import { getSlotRange } from "@/lib/booking"
+import { getSlotRange, isSlotPast } from "@/lib/booking"
+import { useNow } from "@/hooks/use-now"
 
 interface Step1Props {
   lane: Lane
@@ -33,17 +34,27 @@ export function Step1({
   memberDiscountPct,
 }: Step1Props) {
   const today = new Date()
+  // Re-renders every 30s so slots that start while the page is open get disabled
+  const now = useNow()
   const [selectedDate, setSelectedDate] = useState(
     initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
       ? initialDate
       : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
   )
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(() => {
+  const [pickedSlot, setPickedSlot] = useState<Slot | null>(() => {
     const match = initialSlotId
       ? lane.slots.find((s) => s.id === initialSlotId)
       : undefined
-    return match && match.isAvailable && !match.isBlocked ? match : null
+    return match &&
+      match.isAvailable &&
+      !match.isBlocked &&
+      !isSlotPast(match, new Date())
+      ? match
+      : null
   })
+  // A pick whose start time passes while the page is open is dropped
+  const selectedSlot =
+    pickedSlot && !isSlotPast(pickedSlot, now) ? pickedSlot : null
   const [duration, setDuration] = useState<1 | 2 | 3>(1)
 
   const daySlots = useMemo(() => {
@@ -61,7 +72,7 @@ export function Step1({
   const handleDurationChange = (d: 1 | 2 | 3) => {
     setDuration(d)
     if (selectedSlot && !getSlotRange(daySlots, selectedSlot, d)) {
-      setSelectedSlot(null)
+      setPickedSlot(null)
     }
   }
 
@@ -85,7 +96,7 @@ export function Step1({
           selectedDate={selectedDate}
           onSelect={(d) => {
             setSelectedDate(d)
-            setSelectedSlot(null)
+            setPickedSlot(null)
           }}
           slots={lane.slots}
         />
@@ -94,7 +105,8 @@ export function Step1({
           slots={daySlots}
           selectedSlot={selectedSlot}
           duration={duration}
-          onSelect={setSelectedSlot}
+          onSelect={setPickedSlot}
+          now={now}
         />
       </div>
 
