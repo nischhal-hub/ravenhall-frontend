@@ -18,11 +18,10 @@ import {
   Shield,
   Camera,
   ChevronRight,
-  Eye,
-  EyeOff,
 } from "lucide-react"
 import { toast } from "sonner"
 import Image from "next/image"
+import { PasswordInput } from "@/components/auth/password-input"
 import { PanelHero } from "@/components/panel/panel-hero"
 
 function formatDate(iso?: string) {
@@ -63,37 +62,6 @@ function Section({
         </div>
       </div>
       <div className="p-6">{children}</div>
-    </div>
-  )
-}
-
-function PasswordInput({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string
-  onChange: (v: string) => void
-  placeholder?: string
-}) {
-  const [show, setShow] = useState(false)
-
-  return (
-    <div className="relative">
-      <Input
-        type={show ? "text" : "password"}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="rounded-xl pr-10"
-      />
-      <button
-        type="button"
-        onClick={() => setShow((s) => !s)}
-        className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-      >
-        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-      </button>
     </div>
   )
 }
@@ -326,11 +294,16 @@ export default function SettingsPage() {
         >
           <form onSubmit={handlePasswordSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <Label>Current Password</Label>
+              <Label htmlFor="current-password">Current Password</Label>
               <PasswordInput
+                id="current-password"
+                autoComplete="current-password"
                 value={passwordForm.oldPassword}
-                onChange={(v) =>
-                  setPasswordForm((prev) => ({ ...prev, oldPassword: v }))
+                onChange={(e) =>
+                  setPasswordForm((prev) => ({
+                    ...prev,
+                    oldPassword: e.target.value,
+                  }))
                 }
                 placeholder="Enter current password"
               />
@@ -338,21 +311,33 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>New Password</Label>
+                <Label htmlFor="new-password">New Password</Label>
                 <PasswordInput
+                  id="new-password"
+                  autoComplete="new-password"
                   value={passwordForm.newPassword}
-                  onChange={(v) =>
-                    setPasswordForm((prev) => ({ ...prev, newPassword: v }))
+                  onChange={(e) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
                   }
                   placeholder="Minimum 8 characters"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Confirm New Password</Label>
+                <Label htmlFor="confirm-new-password">
+                  Confirm New Password
+                </Label>
                 <PasswordInput
+                  id="confirm-new-password"
+                  autoComplete="new-password"
                   value={passwordForm.confirmPassword}
-                  onChange={(v) =>
-                    setPasswordForm((prev) => ({ ...prev, confirmPassword: v }))
+                  onChange={(e) =>
+                    setPasswordForm((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
                   }
                   placeholder="Repeat new password"
                 />

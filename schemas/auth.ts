@@ -1,58 +1,66 @@
 import { z } from "zod"
 
+// Same rules as the server (auth.validation.ts); only the wording is friendlier
 const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters")
-  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-  .regex(/[0-9]/, "Password must contain at least one number")
+  .min(8, "Use at least 8 characters")
+  .regex(/[A-Z]/, "Add at least one uppercase letter")
+  .regex(/[0-9]/, "Add at least one number")
+
+const emailSchema = z
+  .string()
+  .trim()
+  .min(1, "Enter your email address")
+  .pipe(z.email("Enter a valid email address, like name@example.com"))
 
 export const registerSchema = z.object({
   body: z.object({
-    email: z.email("Invalid email address"),
+    email: emailSchema,
     password: passwordSchema,
     firstName: z
       .string()
-      .min(2, "First name must be at least 2 characters")
-      .max(50),
+      .trim()
+      .min(2, "Enter your first name (at least 2 letters)")
+      .max(50, "Keep your first name under 50 characters"),
     lastName: z
       .string()
-      .min(2, "Last name must be at least 2 characters")
-      .max(50),
+      .trim()
+      .min(2, "Enter your last name (at least 2 letters)")
+      .max(50, "Keep your last name under 50 characters"),
     phone: z.string().optional(),
   }),
 })
 
 export const loginSchema = z.object({
   body: z.object({
-    email: z.email("Invalid email address"),
-    password: z.string().min(1, "Password is required"),
+    email: emailSchema,
+    password: z.string().min(1, "Enter your password"),
   }),
 })
 
 export const forgotPasswordSchema = z.object({
   body: z.object({
-    email: z.email("Invalid email address"),
+    email: emailSchema,
   }),
 })
 
 export const verifyEmailFormSchema = z.object({
-  token: z.string().min(1, "Verification token is required"),
+  token: z.string().trim().min(1, "Enter the code from your email"),
 })
 
 export const resetPasswordSchema = z.object({
   body: z.object({
-    token: z.string().min(1, "Reset token is required"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    token: z.string().trim().min(1, "Enter the reset code from your email"),
+    password: z.string().min(8, "Use at least 8 characters"),
   }),
 })
 
 export const registerFormSchema = registerSchema.shape.body
   .extend({
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-    terms: z.literal(true, { message: "You must accept the terms" }),
+    confirmPassword: z.string().min(1, "Type your password again"),
   })
   .refine((value) => value.password === value.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   })
 

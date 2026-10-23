@@ -7,8 +7,11 @@ import {
   useForm,
   type FieldValues,
   type Path,
+  type Resolver,
   type UseFormSetError,
 } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { CircleAlert, CircleCheck } from "lucide-react"
 
 import {
   ForgotPasswordFormSection,
@@ -42,22 +45,15 @@ import { useQueryClient } from "@tanstack/react-query"
 import { ApiError } from "@/types/response"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AuthLayout } from "@/components/auth/auth-layout"
 
 type AuthMode =
-  | "login"
-  | "register"
-  | "forgot-password"
-  | "verify-email"
-  | "reset-password"
+  "login" | "register" | "forgot-password" | "verify-email" | "reset-password"
 type AuthRole = "customer" | "admin"
 
 type AuthScreenProps = {
   mode: AuthMode
   role: AuthRole
-}
-
-type RegisterFormState = Omit<RegisterFormValues, "terms"> & {
-  terms: boolean
 }
 
 function normalizeRole(value: unknown): AuthRole | null {
@@ -104,43 +100,91 @@ function roleContent(role: AuthRole) {
     verifyEmailHref: "/auth/verify-email",
     dashboardHref: "/panel",
     backHref: "/",
-    backLabel: "Back to landing",
+    backLabel: "Back to home",
     resetPasswordHref: "/auth/reset-password",
   }
 }
 
-function screenMeta(mode: AuthMode) {
+function screenMeta(mode: AuthMode, role: AuthRole) {
+  const eyebrow = role === "admin" ? "Staff portal" : "Customer account"
+
   if (mode === "register") {
     return {
-      eyebrow: "Create account",
+      eyebrow,
+      title: "Create your account",
+      subtitle:
+        "It takes a minute. You'll confirm your email with a 6‑digit code.",
       footerText: "Already have an account?",
+      footerLink: "Log in",
     }
   }
 
   if (mode === "forgot-password") {
     return {
-      eyebrow: "Recover access",
-      footerText: "Remembered your password?",
+      eyebrow,
+      title: "Forgot your password?",
+      subtitle:
+        "Enter the email you signed up with and we'll send you a reset code.",
+      footerText: "Remembered it?",
+      footerLink: "Back to log in",
     }
   }
 
   if (mode === "verify-email") {
     return {
-      eyebrow: "Verify email",
-      footerText: "Already verified your account?",
+      eyebrow,
+      title: "Check your email",
+      subtitle: "We sent a 6‑digit code to the address you registered with.",
+      footerText: "Already verified?",
+      footerLink: "Log in",
     }
   }
   if (mode === "reset-password") {
     return {
-      eyebrow: "Reset password",
-      footerText: "Remembered your password?",
+      eyebrow,
+      title: "Set a new password",
+      subtitle: "Enter the code from your email and choose a new password.",
+      footerText: "Remembered it?",
+      footerLink: "Back to log in",
     }
   }
 
   return {
-    eyebrow: "Welcome back",
-    footerText: "New to Ravenhall?",
+    eyebrow,
+    title: "Welcome back",
+    subtitle:
+      role === "admin"
+        ? "Log in to manage bookings, lanes and the centre."
+        : "Log in to book lanes and manage your bookings.",
+    footerText: "New here?",
+    footerLink: "Create an account",
   }
+}
+
+/**
+ * Plain-language message for a failed auth request. Login never says whether
+ * the email exists: the server answers 401 for both cases.
+ */
+function friendlyAuthError(error: unknown, mode: AuthMode): string {
+  if (!(error instanceof ApiError)) {
+    return "Something went wrong. Please try again."
+  }
+  if (!error.status) {
+    return "We couldn't reach the server. Check your internet connection and try again."
+  }
+  if (error.status === 429) {
+    return "Too many attempts. Please wait a while before trying again."
+  }
+  if (mode === "login" && (error.status === 401 || error.status === 400)) {
+    return "That email and password don't match. Check them and try again, or reset your password."
+  }
+  if (mode === "register" && error.status === 409) {
+    return "An account with this email already exists. Log in instead, or reset your password."
+  }
+  if (error.status >= 500) {
+    return "Something went wrong on our side. Please try again in a moment."
+  }
+  return error.message || "Something went wrong. Please try again."
 }
 
 export function AuthScreen({ mode, role }: AuthScreenProps) {
@@ -150,7 +194,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   const isResetPassword = mode === "reset-password"
 
   const roleInfo = roleContent(role)
-  const meta = screenMeta(mode)
+  const meta = screenMeta(mode, role)
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -163,7 +207,10 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   const [formError, setFormError] = useState("")
   const [formSuccess, setFormSuccess] = useState("")
 
-  const registerForm = useForm<RegisterFormState>({
+  // Validate on blur first, then live once a field has been touched
+  const registerForm = useForm<RegisterFormValues>({
+    mode: "onTouched",
+    resolver: zodResolver(registerFormSchema) as Resolver<RegisterFormValues>,
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -171,11 +218,12 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       phone: "",
       password: "",
       confirmPassword: "",
-      terms: false,
     },
   })
 
   const loginForm = useForm<LoginPayload>({
+    mode: "onTouched",
+    resolver: zodResolver(loginFormSchema) as Resolver<LoginPayload>,
     defaultValues: {
       email: "",
       password: "",
@@ -183,18 +231,30 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   })
 
   const forgotPasswordForm = useForm<ForgotPasswordPayload>({
+    mode: "onTouched",
+    resolver: zodResolver(
+      forgotPasswordSchema.shape.body
+    ) as Resolver<ForgotPasswordPayload>,
     defaultValues: {
       email: "",
     },
   })
 
   const verifyEmailForm = useForm<VerifyEmailFormValues>({
+    mode: "onTouched",
+    resolver: zodResolver(
+      verifyEmailFormSchema
+    ) as Resolver<VerifyEmailFormValues>,
     defaultValues: {
       token: "",
     },
   })
 
   const resetPasswordForm = useForm<ResetPasswordPayload>({
+    mode: "onTouched",
+    resolver: zodResolver(
+      resetPasswordSchema
+    ) as Resolver<ResetPasswordPayload>,
     defaultValues: {
       body: {
         token: "",
@@ -281,13 +341,17 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       registerForm.reset()
       router.push("/auth/verify-email")
     } catch (error) {
+      setFormError(friendlyAuthError(error, "register"))
       if (error instanceof ApiError) {
-        setFormError(error.message)
         applyServerFieldErrors(registerForm.setError, error.details?.errors)
-        return
+        if (error.status === 409) {
+          registerForm.setError(
+            "email",
+            { type: "server", message: "This email is already registered." },
+            { shouldFocus: true }
+          )
+        }
       }
-
-      setFormError("Registration failed. Please try again.")
     }
   })
 
@@ -338,13 +402,10 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       setFormSuccess("Login successful.")
       router.replace(roleInfo.dashboardHref)
     } catch (error) {
+      setFormError(friendlyAuthError(error, "login"))
       if (error instanceof ApiError) {
-        setFormError(error.message)
         applyServerFieldErrors(loginForm.setError, error.details?.errors)
-        return
       }
-
-      setFormError("Login failed. Please try again.")
     }
   })
 
@@ -369,16 +430,13 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         )
         router.push("/auth/reset-password")
       } catch (error) {
+        setFormError(friendlyAuthError(error, "forgot-password"))
         if (error instanceof ApiError) {
-          setFormError(error.message)
           applyServerFieldErrors(
             forgotPasswordForm.setError,
             error.details?.errors
           )
-          return
         }
-
-        setFormError("Failed to send reset email. Please try again.")
       }
     }
   )
@@ -406,16 +464,13 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         toast.success("Email verified. You can now log in.")
         router.replace(roleInfo.switchToLoginHref)
       } catch (error) {
+        setFormError(friendlyAuthError(error, "verify-email"))
         if (error instanceof ApiError) {
-          setFormError(error.message)
           applyServerFieldErrors(
             verifyEmailForm.setError,
             error.details?.errors
           )
-          return
         }
-
-        setFormError("Email verification failed. Please try again.")
       }
     }
   )
@@ -445,127 +500,98 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         toast.success("Password reset successfully. You can now log in.")
         router.replace(roleInfo.switchToLoginHref)
       } catch (error) {
+        setFormError(friendlyAuthError(error, "reset-password"))
         if (error instanceof ApiError) {
-          setFormError(error.message)
           applyServerFieldErrors(
             resetPasswordForm.setError,
             error.details?.errors
           )
-          return
         }
-
-        setFormError("Password reset failed. Please try again.")
       }
     }
   )
   return (
-    <main className="relative min-h-svh overflow-hidden bg-background px-4 py-6 sm:px-6 sm:py-10">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{
-          background:
-            "radial-gradient(60rem 35rem at -10% 0%, color-mix(in oklab, var(--secondary) 28%, transparent), transparent 60%), radial-gradient(52rem 34rem at 120% 100%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 60%)",
-        }}
-      />
-
-      <div className="relative mx-auto w-full max-w-md">
-        <div className="mb-4 flex items-center justify-between">
+    <AuthLayout
+      role={role}
+      eyebrow={meta.eyebrow}
+      title={meta.title}
+      subtitle={meta.subtitle}
+      backHref={roleInfo.backHref}
+      backLabel={roleInfo.backLabel}
+      footer={
+        <>
+          {meta.footerText}{" "}
           <Link
-            href={roleInfo.backHref}
-            className="text-xs font-semibold tracking-[0.15em] text-secondary uppercase transition-colors hover:text-primary"
+            href={
+              mode === "login"
+                ? roleInfo.switchToRegisterHref
+                : roleInfo.switchToLoginHref
+            }
+            className="rounded font-semibold text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-secondary/40 dark:text-sky-300"
           >
-            {roleInfo.backLabel}
+            {meta.footerLink}
           </Link>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-primary uppercase">
-            {roleInfo.badge}
-          </span>
-        </div>
+        </>
+      }
+    >
+      {formError ? (
+        <Alert variant="destructive" className="mb-5 px-3.5 py-3" role="alert">
+          <CircleAlert />
+          <AlertDescription className="text-sm text-destructive">
+            {formError}
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
-        <section className="rounded-3xl border border-border/60 bg-card/95 p-5 shadow-[0_24px_48px_-22px_rgba(2,36,72,0.35)] backdrop-blur sm:p-7">
-          <header className="mb-6 space-y-2">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-              {meta.eyebrow}
-            </p>
-            <h1 className="font-heading text-2xl font-extrabold tracking-tight text-primary sm:text-3xl">
-              {roleInfo.title}
-            </h1>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {roleInfo.subText}
-            </p>
-          </header>
+      {formSuccess ? (
+        <Alert className="mb-5 border-emerald-600/40 px-3.5 py-3" role="status">
+          <CircleCheck className="text-emerald-700 dark:text-emerald-400" />
+          <AlertDescription className="text-sm text-foreground">
+            {formSuccess}
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
-          {formError ? (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription className="text-destructive">
-                {formError}
-              </AlertDescription>
-            </Alert>
-          ) : null}
+      {isRegister ? (
+        <RegisterFormSection
+          form={registerForm}
+          onSubmit={handleRegisterSubmit}
+          isSubmitting={isSubmitting}
+          role={role}
+        />
+      ) : null}
 
-          {formSuccess ? (
-            <Alert className="mb-4 border-accent/60 bg-accent/10">
-              <AlertDescription className="text-accent-foreground">
-                {formSuccess}
-              </AlertDescription>
-            </Alert>
-          ) : null}
+      {mode === "login" ? (
+        <LoginFormSection
+          form={loginForm}
+          onSubmit={handleLoginSubmit}
+          isSubmitting={isSubmitting}
+          forgotPasswordHref={roleInfo.forgotPasswordHref}
+        />
+      ) : null}
 
-          {isRegister ? (
-            <RegisterFormSection
-              form={registerForm}
-              onSubmit={handleRegisterSubmit}
-              isSubmitting={isSubmitting}
-              role={role}
-            />
-          ) : null}
+      {isForgotPassword ? (
+        <ForgotPasswordFormSection
+          form={forgotPasswordForm}
+          onSubmit={handleForgotPasswordSubmit}
+          isSubmitting={isSubmitting}
+        />
+      ) : null}
 
-          {mode === "login" ? (
-            <LoginFormSection
-              form={loginForm}
-              onSubmit={handleLoginSubmit}
-              isSubmitting={isSubmitting}
-              forgotPasswordHref={roleInfo.forgotPasswordHref}
-            />
-          ) : null}
-
-          {isForgotPassword ? (
-            <ForgotPasswordFormSection
-              form={forgotPasswordForm}
-              onSubmit={handleForgotPasswordSubmit}
-              isSubmitting={isSubmitting}
-            />
-          ) : null}
-
-          {isVerifyEmail ? (
-            <VerifyEmailFormSection
-              form={verifyEmailForm}
-              onSubmit={handleVerifyEmailSubmit}
-              isSubmitting={isSubmitting}
-            />
-          ) : null}
-          {isResetPassword ? (
-            <ResetPasswordFormSection
-              form={resetPasswordForm}
-              onSubmit={handleResetPasswordSubmit}
-              isSubmitting={isSubmitting}
-            />
-          ) : null}
-          <div className="mt-6 border-t border-border/70 pt-5 text-center text-sm text-muted-foreground">
-            {meta.footerText}{" "}
-            <Link
-              href={
-                mode === "login"
-                  ? roleInfo.switchToRegisterHref
-                  : roleInfo.switchToLoginHref
-              }
-              className="font-bold text-primary transition-colors hover:text-secondary"
-            >
-              {mode === "login" ? "Create account" : "Login"}
-            </Link>
-          </div>
-
-        </section>
-      </div>
-    </main>
+      {isVerifyEmail ? (
+        <VerifyEmailFormSection
+          form={verifyEmailForm}
+          onSubmit={handleVerifyEmailSubmit}
+          isSubmitting={isSubmitting}
+        />
+      ) : null}
+      {isResetPassword ? (
+        <ResetPasswordFormSection
+          form={resetPasswordForm}
+          onSubmit={handleResetPasswordSubmit}
+          isSubmitting={isSubmitting}
+        />
+      ) : null}
+    </AuthLayout>
   )
 }

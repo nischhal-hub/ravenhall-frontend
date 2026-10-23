@@ -9,7 +9,6 @@ import {
   CreditCard,
   Clock,
   CheckCircle2,
-  XCircle,
   ChevronRight,
   Sparkles,
   TrendingUp,
@@ -25,6 +24,7 @@ import {
 } from "@/components/reusable/status-badge"
 import { formatCurrency } from "@/lib/utils"
 import { useMyMembershipQuery } from "@/services/queries/membership.query"
+import { ApiError } from "@/types/response"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -220,7 +220,8 @@ function NoMembership({ onJoin }: { onJoin: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MembershipPage() {
   const router = useRouter()
-  const { data, isLoading, isError, error } = useMyMembershipQuery()
+  const { data, isLoading, isError, error, refetch, isRefetching } =
+    useMyMembershipQuery()
   // @ts-expect-error dddd
   const membership = data?.data || null
 
@@ -243,27 +244,37 @@ export default function MembershipPage() {
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) return <PageSkeleton />
 
-  // ── Error ────────────────────────────────────────────────────────────────
+  // ── No membership ────────────────────────────────────────────────────────
+  // The API answers 200 with `data: null` when the user has never joined;
+  // treat a 404 the same way. Neither is an error for the user.
+  const noMembership =
+    (!isError && !membership) ||
+    (error instanceof ApiError && error.status === 404)
+  if (noMembership) {
+    return <NoMembership onJoin={() => router.push("/membership")} />
+  }
+
+  // ── Couldn't load (network/server) ───────────────────────────────────────
   if (isError || !membership) {
-    const msg =
-      error instanceof Error ? error.message : "Could not load membership."
-    // If 404-ish, show the "no membership" state
-    if (msg.toLowerCase().includes("not found") || msg.includes("404")) {
-      return <NoMembership onJoin={() => router.push("/membership/plans")} />
-    }
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-        <XCircle className="h-12 w-12 text-destructive" />
+        <Shield className="h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-semibold text-foreground">
-          Failed to load membership
+          We couldn&apos;t check your membership right now
         </p>
-        <p className="text-sm text-muted-foreground">{msg}</p>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Please check your connection and try again in a moment.
+        </p>
         <Button
           variant="outline"
-          onClick={() => window.location.reload()}
+          onClick={() => refetch()}
+          disabled={isRefetching}
           className="gap-2"
         >
-          <RefreshCw className="h-4 w-4" /> Try again
+          <RefreshCw
+            className={`h-4 w-4 ${isRefetching ? "animate-spin" : ""}`}
+          />
+          Try again
         </Button>
       </div>
     )
@@ -412,7 +423,7 @@ export default function MembershipPage() {
               {/* Renew CTA */}
               {(isUrgent || isExpired) && (
                 <Button
-                  onClick={() => router.push("/membership/plans")}
+                  onClick={() => router.push("/membership")}
                   className="mt-2 h-11 w-full rounded-xl font-bold"
                 >
                   {isExpired ? "Renew Membership" : "Renew Early"}
@@ -494,7 +505,7 @@ export default function MembershipPage() {
                 only offer it here as a secondary action otherwise. */}
             {!isUrgent && !isExpired && (
               <Button
-                onClick={() => router.push("/membership/plans")}
+                onClick={() => router.push("/membership")}
                 className="h-11 rounded-xl px-6 font-semibold"
               >
                 Upgrade Plan
