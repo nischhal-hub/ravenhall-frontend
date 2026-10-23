@@ -171,7 +171,7 @@ export function CancelProposalCard({
   const confirm = async () => {
     setBusy(true)
     try {
-      await cancelBookingRequest(booking.id)
+      await cancelBookingRequest({ id: booking.id })
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["bookings"] }),
         queryClient.invalidateQueries({ queryKey: ["my-bookings"] }),

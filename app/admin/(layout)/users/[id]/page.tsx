@@ -1,235 +1,55 @@
 "use client"
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import { ArrowLeft, UserX } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { BookingStatusBadge } from "@/components/reusable/status-badge"
-import PageHeader from "@/components/ui/page-header"
-import { CheckCircle, Bell, Zap, Calendar, ArrowLeft } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { EmptyState } from "@/components/reusable/empty-state"
 import {
-  useProfileQuery,
-  useProfilesQuery,
-} from "@/services/queries/user.query"
-import { useRouter } from "next/navigation"
-import { formatCurrency } from "@/lib/utils"
+  DetailLayout,
+  DetailPageHeader,
+  InfoList,
+  InfoRow,
+} from "@/components/detail"
 
-function formatDate(dateString?: string) {
-  if (!dateString) return "N/A"
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })
-}
-
-function PageSkeleton() {
-  return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <Skeleton className="h-8 w-64" />
-      <div className="grid gap-6 md:grid-cols-2">
-        <Skeleton className="h-48 w-full rounded-lg" />
-        <Skeleton className="h-48 w-full rounded-lg" />
-      </div>
-      <Skeleton className="h-64 w-full rounded-lg" />
-    </div>
-  )
-}
-
-export default function ProfilePage() {
-  const router = useRouter()
-  const { data: response, isLoading, error } = useProfilesQuery()
-
-  const user = response?.data
-
-  if (isLoading) return <PageSkeleton />
-
-  if (error || !user) {
-    return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Alert variant="destructive">
-          <AlertDescription>Failed to load profile.</AlertDescription>
-        </Alert>
-      </div>
-    )
-  }
-
-  const {
-    firstName,
-    lastName,
-    email,
-    phone,
-    createdAt,
-    membership,
-    bookings = [],
-    notifications = [],
-  } = user
+// The API has no "get one user" endpoint for admins yet. This page used to
+// call /auth/me and so showed the signed-in admin's own profile for every id.
+// Until that endpoint exists, say so plainly instead of showing the wrong person.
+export default function UserDetailPage() {
+  const params = useParams()
+  const id = params?.id as string
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-5 w-5" />
-        Back
-      </Button>
+    <DetailLayout className="pb-8">
+      <DetailPageHeader
+        backHref="/admin/users"
+        backLabel="Users"
+        title="User details"
+      />
 
-      <PageHeader size="lg" title={`${firstName} ${lastName}`} description={email} />
-
-      {/* Personal Info & Membership */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Personal Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Your account details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{email}</p>
+      <Card className="mx-auto max-w-lg px-6">
+        <EmptyState
+          icon={UserX}
+          title="User details aren't available yet"
+          description="A single user's profile can't be loaded on this page yet. Their name, email, role and join date are shown on the Users list."
+          action={
+            <div className="space-y-5">
+              <div className="rounded-md bg-muted/50 p-3 text-left">
+                <InfoList columns={1}>
+                  <InfoRow label="User ID" value={id} copyValue={id} mono />
+                </InfoList>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Phone</p>
-                <p className="font-medium">{phone || "Not provided"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Member Since</p>
-                <p className="font-medium">{formatDate(createdAt)}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span>Email Verified</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Membership */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                {membership?.plan || "CASUAL"} Membership
-              </CardTitle>
-              <CardDescription>
-                {membership?.isActive ? "Active Plan" : "Inactive"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {membership ? (
-                <>
-                  {/* <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Discount
-                    </span>
-                    <Badge variant="default">
-                      {membership.discountPct}% OFF
-                    </Badge>
-                  </div> */}
-                  <div>
-                    <p className="text-sm text-muted-foreground">Valid Until</p>
-                    <p className="font-medium">
-                      {formatDate(membership.endDate)}
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <p className="text-muted-foreground">
-                  You don&apos;t have an active membership yet.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Bookings */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Recent Bookings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {bookings.length === 0 ? (
-              <p className="py-12 text-center text-muted-foreground">
-                No bookings yet
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {bookings.slice(0, 5).map((booking: any) => (
-                  <div
-                    key={booking.id}
-                    className="flex items-center justify-between rounded-lg border p-4"
-                  >
-                    <div>
-                      <p className="font-medium">{booking.bookingRef}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(booking.createdAt)}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-sm text-muted-foreground line-through">
-                          {formatCurrency(booking.totalAmount)}
-                        </p>
-                        <p className="font-semibold">
-                          {formatCurrency(booking.finalAmount)}
-                        </p>
-                      </div>
-                      <BookingStatusBadge status={booking.status} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Notifications */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Recent Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {notifications.length === 0 ? (
-              <p className="py-12 text-center text-muted-foreground">
-                No notifications yet
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {notifications.slice(0, 6).map((notif: any) => (
-                  <div key={notif.id} className="rounded-lg border p-4">
-                    <div className="flex justify-between gap-4">
-                      <div className="flex-1">
-                        <p className="font-medium">{notif.subject}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {notif.body}
-                        </p>
-                      </div>
-                      <p className="text-xs whitespace-nowrap text-muted-foreground">
-                        {formatDate(notif.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-    </div>
+              <Button asChild className="h-11 w-full text-sm md:h-9">
+                <Link href="/admin/users">
+                  <ArrowLeft />
+                  Back to users
+                </Link>
+              </Button>
+            </div>
+          }
+        />
+      </Card>
+    </DetailLayout>
   )
 }

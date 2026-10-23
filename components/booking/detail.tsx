@@ -2,15 +2,38 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import PageHeader from "@/components/ui/page-header"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Textarea } from "@/components/ui/textarea"
+import { EmptyState } from "@/components/reusable/empty-state"
 import {
-  BOOKING_STATUS_CONFIG,
+  BookingStatusBadge,
   PaymentStatusBadge,
+  getStatusUpdateOptions,
+  isBookingCancellable,
 } from "@/components/reusable/status-badge"
-import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils"
+import {
+  AmountRow,
+  DetailColumns,
+  DetailLayout,
+  DetailPageHeader,
+  InfoCard,
+  InfoList,
+  InfoRow,
+  StatusTimeline,
+  SummaryStrip,
+  detailActionClass,
+  detailIconActionClass,
+  formatDateTime12,
+  formatDuration,
+  formatLongDate,
+  formatTime,
+  humanize,
+  minutesBetween,
+  type TimelineEvent,
+} from "@/components/detail"
+import { formatCurrency } from "@/lib/utils"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,40 +46,36 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
+  useAdminCancelBookingMutation,
   useCancelBookingMutation,
   useUpdateBookingStatusMutation,
   useDeleteBookingMutation,
 } from "@/services/mutations/booking.mutations"
 import {
-  ArrowLeft,
+  AlertCircle,
   Calendar,
+  CalendarCheck2,
   CheckCircle2,
   Clock,
   CreditCard,
   DollarSign,
-  Hash,
-  Layers,
-  Mail,
+  Flag,
   MapPin,
-  Phone,
-  Loader2,
+  MoreHorizontal,
+  NotebookPen,
+  PlusCircle,
   RefreshCw,
-  Tag,
-  Timer,
+  RotateCcw,
   Trash2,
   User,
   XCircle,
   Activity,
-  AlertCircle,
-  ReceiptText,
-  ShieldCheck,
 } from "lucide-react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -70,6 +89,11 @@ export interface Booking {
   discountAmount: number
   finalAmount: number
   notes: string | null
+  source?: "ONLINE" | "POS" | string
+  bookedById?: string | null
+  cancelledAt?: string | null
+  cancellationReason?: string | null
+  cancelledById?: string | null
   discountCodeId: string | null
   createdAt: string
   updatedAt: string
@@ -101,7 +125,7 @@ export interface Booking {
         id: string
         name: string
         type: string
-        description: string
+        description: string | null
         capacity: number
         hourlyRate: number
         imageUrl: string | null
@@ -112,15 +136,17 @@ export interface Booking {
   payment: {
     id: string
     bookingId: string
-    stripePaymentIntentId: string
+    stripePaymentIntentId: string | null
+    paymentMethod?: string
     amount: number
     currency: string
     status: string
     refundAmount: number | null
     stripeRefundId: string | null
     paidAt: string | null
+    updatedAt?: string
   } | null
-  discountCode: unknown | null
+  discountCode: { code?: string } | null
 }
 
 interface BookingDetailPageProps {
@@ -130,100 +156,172 @@ interface BookingDetailPageProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const BOOKING_STATUSES = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"]
-
-const STATUS_ICON: Record<string, React.ElementType> = {
-  CONFIRMED: CheckCircle2,
-  CANCELLED: XCircle,
-  COMPLETED: Activity,
-  PENDING: Timer,
+const STATUS_ACTION_LABEL: Record<string, { full: string; short: string }> = {
+  CONFIRMED: { full: "Mark as confirmed", short: "Confirm" },
+  COMPLETED: { full: "Mark as completed", short: "Complete" },
 }
 
-const STATUS_BAR_COLOR: Record<string, string> = {
-  default: "bg-primary",
-  secondary: "bg-secondary",
-  destructive: "bg-destructive",
-  outline: "bg-foreground",
+const PAYMENT_METHOD_LABEL: Record<string, string> = {
+  STRIPE: "Card (online)",
+  CARD: "Card (in person)",
+  CASH: "Cash",
+  BANK_TRANSFER: "Bank transfer",
+  OTHER: "Other",
 }
 
-function statusConfig(status: string) {
-  const key = status.toUpperCase()
-  const config = BOOKING_STATUS_CONFIG[
-    key as keyof typeof BOOKING_STATUS_CONFIG
-  ] || {
-    label: status,
-    variant: "secondary" as const,
+function cancelledByLabel(booking: Booking, isAdmin?: boolean) {
+  if (!booking.cancelledById) return "Cancelled"
+  if (booking.cancelledById === booking.userId) {
+    return isAdmin ? "Cancelled by the customer" : "Cancelled by you"
+  }
+  return "Cancelled by staff"
+}
+
+/** Why some actions are missing, in plain words */
+function actionHint(status: string, isAdmin?: boolean) {
+  if (status === "CANCELLED") {
+    return isAdmin
+      ? "This booking is cancelled, so its status can't be changed."
+      : "This booking has been cancelled. There's nothing more to do."
+  }
+  if (status === "COMPLETED") {
+    return isAdmin
+      ? "This session is complete, so it can't be cancelled or moved to another status."
+      : "This session is complete, so it can no longer be cancelled."
+  }
+  return undefined
+}
+
+function getSessionTimes(items: Booking["items"]) {
+  const slots = items
+    .map((item) => item.slot)
+    .filter(Boolean)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))
+  if (slots.length === 0) return null
+  const start = slots[0].startTime
+  const end = slots[slots.length - 1].endTime
+  return { start, end, minutes: minutesBetween(start, end) }
+}
+
+function buildTimeline(
+  booking: Booking,
+  currency: string | undefined,
+  isAdmin?: boolean
+): TimelineEvent[] {
+  const status = booking.status.toUpperCase()
+  const payment = booking.payment
+  const paymentStatus = payment?.status.toUpperCase()
+  const slot = booking.items[0]?.slot
+  const times = getSessionTimes(booking.items)
+  const events: TimelineEvent[] = []
+
+  events.push({
+    id: "created",
+    title: "Booking made",
+    icon: PlusCircle,
+    date: booking.createdAt,
+    description:
+      booking.source === "POS" ? "Booked at the counter" : "Booked online",
+  })
+
+  if (payment?.paidAt) {
+    events.push({
+      id: "paid",
+      title: "Payment received",
+      icon: CreditCard,
+      tone: "success",
+      date: payment.paidAt,
+      description: `${formatCurrency(payment.amount, currency)}${
+        payment.paymentMethod
+          ? ` · ${PAYMENT_METHOD_LABEL[payment.paymentMethod] ?? humanize(payment.paymentMethod)}`
+          : ""
+      }`,
+    })
+  } else if (paymentStatus === "FAILED") {
+    events.push({
+      id: "payment-failed",
+      title: "Payment failed",
+      icon: AlertCircle,
+      tone: "danger",
+      date: payment?.updatedAt,
+    })
   }
 
-  return {
-    label: config.label,
-    variant: config.variant,
-    icon: STATUS_ICON[key] || Timer,
-    bar: STATUS_BAR_COLOR[config.variant],
+  if (status === "CONFIRMED" || status === "COMPLETED") {
+    events.push({
+      id: "confirmed",
+      title: "Booking confirmed",
+      icon: CheckCircle2,
+      tone: "success",
+    })
   }
+
+  if (status === "COMPLETED") {
+    events.push({
+      id: "completed",
+      title: "Session completed",
+      icon: Flag,
+      tone: "success",
+      description: slot ? `Played on ${formatLongDate(slot.date)}` : undefined,
+    })
+  }
+
+  if (status === "CANCELLED") {
+    events.push({
+      id: "cancelled",
+      title: cancelledByLabel(booking, isAdmin),
+      icon: XCircle,
+      tone: "danger",
+      date: booking.cancelledAt,
+      description: booking.cancellationReason
+        ? `Reason: ${booking.cancellationReason}`
+        : "No reason given",
+    })
+  }
+
+  if (
+    (payment?.refundAmount ?? 0) > 0 ||
+    paymentStatus === "REFUNDED" ||
+    paymentStatus === "PARTIALLY_REFUNDED"
+  ) {
+    events.push({
+      id: "refunded",
+      title:
+        paymentStatus === "PARTIALLY_REFUNDED" ? "Partly refunded" : "Refunded",
+      icon: RotateCcw,
+      tone: "muted",
+      date: payment?.updatedAt,
+      description: payment?.refundAmount
+        ? `${formatCurrency(payment.refundAmount, currency)} returned to the original payment method`
+        : undefined,
+    })
+  }
+
+  // What happens next, so first-time customers know what to expect
+  if (status === "PENDING") {
+    events.push({
+      id: "next-confirm",
+      title: "Waiting for confirmation",
+      icon: Clock,
+      upcoming: true,
+      description: isAdmin
+        ? "Confirm the booking once it's been checked."
+        : "You'll get a notification once it's confirmed.",
+    })
+  } else if (status === "CONFIRMED" && slot) {
+    events.push({
+      id: "next-session",
+      title: "Your session",
+      icon: CalendarCheck2,
+      upcoming: true,
+      description: `${formatLongDate(slot.date)}${
+        times ? `, ${formatTime(times.start)} – ${formatTime(times.end)}` : ""
+      }`,
+    })
+  }
+
+  return events
 }
-
-function formatTime(time: string) {
-  const [h, m] = time.split(":").map(Number)
-  const suffix = h >= 12 ? "PM" : "AM"
-  const hour = h % 12 || 12
-  return `${hour}:${m.toString().padStart(2, "0")} ${suffix}`
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function SectionCard({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: React.ElementType
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="rounded-xl border border-border bg-card">
-      {/* Card header */}
-      <div className="flex items-center gap-2.5 border-b border-border px-5 py-3.5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-muted">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-        </div>
-        <span className="text-sm font-semibold">{title}</span>
-      </div>
-      <div className="px-5 py-4">{children}</div>
-    </div>
-  )
-}
-
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-  mono = false,
-}: {
-  icon: React.ElementType
-  label: string
-  value: React.ReactNode
-  mono?: boolean
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4 border-b border-border/50 py-2.5 last:border-0">
-      <div className="flex shrink-0 items-center gap-2">
-        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="text-sm text-muted-foreground">{label}</span>
-      </div>
-      <span
-        className={`max-w-[60%] truncate text-right text-sm font-medium ${
-          mono ? "rounded bg-muted px-2 py-0.5 font-mono text-xs" : ""
-        }`}
-      >
-        {value}
-      </span>
-    </div>
-  )
-}
-
-type CancelStage = "idle" | "processing" | "done" | "error"
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -232,60 +330,50 @@ export function BookingDetailPage({
   isAdmin,
 }: BookingDetailPageProps) {
   const router = useRouter()
-  const [selectedStatus, setSelectedStatus] = useState(booking.status)
-  const [cancelStage, setCancelStage] = useState<CancelStage>("idle")
-  const [cancelRefund, setCancelRefund] = useState<{
-    amount: number
-    currency: string
-  } | null>(null)
-  const [cancelError, setCancelError] = useState("")
+  const statusOptions = getStatusUpdateOptions(booking.status)
+  const [cancelReason, setCancelReason] = useState("")
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
-  const cancelMutation = useCancelBookingMutation()
+  // One cancel action for both portals; admins hit the staff endpoint, which
+  // can cancel any booking and notifies the customer
+  const customerCancelMutation = useCancelBookingMutation()
+  const adminCancelMutation = useAdminCancelBookingMutation()
+  const cancelMutation = isAdmin ? adminCancelMutation : customerCancelMutation
   const statusMutation = useUpdateBookingStatusMutation()
   const deleteMutation = useDeleteBookingMutation()
 
-  const statusCfg = statusConfig(booking.status)
-  const StatusIcon = statusCfg.icon
-  const isCancellable = !["CANCELLED", "COMPLETED"].includes(
-    booking.status.toUpperCase()
-  )
+  const status = booking.status.toUpperCase()
+  const isCancellable = isBookingCancellable(booking.status)
+  const nextStatus = isAdmin ? statusOptions[0] : undefined
+  const nextStatusLabel = nextStatus
+    ? STATUS_ACTION_LABEL[nextStatus]
+    : undefined
+  const hint = actionHint(status, isAdmin)
 
-  const sortedSlots = booking.items
-    .map((item) => item.slot)
-    .sort((a, b) => a.startTime.localeCompare(b.startTime))
-  const slot = sortedSlots[0]
-  const endSlot = sortedSlots[sortedSlots.length - 1]
+  const slot = booking.items[0]?.slot
   const lane = slot?.lane
+  const times = getSessionTimes(booking.items)
   const payment = booking.payment
+  const currency = payment?.currency
+  const timeline = buildTimeline(booking, currency, isAdmin)
+  // No money has moved yet (no payment, or one that was never completed)
+  const isUncharged =
+    !payment ||
+    (!payment.paidAt &&
+      !payment.refundAmount &&
+      payment.status.toUpperCase() !== "SUCCEEDED")
+  const customerName = `${booking.user.firstName} ${booking.user.lastName}`
 
   const handleStatusUpdate = () => {
-    if (selectedStatus === booking.status) return
-    statusMutation.mutate({ id: booking.id, status: selectedStatus })
+    if (!nextStatus) return
+    statusMutation.mutate({ id: booking.id, status: nextStatus })
   }
 
   const handleCancel = () => {
-    // Snapshot now: the booking prop changes once the cancel goes through
-    const wasPaid = ["SUCCEEDED", "PAID"].includes(
-      payment?.status?.toUpperCase() ?? ""
+    cancelMutation.mutate(
+      { id: booking.id, reason: cancelReason.trim() || undefined },
+      { onSuccess: () => setCancelReason("") }
     )
-    setCancelRefund(
-      wasPaid && payment
-        ? { amount: payment.amount, currency: payment.currency }
-        : null
-    )
-    setCancelStage("processing")
-
-    cancelMutation.mutate(booking.id, {
-      onSuccess: () => setCancelStage("done"),
-      onError: (error: any) => {
-        setCancelError(
-          error?.response?.data?.message ||
-            error?.message ||
-            "Something went wrong"
-        )
-        setCancelStage("error")
-      },
-    })
   }
 
   const handleDelete = () => {
@@ -294,484 +382,447 @@ export function BookingDetailPage({
     })
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* ── Cancel progress / result ── */}
-      <AlertDialog
-        open={cancelStage !== "idle"}
-        onOpenChange={(open) => {
-          // Can't be dismissed while the cancellation is in flight
-          if (!open && cancelStage !== "processing") setCancelStage("idle")
-        }}
-      >
+  // ── Actions ──
+  const cancelAction = (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          disabled={!isCancellable}
+          aria-describedby={!isCancellable ? "booking-action-hint" : undefined}
+          className={`${detailActionClass} border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive`}
+        >
+          <XCircle />
+          <span className="md:hidden">
+            {isAdmin ? "Cancel" : "Cancel booking"}
+          </span>
+          <span className="hidden md:inline">Cancel booking</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Booking <strong>{booking.bookingRef}</strong> will be cancelled and
+            its slot released. Online payments are refunded automatically.{" "}
+            {isAdmin
+              ? "The customer will be notified in-app and by email."
+              : "You'll receive a confirmation email."}{" "}
+            This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="space-y-1.5">
+          <label
+            htmlFor="cancel-reason"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Reason (optional{isAdmin ? ", shared with the customer" : ""})
+          </label>
+          <Textarea
+            id="cancel-reason"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            maxLength={500}
+            placeholder={
+              isAdmin
+                ? "e.g. Lane closed for maintenance"
+                : "e.g. Can no longer make it"
+            }
+          />
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Keep booking</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleCancel}
+            disabled={cancelMutation.isPending}
+            className="bg-destructive hover:bg-destructive/90"
+          >
+            {cancelMutation.isPending ? "Cancelling…" : "Yes, cancel"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+
+  const statusAction = nextStatus && nextStatusLabel && (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          className={detailActionClass}
+          disabled={statusMutation.isPending}
+        >
+          {statusMutation.isPending ? (
+            <RefreshCw className="animate-spin" />
+          ) : (
+            <CheckCircle2 />
+          )}
+          <span className="md:hidden">{nextStatusLabel.short}</span>
+          <span className="hidden md:inline">{nextStatusLabel.full}</span>
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{nextStatusLabel.full}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Booking <strong>{booking.bookingRef}</strong> will move from{" "}
+            {humanize(status).toLowerCase()} to{" "}
+            {humanize(nextStatus).toLowerCase()}. This can&apos;t be reversed.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Not now</AlertDialogCancel>
+          <AlertDialogAction onClick={handleStatusUpdate}>
+            {nextStatusLabel.full}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+
+  const moreMenu = isAdmin && (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="More actions"
+            className={detailIconActionClass}
+          >
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => setDeleteOpen(true)}
+          >
+            <Trash2 />
+            Delete booking
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              {cancelStage === "processing" && (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  Cancelling your booking…
-                </>
-              )}
-              {cancelStage === "done" && (
-                <>
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  Booking cancelled
-                </>
-              )}
-              {cancelStage === "error" && (
-                <>
-                  <AlertCircle className="h-5 w-5 text-destructive" />
-                  Couldn&apos;t cancel booking
-                </>
-              )}
+              <AlertCircle className="h-4 w-4 text-destructive" />
+              Delete booking?
             </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2">
-                {cancelStage === "processing" && (
-                  <p>
-                    Please wait while we cancel{" "}
-                    <strong>{booking.bookingRef}</strong>
-                    {cancelRefund ? " and process your refund" : ""}. Don&apos;t
-                    close this page.
-                  </p>
-                )}
-                {cancelStage === "done" && (
-                  <>
-                    <p>
-                      Booking <strong>{booking.bookingRef}</strong> has been
-                      cancelled and the slot has been released.
-                    </p>
-                    {cancelRefund ? (
-                      <p>
-                        A refund of{" "}
-                        <strong>
-                          {formatCurrency(
-                            cancelRefund.amount,
-                            cancelRefund.currency
-                          )}
-                        </strong>{" "}
-                        has been issued to the original payment method. It can
-                        take 5–10 business days to appear on the statement.
-                      </p>
-                    ) : (
-                      <p>
-                        No payment was taken, so there is nothing to refund.
-                      </p>
-                    )}
-                  </>
-                )}
-                {cancelStage === "error" && <p>{cancelError}</p>}
-              </div>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{booking.bookingRef}</strong>{" "}
+              and all associated data. To keep a record, cancel it instead.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {cancelStage !== "processing" && (
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                {cancelStage === "done" ? "Done" : "Close"}
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep booking</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete permanently"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  )
 
-      {/* ── Top bar ── */}
-      <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="-ml-2 gap-1.5 text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
+  // Customers only see Cancel while it's possible; admins keep it visible
+  // (disabled, explained by the hint) next to their other actions
+  const hasActions = isAdmin || isCancellable
+  const actions = hasActions && (
+    <>
+      {statusAction}
+      {cancelAction}
+      {moreMenu}
+    </>
+  )
 
-          <div className="flex items-center gap-2">
-            {/* Cancel */}
-            {isCancellable && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <XCircle className="h-3.5 w-3.5" />
-                    Cancel booking
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Booking <strong>{booking.bookingRef}</strong> will be
-                      cancelled. This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Keep it</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleCancel}
-                      className="bg-destructive hover:bg-destructive/90"
-                    >
-                      Yes, cancel
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-
-            {/* Delete — admin only */}
-            {isAdmin && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-destructive" />
-                      Delete booking?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete{" "}
-                      <strong>{booking.bookingRef}</strong> and all associated
-                      data.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      className="bg-destructive hover:bg-destructive/90"
-                    >
-                      {deleteMutation.isPending
-                        ? "Deleting…"
-                        : "Delete permanently"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Page body ── */}
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        {/* ── Hero header ── */}
-        <div className="mb-8">
-          <PageHeader
-            size="lg"
-            title="Booking Detail"
-            actions={
-              <Badge
-                variant={statusCfg.variant}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
-              >
-                <StatusIcon className="h-3.5 w-3.5" />
-                {statusCfg.label}
-              </Badge>
-            }
+  return (
+    <DetailLayout>
+      <DetailPageHeader
+        backHref={isAdmin ? "/admin/bookings" : "/panel/bookings"}
+        backLabel="Bookings"
+        title={booking.bookingRef}
+        copyLabel="Booking reference"
+        status={
+          <BookingStatusBadge
+            status={status}
+            showIcon
+            className="h-6 px-2.5 text-xs [&>svg]:size-3.5!"
           />
-          <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-            <Hash className="h-3.5 w-3.5" />
-            <span className="font-mono font-semibold">
-              {booking.bookingRef}
-            </span>
-            <span>·</span>
-            <span>Created {formatDateTime(booking.createdAt)}</span>
-          </div>
+        }
+        meta={`Booked ${formatDateTime12(booking.createdAt)}${
+          isAdmin ? ` by ${customerName}` : ""
+        }`}
+        actions={actions || undefined}
+        hint={hint}
+        hintId="booking-action-hint"
+      />
 
-          {/* Status progress bar */}
-          <div className="mt-6 grid grid-cols-4 gap-1.5">
-            {BOOKING_STATUSES.map((s, i) => {
-              const steps = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]
-              const currentIndex = steps.indexOf(booking.status.toUpperCase())
-              const stepIndex = steps.indexOf(s)
-              const isCancelled = booking.status.toUpperCase() === "CANCELLED"
-              const isActive = isCancelled
-                ? s === "CANCELLED"
-                : stepIndex <= currentIndex
-              return (
-                <div key={s} className="space-y-1">
-                  <div
-                    className={`h-1 rounded-full transition-colors ${
-                      isActive
-                        ? isCancelled && s === "CANCELLED"
-                          ? "bg-destructive"
-                          : statusCfg.bar
-                        : "bg-muted"
-                    }`}
-                  />
-                  <span className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                    {s.charAt(0) + s.slice(1).toLowerCase()}
-                  </span>
-                </div>
+      <SummaryStrip
+        items={[
+          {
+            icon: Calendar,
+            label: "Date",
+            value: slot ? formatLongDate(slot.date) : "—",
+          },
+          {
+            icon: Clock,
+            label: "Time",
+            value: times
+              ? `${formatTime(times.start)} – ${formatTime(times.end)}`
+              : "—",
+            sub: times ? formatDuration(times.minutes) : undefined,
+          },
+          {
+            icon: MapPin,
+            label: "Lane",
+            value: lane?.name ?? "—",
+            sub: lane ? `${humanize(lane.type)} lane` : undefined,
+          },
+          {
+            icon: DollarSign,
+            label: "Total",
+            value: formatCurrency(booking.finalAmount, currency),
+            sub: isUncharged ? (
+              status === "CANCELLED" ? (
+                "Not charged"
+              ) : (
+                "Not paid yet"
               )
-            })}
-          </div>
-        </div>
+            ) : (
+              <PaymentStatusBadge status={payment!.status} className="mt-1" />
+            ),
+          },
+        ]}
+      />
 
-        {/* ── Two-column grid ── */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          {/* Left column (2/3) */}
-          <div className="space-y-5 lg:col-span-2">
-            {/* Customer */}
-            <SectionCard icon={User} title="Customer">
-              <div className="flex items-center gap-4 pb-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-base font-bold text-primary">
-                  {booking.user.firstName[0]}
-                  {booking.user.lastName[0]}
-                </div>
-                <div>
-                  <p className="font-semibold">
-                    {booking.user.firstName} {booking.user.lastName}
-                  </p>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground capitalize">
-                      {booking.user.role.toLowerCase()}
-                    </span>
-                    {booking.user.isEmailVerified && (
-                      <Badge
-                        variant="default"
-                        className="gap-1 px-1.5 py-0 text-[10px]"
-                      >
-                        <ShieldCheck className="h-2.5 w-2.5" />
-                        Verified
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <Separator className="mb-3" />
-              <InfoRow icon={Mail} label="Email" value={booking.user.email} />
-              {booking.user.phone && (
+      <DetailColumns
+        main={
+          <>
+            {status === "CANCELLED" && (
+              <Alert variant="destructive" className="px-4 py-3">
+                <XCircle />
+                <AlertTitle className="text-sm font-semibold">
+                  {cancelledByLabel(booking, isAdmin)}
+                  {booking.cancelledAt &&
+                    ` on ${formatDateTime12(booking.cancelledAt)}`}
+                </AlertTitle>
+                <AlertDescription className="text-sm">
+                  {booking.cancellationReason
+                    ? `Reason: ${booking.cancellationReason}`
+                    : "No reason was given."}
+                  {payment?.refundAmount
+                    ? ` A refund of ${formatCurrency(payment.refundAmount, currency)} was issued.`
+                    : ""}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <InfoCard icon={CalendarCheck2} title="Booking details">
+              <InfoList>
                 <InfoRow
-                  icon={Phone}
-                  label="Phone"
-                  value={booking.user.phone}
+                  label="Booking reference"
+                  value={booking.bookingRef}
+                  copyValue={booking.bookingRef}
                 />
-              )}
-            </SectionCard>
-
-            {/* Lane & Slot */}
-            {lane && slot && (
-              <SectionCard icon={MapPin} title="Lane & Slot">
-                <InfoRow icon={MapPin} label="Lane" value={lane.name} />
+                <InfoRow label="Lane" value={lane?.name} />
                 <InfoRow
-                  icon={Layers}
-                  label="Type"
+                  label="Lane type"
+                  value={lane ? humanize(lane.type) : undefined}
+                />
+                <InfoRow
+                  label="Date"
+                  value={slot ? formatLongDate(slot.date) : undefined}
+                />
+                <InfoRow
+                  label="Time"
                   value={
-                    <Badge variant="secondary" className="text-xs">
-                      {lane.type}
-                    </Badge>
+                    times
+                      ? `${formatTime(times.start)} – ${formatTime(times.end)} (${formatDuration(times.minutes)})`
+                      : undefined
                   }
                 />
                 <InfoRow
-                  icon={Calendar}
-                  label="Date"
-                  value={formatDate(slot.date)}
+                  label="Lane capacity"
+                  value={lane ? `Up to ${lane.capacity} people` : undefined}
                 />
                 <InfoRow
-                  icon={Clock}
-                  label="Time"
-                  value={`${formatTime(slot.startTime)} – ${formatTime(endSlot.endTime)}`}
+                  label="Booked via"
+                  value={booking.source === "POS" ? "At the counter" : "Online"}
                 />
-                <InfoRow
-                  icon={User}
-                  label="Capacity"
-                  value={`${lane.capacity} persons`}
-                />
-                {lane.description && (
-                  <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2.5">
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {lane.description}
-                    </p>
-                  </div>
+                {lane?.description && (
+                  <InfoRow
+                    full
+                    label="About this lane"
+                    value={lane.description}
+                  />
                 )}
-              </SectionCard>
-            )}
+              </InfoList>
+            </InfoCard>
 
-            {/* Payment */}
-            {payment && (
-              <SectionCard icon={CreditCard} title="Payment">
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Payment status
-                  </span>
-                  <PaymentStatusBadge status={payment.status} />
-                </div>
-                <Separator className="mb-3" />
+            <InfoCard icon={User} title={isAdmin ? "Customer" : "Your details"}>
+              <InfoList>
+                <InfoRow label="Name" value={customerName} />
                 <InfoRow
-                  icon={CreditCard}
-                  label="Stripe intent"
-                  value={payment.stripePaymentIntentId}
-                  mono
+                  label="Email"
+                  value={
+                    isAdmin ? (
+                      <a
+                        href={`mailto:${booking.user.email}`}
+                        className="underline-offset-2 hover:underline"
+                      >
+                        {booking.user.email}
+                      </a>
+                    ) : (
+                      booking.user.email
+                    )
+                  }
+                  copyValue={booking.user.email}
                 />
+                <InfoRow label="Phone" value={booking.user.phone} />
                 <InfoRow
-                  icon={DollarSign}
-                  label="Charged"
-                  value={formatCurrency(payment.amount, payment.currency)}
+                  label="Email verified"
+                  value={
+                    booking.user.isEmailVerified ? (
+                      <span className="inline-flex items-center gap-1">
+                        <CheckCircle2
+                          className="size-3.5 text-emerald-600 dark:text-emerald-400"
+                          aria-hidden
+                        />
+                        Yes
+                      </span>
+                    ) : (
+                      "Not yet"
+                    )
+                  }
                 />
-                {payment.paidAt && (
+                {isAdmin && (
                   <InfoRow
-                    icon={CheckCircle2}
-                    label="Paid at"
-                    value={formatDateTime(payment.paidAt)}
+                    label="Account type"
+                    value={humanize(booking.user.role)}
                   />
                 )}
-                {payment.refundAmount && (
-                  <InfoRow
-                    icon={RefreshCw}
-                    label="Refund"
-                    value={formatCurrency(
-                      payment.refundAmount,
-                      payment.currency
-                    )}
-                  />
-                )}
-                {payment.stripeRefundId && (
-                  <InfoRow
-                    icon={RefreshCw}
-                    label="Refund ID"
-                    value={payment.stripeRefundId}
-                    mono
-                  />
-                )}
-              </SectionCard>
-            )}
+              </InfoList>
+            </InfoCard>
 
-            {/* Notes */}
-            {booking.notes && (
-              <SectionCard icon={ReceiptText} title="Notes">
-                <p className="text-sm leading-relaxed text-muted-foreground">
+            <InfoCard icon={NotebookPen} title="Notes">
+              {booking.notes ? (
+                <p className="text-sm leading-relaxed whitespace-pre-line">
                   {booking.notes}
                 </p>
-              </SectionCard>
-            )}
-          </div>
-
-          {/* Right column (1/3) */}
-          <div className="space-y-5">
-            {/* Pricing summary */}
-            <SectionCard icon={DollarSign} title="Pricing">
+              ) : (
+                <EmptyState
+                  size="sm"
+                  title="No notes"
+                  description="Nothing extra was added to this booking."
+                  className="py-4"
+                />
+              )}
+            </InfoCard>
+          </>
+        }
+        aside={
+          <>
+            <InfoCard icon={CreditCard} title="Payment">
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    Unit price{booking.items.length > 1 && ` × ${booking.items.length} hrs`}
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(
-                      booking.items[0]?.unitPrice ?? 0,
-                      payment?.currency
-                    )}
-                  </span>
-                </div>
+                <AmountRow
+                  label={
+                    booking.items.length > 1
+                      ? `Session price (${booking.items.length} slots)`
+                      : "Session price"
+                  }
+                  value={formatCurrency(booking.totalAmount, currency)}
+                />
                 {booking.discountAmount > 0 && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1.5 text-muted-foreground">
-                      <Tag className="h-3 w-3" />
-                      Discount
-                    </span>
-                    <span className="font-medium text-accent">
-                      −{" "}
-                      {formatCurrency(
-                        booking.discountAmount,
-                        payment?.currency
-                      )}
-                    </span>
-                  </div>
+                  <AmountRow
+                    label={
+                      booking.discountCode?.code
+                        ? `Discount (${booking.discountCode.code})`
+                        : "Discount"
+                    }
+                    value={`− ${formatCurrency(booking.discountAmount, currency)}`}
+                  />
                 )}
               </div>
               <Separator className="my-3" />
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">Total due</span>
-                <span className="text-xl font-black text-primary">
-                  {formatCurrency(booking.finalAmount, payment?.currency)}
-                </span>
-              </div>
-            </SectionCard>
+              <AmountRow
+                emphasis
+                label="Total"
+                value={formatCurrency(booking.finalAmount, currency)}
+              />
 
-            {/* Timestamps */}
-            <SectionCard icon={Clock} title="Timestamps">
-              <div className="space-y-0">
-                <InfoRow
-                  icon={Calendar}
-                  label="Created"
-                  value={formatDateTime(booking.createdAt)}
-                />
-                <InfoRow
-                  icon={RefreshCw}
-                  label="Updated"
-                  value={formatDateTime(booking.updatedAt)}
-                />
-              </div>
-            </SectionCard>
-
-            {/* Admin: update status */}
-            {isAdmin && (
-              <SectionCard icon={Activity} title="Update Status">
-                <div className="space-y-3">
-                  <Select
-                    value={selectedStatus}
-                    onValueChange={setSelectedStatus}
-                  >
-                    <SelectTrigger className="h-9 w-full text-sm">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BOOKING_STATUSES.map((s) => (
-                        <SelectItem key={s} value={s} className="text-sm">
-                          {s.charAt(0) + s.slice(1).toLowerCase()}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    size="sm"
-                    className="h-9 w-full"
-                    onClick={handleStatusUpdate}
-                    disabled={
-                      selectedStatus === booking.status ||
-                      statusMutation.isPending
+              <Separator className="my-4" />
+              {payment ? (
+                <InfoList columns={1}>
+                  <InfoRow
+                    label="Payment status"
+                    value={<PaymentStatusBadge status={payment.status} />}
+                  />
+                  <InfoRow
+                    label="Payment method"
+                    value={
+                      payment.paymentMethod
+                        ? (PAYMENT_METHOD_LABEL[payment.paymentMethod] ??
+                          humanize(payment.paymentMethod))
+                        : undefined
                     }
-                  >
-                    {statusMutation.isPending ? (
-                      <>
-                        <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" />
-                        Applying…
-                      </>
-                    ) : (
-                      "Apply status"
-                    )}
-                  </Button>
-                </div>
-              </SectionCard>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+                  />
+                  <InfoRow
+                    label="Paid on"
+                    value={
+                      payment.paidAt
+                        ? formatDateTime12(payment.paidAt)
+                        : undefined
+                    }
+                  />
+                  {(payment.refundAmount ?? 0) > 0 && (
+                    <InfoRow
+                      label="Refunded"
+                      value={formatCurrency(payment.refundAmount, currency)}
+                    />
+                  )}
+                  {isAdmin && payment.stripePaymentIntentId && (
+                    <InfoRow
+                      label="Payment reference"
+                      value={payment.stripePaymentIntentId}
+                      copyValue={payment.stripePaymentIntentId}
+                      mono
+                    />
+                  )}
+                  {isAdmin && payment.stripeRefundId && (
+                    <InfoRow
+                      label="Refund reference"
+                      value={payment.stripeRefundId}
+                      copyValue={payment.stripeRefundId}
+                      mono
+                    />
+                  )}
+                </InfoList>
+              ) : (
+                <EmptyState
+                  size="sm"
+                  icon={CreditCard}
+                  title="No payment yet"
+                  description={
+                    isAdmin
+                      ? "No payment has been recorded for this booking."
+                      : "You haven't been charged for this booking."
+                  }
+                  className="py-2"
+                />
+              )}
+            </InfoCard>
+
+            <InfoCard icon={Activity} title="Activity">
+              <StatusTimeline events={timeline} />
+            </InfoCard>
+          </>
+        }
+      />
+    </DetailLayout>
   )
 }
-
-// ─── Usage ────────────────────────────────────────────────────────────────────
-//
-// app/bookings/[id]/page.tsx
-//
-// import { BookingDetailPage } from "@/components/BookingDetailPage"
-//
-// export default async function Page({ params }: { params: { id: string } }) {
-//   const booking = await fetchBooking(params.id)          // your server-side fetch
-//   return <BookingDetailPage booking={booking} isAdmin={false} />
-// }

@@ -15,8 +15,26 @@ export async function createBookingRequest(data: CreateBookingPayload) {
   return response.data
 }
 
-export async function cancelBookingRequest(id: string) {
-  const response = await apiClient.patch(`/bookings/${id}/cancel`)
+export interface CancelBookingPayload {
+  id: string
+  reason?: string
+}
+
+export async function cancelBookingRequest({
+  id,
+  reason,
+}: CancelBookingPayload) {
+  const response = await apiClient.patch(`/bookings/${id}/cancel`, { reason })
+  return response.data
+}
+
+export async function adminCancelBookingRequest({
+  id,
+  reason,
+}: CancelBookingPayload) {
+  const response = await apiClient.patch(`/admin/bookings/${id}/cancel`, {
+    reason,
+  })
   return response.data
 }
 
@@ -66,9 +84,13 @@ function useBookingMutation<TData, TVariables>(
       queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
       // Single-booking detail (useBookingById) — keyed ["booking", id]
       queryClient.invalidateQueries({ queryKey: ["booking"] })
+      queryClient.invalidateQueries({ queryKey: ["notifications"] })
       toast.success(successMessage)
     },
-    onError: (error: any) => {
+    // Some callers' errors carry the raw axios response; prefer its message
+    onError: (
+      error: Error & { response?: { data?: { message?: string } } }
+    ) => {
       const message =
         error?.response?.data?.message ||
         error.message ||
@@ -92,6 +114,14 @@ export function useCancelBookingMutation() {
     ["bookings", "cancel"],
     cancelBookingRequest,
     "Booking cancelled successfully"
+  )
+}
+
+export function useAdminCancelBookingMutation() {
+  return useBookingMutation(
+    ["bookings", "admin-cancel"],
+    adminCancelBookingRequest,
+    "Booking cancelled — the customer has been notified"
   )
 }
 

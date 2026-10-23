@@ -37,6 +37,8 @@ import {
   useVerifyEmailMutation,
 } from "@/services/mutations/auth.mutations"
 import { setAuthTokens } from "@/services/auth/token-store"
+import { resetUserState } from "@/services/auth/session"
+import { useQueryClient } from "@tanstack/react-query"
 import { ApiError } from "@/types/response"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -150,6 +152,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
   const roleInfo = roleContent(role)
   const meta = screenMeta(mode)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const registerMutation = useRegisterMutation()
   const loginMutation = useLoginMutation()
@@ -320,6 +323,9 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         )
         return
       }
+      // Start the new session with an empty cache so no previous account's
+      // bookings/notifications can render before fresh data arrives
+      await resetUserState(queryClient)
       if (response.data?.accessToken) {
         setAuthTokens(
           {
