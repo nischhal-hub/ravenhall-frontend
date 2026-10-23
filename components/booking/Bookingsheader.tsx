@@ -34,7 +34,7 @@ export function BookingsHeader({
             size="sm"
             onClick={onRefresh}
             disabled={isRefetching}
-            className="h-9 rounded-xl border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20"
+            className="h-9 rounded-xl"
           >
             <RefreshCw
               className={`mr-2 h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`}
@@ -44,7 +44,7 @@ export function BookingsHeader({
           <Button
             size="sm"
             onClick={onNewBooking}
-            className="h-9 rounded-xl bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+            className="h-9 rounded-xl bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             New Booking

@@ -117,12 +117,12 @@ function PlanCard({
       className={cn(
         "relative flex h-full flex-col justify-between rounded-3xl p-7 transition-transform duration-200 hover:-translate-y-1",
         plan.featured
-          ? "bg-primary text-primary-foreground shadow-[0_28px_60px_-24px_rgba(30,58,95,0.8)]"
+          ? "bg-primary text-primary-foreground shadow-[0_28px_60px_-24px_rgba(190,18,60,0.45)]"
           : "bg-muted text-foreground"
       )}
     >
       {plan.featured && (
-        <p className="absolute top-0 right-4 rounded-b-2xl bg-accent px-4 py-1 text-[11px] font-black tracking-wider text-accent-foreground uppercase">
+        <p className="absolute top-0 right-4 rounded-b-2xl bg-highlight px-4 py-1 text-[11px] font-black tracking-wider text-highlight-foreground uppercase">
           Most Popular
         </p>
       )}
@@ -148,7 +148,7 @@ function PlanCard({
             className={cn(
               "mt-5 rounded-xl px-3 py-2 text-center text-xs font-semibold",
               plan.featured
-                ? "bg-primary-foreground/10 text-accent"
+                ? "bg-primary-foreground/10 text-highlight-soft"
                 : "bg-primary/10 text-primary"
             )}
           >
@@ -162,7 +162,7 @@ function PlanCard({
               <PointIcon
                 className={cn(
                   "size-4 shrink-0",
-                  plan.featured ? "text-accent" : "text-primary"
+                  plan.featured ? "text-highlight-soft" : "text-primary"
                 )}
               />
               {point}

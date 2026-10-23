@@ -64,7 +64,7 @@ function CheckoutForm({ plan }: { plan: string }) {
       <Button
         onClick={handlePay}
         disabled={!stripe || !elements || loading}
-        className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90"
+        className="h-12 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90"
       >
         {loading ? (
           <>
@@ -81,10 +81,10 @@ function CheckoutForm({ plan }: { plan: string }) {
 
       <div className="flex justify-center gap-6 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <ShieldCheck className="size-4 text-accent" /> SSL Secured
+          <ShieldCheck className="size-4 text-primary dark:text-rose-400" /> SSL Secured
         </span>
         <span className="flex items-center gap-1">
-          <CheckCircle2 className="size-4 text-accent" /> Instant Confirmation
+          <CheckCircle2 className="size-4 text-primary dark:text-rose-400" /> Instant Confirmation
         </span>
       </div>
     </div>
@@ -143,7 +143,7 @@ export default function MembershipCheckout({
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
         <div className="flex flex-col items-center">
-          <Loader2 className="size-12 animate-spin text-accent" />
+          <Loader2 className="size-12 animate-spin text-primary dark:text-rose-400" />
           <p className="mt-4 text-sm text-muted-foreground">
             Preparing secure checkout...
           </p>

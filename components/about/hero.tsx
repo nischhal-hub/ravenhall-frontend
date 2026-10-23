@@ -18,7 +18,7 @@ export function AboutHero() {
         <h1 className="max-w-xl font-heading text-4xl leading-tight font-extrabold tracking-tight text-primary-foreground sm:text-5xl lg:text-6xl">
           Where Legends
           <br />
-          <span className="text-accent">Train Indoors.</span>
+          <span className="text-highlight-soft">Train Indoors.</span>
         </h1>
 
         <p className="mt-6 max-w-xl text-sm leading-relaxed text-primary-foreground/80 sm:text-base">
@@ -34,7 +34,7 @@ export function AboutHero() {
             { value: "24/7", label: "Online Booking" },
           ].map((stat) => (
             <div key={stat.label}>
-              <p className="font-heading text-4xl font-black text-accent">
+              <p className="font-heading text-4xl font-black text-highlight-soft">
                 {stat.value}
               </p>
               <p className="mt-1 text-xs font-semibold tracking-widest text-primary-foreground/60 uppercase">

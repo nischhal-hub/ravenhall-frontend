@@ -15,9 +15,9 @@ interface Props {
 }
 
 const STATUS_CONFIG = [
-  { key: "confirmed", label: "Confirmed", color: "var(--chart-2)" },
-  { key: "completed", label: "Completed", color: "var(--chart-3)" },
-  { key: "pending", label: "Pending", color: "var(--chart-4)" },
+  { key: "confirmed", label: "Confirmed", color: "var(--chart-4)" },
+  { key: "completed", label: "Completed", color: "var(--chart-2)" },
+  { key: "pending", label: "Pending", color: "var(--chart-3)" },
   { key: "cancelled", label: "Cancelled", color: "var(--destructive)" },
 ] as const
 

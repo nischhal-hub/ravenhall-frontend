@@ -178,7 +178,7 @@ export function PosReceiptModal({
                   </div>
                 )}
                 {receipt.pricing.discount > 0 && (
-                  <div className="flex justify-between text-accent font-medium">
+                  <div className="flex justify-between text-primary dark:text-rose-400 font-medium">
                     <span>
                       Discount {receipt.pricing.discountCode ? `(${receipt.pricing.discountCode})` : ""}:
                     </span>

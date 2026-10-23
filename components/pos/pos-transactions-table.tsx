@@ -141,7 +141,7 @@ export function PosTransactionsTable({
               ${item.finalAmount.toFixed(2)}
             </span>
             {item.discountAmount > 0 && (
-              <p className="text-[10px] text-accent font-medium">
+              <p className="text-[10px] text-primary dark:text-rose-400 font-medium">
                 Saved ${item.discountAmount.toFixed(2)}
               </p>
             )}
@@ -224,7 +224,7 @@ export function PosTransactionsTable({
                 variant="default"
                 size="sm"
                 onClick={() => onOpenCollectPayment(item)}
-                className="h-7 text-xs px-2 gap-1 bg-accent text-accent-foreground hover:bg-accent/90"
+                className="h-7 text-xs px-2 gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
                 title="Collect Payment"
               >
                 <DollarSign className="size-3" />

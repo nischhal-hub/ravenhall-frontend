@@ -6,7 +6,9 @@ import { heroStatus } from "@/components/pages/landing/data"
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-primary via-[#17355b] to-[#1e3a5f] px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
+    <section
+      style={{ background: "var(--gradient-hero)" }}
+      className="relative overflow-hidden px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-24">
       <div className="absolute inset-0 opacity-25">
         <Image
           src="/images/landing/hero.jpg"
@@ -19,13 +21,13 @@ export function HeroSection() {
 
       <div className="relative mx-auto grid w-full max-w-7xl gap-8 lg:grid-cols-2 lg:items-center">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold tracking-wider text-accent uppercase">
+          <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold tracking-wider text-highlight-soft uppercase">
             <Sparkles className="size-3.5" />
             Melbourne&apos;s Elite Cricket Venue
           </div>
 
           <h1 className="max-w-xl font-heading text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Book Your Lane at <span className="text-accent">Ravenhall</span>
+            Book Your Lane at <span className="text-highlight-soft">Ravenhall</span>
             <br />
             Indoor Cricket Centre
           </h1>
@@ -54,7 +56,7 @@ export function HeroSection() {
         <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl sm:p-6 lg:ml-auto lg:w-120">
           <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
             <p className="font-semibold text-white">Live Status</p>
-            <span className="inline-flex items-center gap-2 text-sm text-accent">
+            <span className="inline-flex items-center gap-2 text-sm text-highlight-soft">
               <span className="size-2 rounded-full bg-accent" />
               Open Now
             </span>
@@ -70,14 +72,14 @@ export function HeroSection() {
                   <p className="mt-1 text-lg font-bold text-white sm:text-2xl">
                     {item.value}
                   </p>
-                  <Icon className="mt-2 size-4 text-accent" />
+                  <Icon className="mt-2 size-4 text-highlight-soft" />
                 </div>
               )
             })}
           </div>
 
           <div className="mt-4 flex items-center gap-3 rounded-2xl bg-accent/10 p-3">
-            <Star className="size-4 text-accent" />
+            <Star className="size-4 text-highlight-soft" />
             <p className="text-xs text-white/90 sm:text-sm">
               Join 200+ active members training at Ravenhall weekly.
             </p>

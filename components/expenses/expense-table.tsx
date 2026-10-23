@@ -320,7 +320,7 @@ export function ExpenseTable() {
                   : "No data"}
               </p>
             </div>
-            <div className="size-9 rounded-xl bg-accent/15 flex items-center justify-center text-accent">
+            <div className="size-9 rounded-xl bg-accent/15 flex items-center justify-center text-primary dark:text-rose-400">
               <Tag className="size-5" />
             </div>
           </div>

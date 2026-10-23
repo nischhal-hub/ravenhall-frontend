@@ -123,7 +123,7 @@ export function Step3({
                 </span>
               </div>
               {memberDiscountPct > 0 && (
-                <div className="flex justify-between text-accent">
+                <div className="flex justify-between text-primary dark:text-rose-400">
                   <span>Member Discount ({memberDiscountPct}%)</span>
                   <span className="font-semibold">
                     -${price.memberDiscount.toFixed(2)}
@@ -131,7 +131,7 @@ export function Step3({
                 </div>
               )}
               {price.promoDiscount > 0 && (
-                <div className="flex justify-between text-accent">
+                <div className="flex justify-between text-primary dark:text-rose-400">
                   <span>Promo ({promo})</span>
                   <span className="font-semibold">
                     -${price.promoDiscount.toFixed(2)}

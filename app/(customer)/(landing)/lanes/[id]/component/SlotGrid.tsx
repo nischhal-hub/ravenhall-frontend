@@ -31,7 +31,7 @@ export function SlotGrid({
         <h3 className="font-bold text-foreground">Available Slots</h3>
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-accent" />{" "}
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />{" "}
             Available
           </span>
           <span className="flex items-center gap-1">
@@ -89,7 +89,7 @@ export function SlotGrid({
                         ? "text-destructive"
                         : isPast || isTooShort
                           ? "text-muted-foreground/60"
-                          : "text-accent"
+                          : "text-emerald-700 dark:text-emerald-400"
                   )}
                 >
                   {isSelected

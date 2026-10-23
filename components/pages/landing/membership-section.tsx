@@ -85,7 +85,7 @@ export function MembershipSection() {
               )}
             >
               {plan.featured && (
-                <p className="absolute top-0 right-4 rounded-b-2xl bg-accent px-4 py-1 text-[11px] font-black tracking-wider text-accent-foreground uppercase">
+                <p className="absolute top-0 right-4 rounded-b-2xl bg-highlight px-4 py-1 text-[11px] font-black tracking-wider text-highlight-foreground uppercase">
                   Most Popular
                 </p>
               )}
@@ -110,7 +110,7 @@ export function MembershipSection() {
                     className={cn(
                       "mt-5 rounded-xl px-3 py-2 text-center text-xs font-semibold",
                       plan.featured
-                        ? "bg-primary-foreground/10 text-accent"
+                        ? "bg-primary-foreground/10 text-highlight-soft"
                         : "bg-primary/10 text-primary"
                     )}
                   >
@@ -124,7 +124,7 @@ export function MembershipSection() {
                       <PointIcon
                         className={cn(
                           "size-4",
-                          plan.featured ? "text-accent" : "text-primary"
+                          plan.featured ? "text-highlight-soft" : "text-primary"
                         )}
                       />
                       {point}

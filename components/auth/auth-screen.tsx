@@ -527,7 +527,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
                 ? roleInfo.switchToRegisterHref
                 : roleInfo.switchToLoginHref
             }
-            className="rounded font-semibold text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-secondary/40 dark:text-sky-300"
+            className="rounded font-semibold text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/40 dark:text-rose-400"
           >
             {meta.footerLink}
           </Link>

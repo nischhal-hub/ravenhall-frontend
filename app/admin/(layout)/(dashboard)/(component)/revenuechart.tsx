@@ -4,6 +4,13 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import {
+  chartAxis,
+  chartColors,
+  chartGrid,
+  chartLegend,
+  chartTooltip,
+} from "@/lib/chart-theme"
+import {
   Line,
   XAxis,
   YAxis,
@@ -141,28 +148,32 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
                 </linearGradient>
               </defs>
 
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12 }} />
+              <CartesianGrid {...chartGrid} />
+              <XAxis dataKey="date" {...chartAxis} />
+              <YAxis tickFormatter={formatYAxis} {...chartAxis} />
 
-              <Tooltip />
-              <Legend />
+              <Tooltip
+                {...chartTooltip}
+                cursor={{ stroke: "var(--border)" }}
+                formatter={(value) => formatCurrency(Number(value))}
+              />
+              <Legend {...chartLegend} />
 
               <Area
                 type="monotone"
                 dataKey="revenue"
                 name="Revenue"
-                stroke="var(--chart-1)"
+                stroke={chartColors.rose}
                 fill="url(#colorRevenue)"
-                strokeWidth={3}
+                strokeWidth={2}
               />
 
               <Line
                 type="monotone"
                 dataKey="trend"
                 name="3-Period Trend"
-                stroke="var(--chart-3)"
-                strokeWidth={2.5}
+                stroke={chartColors.amber}
+                strokeWidth={2}
                 strokeDasharray="6 3"
                 dot={false}
               />

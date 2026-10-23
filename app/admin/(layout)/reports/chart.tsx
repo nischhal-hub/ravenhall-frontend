@@ -36,6 +36,13 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import type { RevenueReportResult } from "@/types/revenue-response.types"
+import {
+  chartAxis,
+  chartColors,
+  chartGrid,
+  chartLegend,
+  chartTooltip,
+} from "@/lib/chart-theme"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
@@ -155,7 +162,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
             <span className="text-[11px] font-semibold text-muted-foreground uppercase">
               Net Revenue
             </span>
-            <TrendingUp className="size-4 text-accent" />
+            <TrendingUp className="size-4 text-emerald-700 dark:text-emerald-400" />
           </div>
           <div className="mt-2">
             <p className="text-xl font-heading font-black text-primary font-mono">
@@ -197,7 +204,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
               Net Profit
             </span>
             {isProfitable ? (
-              <ArrowUpRight className="size-4 text-accent" />
+              <ArrowUpRight className="size-4 text-emerald-700 dark:text-emerald-400" />
             ) : (
               <ArrowDownRight className="size-4 text-destructive" />
             )}
@@ -206,7 +213,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
             <p
               className={cn(
                 "text-xl font-heading font-black font-mono",
-                isProfitable ? "text-accent" : "text-destructive"
+                isProfitable ? "text-emerald-700 dark:text-emerald-400" : "text-destructive"
               )}
             >
               ${summary.netProfit.toFixed(2)}
@@ -229,7 +236,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
             <p
               className={cn(
                 "text-xl font-heading font-black font-mono",
-                summary.profitMarginPct >= 0 ? "text-accent" : "text-destructive"
+                summary.profitMarginPct >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-destructive"
               )}
             >
               {summary.profitMarginPct.toFixed(1)}%
@@ -284,13 +291,14 @@ export function RevenueChart({ report }: RevenueChartProps) {
             <ResponsiveContainer width="100%" height={360}>
               {chartType === "bar" ? (
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
-                  <XAxis dataKey="period" tick={{ fontSize: 11 }} />
+                  <CartesianGrid {...chartGrid} />
+                  <XAxis dataKey="period" {...chartAxis} />
                   <YAxis
-                    tick={{ fontSize: 11 }}
+                    {...chartAxis}
                     tickFormatter={(v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
                   />
                   <Tooltip
+                    {...chartTooltip}
                     formatter={(value: any, name: any) => [
                       `$${Number(value).toFixed(2)} AUD`,
                       name === "revenue"
@@ -301,6 +309,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                     ]}
                   />
                   <Legend
+                    {...chartLegend}
                     verticalAlign="top"
                     height={36}
                     formatter={(value) =>
@@ -311,33 +320,34 @@ export function RevenueChart({ report }: RevenueChartProps) {
                         : "Net Profit"
                     }
                   />
-                  <Bar dataKey="revenue" fill="#1e3a5f" radius={[4, 4, 0, 0]} name="revenue" />
-                  <Bar dataKey="expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} name="expenses" />
-                  <Bar dataKey="netProfit" fill="#22c55e" radius={[4, 4, 0, 0]} name="netProfit" />
+                  <Bar dataKey="revenue" fill={chartColors.indigo} radius={[4, 4, 0, 0]} name="revenue" />
+                  <Bar dataKey="expenses" fill={chartColors.negative} radius={[4, 4, 0, 0]} name="expenses" />
+                  <Bar dataKey="netProfit" fill={chartColors.cyan} radius={[4, 4, 0, 0]} name="netProfit" />
                 </BarChart>
               ) : (
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#1e3a5f" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#1e3a5f" stopOpacity={0} />
+                      <stop offset="5%" stopColor={chartColors.indigo} stopOpacity={0.4} />
+                      <stop offset="95%" stopColor={chartColors.indigo} stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="gradExpenses" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                      <stop offset="5%" stopColor={chartColors.negative} stopOpacity={0.4} />
+                      <stop offset="95%" stopColor={chartColors.negative} stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="gradProfit" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                      <stop offset="5%" stopColor={chartColors.cyan} stopOpacity={0.4} />
+                      <stop offset="95%" stopColor={chartColors.cyan} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
-                  <XAxis dataKey="period" tick={{ fontSize: 11 }} />
+                  <CartesianGrid {...chartGrid} />
+                  <XAxis dataKey="period" {...chartAxis} />
                   <YAxis
-                    tick={{ fontSize: 11 }}
+                    {...chartAxis}
                     tickFormatter={(v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
                   />
                   <Tooltip
+                    {...chartTooltip}
                     formatter={(value: any, name: any) => [
                       `$${Number(value).toFixed(2)} AUD`,
                       name === "revenue"
@@ -348,6 +358,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                     ]}
                   />
                   <Legend
+                    {...chartLegend}
                     verticalAlign="top"
                     height={36}
                     formatter={(value) =>
@@ -361,7 +372,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                   <Area
                     type="monotone"
                     dataKey="revenue"
-                    stroke="#1e3a5f"
+                    stroke={chartColors.indigo}
                     fill="url(#gradRevenue)"
                     strokeWidth={2}
                     name="revenue"
@@ -369,7 +380,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                   <Area
                     type="monotone"
                     dataKey="expenses"
-                    stroke="#f43f5e"
+                    stroke={chartColors.negative}
                     fill="url(#gradExpenses)"
                     strokeWidth={2}
                     name="expenses"
@@ -377,7 +388,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                   <Area
                     type="monotone"
                     dataKey="netProfit"
-                    stroke="#22c55e"
+                    stroke={chartColors.cyan}
                     fill="url(#gradProfit)"
                     strokeWidth={2}
                     name="netProfit"
@@ -660,7 +671,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                         className={cn(
                           "text-[9px] py-0 px-1.5 font-semibold",
                           tx.type === "REVENUE"
-                            ? "bg-accent/15 text-accent border border-accent/30"
+                            ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
                             : "bg-destructive/10 text-destructive border border-destructive/20"
                         )}
                       >
@@ -679,7 +690,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                     <td
                       className={cn(
                         "py-2.5 px-3 text-right font-mono font-bold",
-                        tx.type === "REVENUE" ? "text-accent" : "text-destructive"
+                        tx.type === "REVENUE" ? "text-emerald-700 dark:text-emerald-400" : "text-destructive"
                       )}
                     >
                       {tx.type === "REVENUE" ? "+" : "-"}${tx.amount.toFixed(2)}

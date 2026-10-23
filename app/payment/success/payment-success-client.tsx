@@ -215,7 +215,7 @@ export default function PaymentSuccessClient() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-accent/15">
-            <CheckCircle className="h-12 w-12 text-accent" />
+            <CheckCircle className="h-12 w-12 text-emerald-700 dark:text-emerald-400" />
           </div>
 
           <h1 className="mb-3 text-3xl font-bold">Booking Confirmed!</h1>
@@ -325,7 +325,7 @@ export default function PaymentSuccessClient() {
         <div className="mt-5 space-y-2.5">
           <Button
             onClick={() => router.push(`/panel/bookings/${bookingId}`)}
-            className="h-12 w-full rounded-xl bg-accent text-sm font-semibold text-accent-foreground hover:bg-accent/90"
+            className="h-12 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground hover:bg-primary/90"
           >
             View My Booking →
           </Button>
@@ -361,7 +361,7 @@ export default function PaymentSuccessClient() {
           </div>
 
           <div className="flex flex-col justify-between rounded-xl bg-primary p-3">
-            <p className="text-[9px] font-bold tracking-widest text-accent uppercase">
+            <p className="text-[9px] font-bold tracking-widest text-highlight-soft uppercase">
               Follow the Game
             </p>
             <div className="mt-2 flex items-center gap-3">

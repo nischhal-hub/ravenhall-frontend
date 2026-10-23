@@ -77,7 +77,7 @@ function SubmitButton({
       type="submit"
       disabled={pending || disabled}
       aria-busy={pending}
-      className="h-12 w-full rounded-xl text-base font-semibold transition-colors hover:bg-secondary motion-reduce:transition-none"
+      className="h-12 w-full rounded-xl text-base font-semibold transition-colors hover:bg-primary/90 motion-reduce:transition-none"
     >
       {pending && (
         <Loader2
@@ -181,7 +181,7 @@ export function RegisterFormSection({
                 key={s.title}
                 className={cn(
                   "h-1.5 flex-1 rounded-full transition-colors motion-reduce:transition-none",
-                  i < step ? "bg-primary dark:bg-sky-400" : "bg-muted"
+                  i < step ? "bg-primary" : "bg-muted"
                 )}
               />
             ))}
@@ -231,7 +231,7 @@ export function RegisterFormSection({
 
             <Button
               type="submit"
-              className="h-12 w-full rounded-xl text-base font-semibold transition-colors hover:bg-secondary motion-reduce:transition-none"
+              className="h-12 w-full rounded-xl text-base font-semibold transition-colors hover:bg-primary/90 motion-reduce:transition-none"
             >
               Continue
               <ArrowRight className="size-4.5" aria-hidden />
@@ -247,7 +247,7 @@ export function RegisterFormSection({
               <button
                 type="button"
                 onClick={goBack}
-                className="shrink-0 rounded font-medium text-secondary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-secondary/40 dark:text-sky-300"
+                className="shrink-0 rounded font-medium text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/40 dark:text-rose-400"
               >
                 Edit
               </button>
@@ -395,7 +395,7 @@ export function LoginFormSection({
           labelAside={
             <Link
               href={forgotPasswordHref}
-              className="rounded text-sm font-medium text-secondary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-secondary/40 dark:text-sky-300"
+              className="rounded text-sm font-medium text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/40 dark:text-rose-400"
             >
               Forgot password?
             </Link>

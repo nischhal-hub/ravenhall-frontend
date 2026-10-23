@@ -139,7 +139,7 @@ export const PasswordInput = React.forwardRef<
             aria-pressed={visible}
             aria-controls={inputId}
             disabled={props.disabled}
-            className="absolute top-1/2 right-0.5 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-secondary/40 disabled:opacity-50 motion-reduce:transition-none sm:size-10"
+            className="absolute top-1/2 right-0.5 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40 disabled:opacity-50 motion-reduce:transition-none sm:size-10"
           >
             {visible ? (
               <EyeOff className="size-4.5" aria-hidden />

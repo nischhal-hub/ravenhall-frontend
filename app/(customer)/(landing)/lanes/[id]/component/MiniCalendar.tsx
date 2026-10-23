@@ -67,7 +67,7 @@ export function MiniCalendar({
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Calendar className="size-4 text-accent" />
+          <Calendar className="size-4 text-primary dark:text-rose-400" />
           <span className="font-bold text-foreground">
             {MONTHS[viewMonth]} {viewYear}
           </span>
@@ -119,13 +119,13 @@ export function MiniCalendar({
                 "relative mx-auto flex h-9 w-9 flex-col items-center justify-center rounded-full text-sm font-medium transition-all",
                 isPast && "cursor-not-allowed text-muted-foreground/30",
                 !isPast && !isSelected && "text-foreground hover:bg-muted",
-                isToday && !isSelected && "border border-accent text-accent",
+                isToday && !isSelected && "border border-accent text-primary dark:text-rose-400",
                 isSelected && "bg-foreground font-bold text-background"
               )}
             >
               {day}
               {hasSlot && !isSelected && (
-                <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-accent" />
+                <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-emerald-500" />
               )}
             </button>
           )

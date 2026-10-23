@@ -43,17 +43,17 @@ export function DashboardHeader({ user, membership }: DashboardHeaderProps) {
       description={user.email}
       actions={
         membership?.isActive ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 px-5 py-3 backdrop-blur-sm">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent">
-              <Shield className="h-4 w-4 text-accent-foreground" />
+          <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-3 shadow-xs">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-highlight">
+              <Shield className="h-4 w-4 text-highlight-foreground" />
             </div>
             <div>
-              <p className="text-xs font-bold tracking-widest text-accent uppercase">
+              <p className="text-xs font-bold tracking-widest text-foreground uppercase">
                 {membership.plan} Member
               </p>
               <div className="mt-0.5 flex items-center gap-1.5">
-                <Zap className="h-3 w-3 text-primary-foreground/70" />
-                <span className="text-sm font-semibold text-primary-foreground/80">
+                <Zap className="h-3 w-3 text-muted-foreground" />
+                <span className="text-sm font-semibold text-muted-foreground">
                   {membership.discountPct}% off · expires{" "}
                   {formatDate(membership.endDate)}
                 </span>
