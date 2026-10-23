@@ -2,19 +2,41 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiClient } from "../api/client"
 import { toast } from "sonner"
 
+export interface PaymentIntentResult {
+  clientSecret: string
+  /** The amount Stripe will charge, from the server */
+  amount: number
+  currency: string
+}
+
+/** Starts or resumes checkout for a PENDING booking (the server reuses its PaymentIntent) */
 export async function createPaymentIntentRequest(data: {
   bookingId: string
-}): Promise<{ clientSecret: string }> {
-  const response = await apiClient.post<{ clientSecret: string }>(
+}): Promise<PaymentIntentResult> {
+  const response = await apiClient.post<{ data: PaymentIntentResult }>(
     "/payments/intent",
     data
   )
-  return response.data // ← this is what gets set as `clientSecret` in Step3
+  return response.data.data
 }
 
-export async function confirmPaymentRequest(data: { bookingId: string }) {
-  const response = await apiClient.post("/payments/confirm", data)
-  return response.data
+export type PaymentOutcome = "paid" | "processing" | "failed" | "unpaid"
+
+export interface ConfirmPaymentResult {
+  bookingId: string
+  bookingRef: string
+  outcome: PaymentOutcome
+}
+
+/** Asks the server to check the payment with Stripe after the customer returns */
+export async function confirmPaymentRequest(data: {
+  bookingId: string
+}): Promise<ConfirmPaymentResult> {
+  const response = await apiClient.post<{ data: ConfirmPaymentResult }>(
+    "/payments/confirm",
+    data
+  )
+  return response.data.data
 }
 
 // ─────────────────────────────────────────────
@@ -61,7 +83,7 @@ function usePaymentMutation<TData, TVariables>(
 // ─────────────────────────────────────────────
 
 export function useCreatePaymentIntentMutation() {
-  return usePaymentMutation<{ clientSecret: string }, { bookingId: string }>(
+  return usePaymentMutation<PaymentIntentResult, { bookingId: string }>(
     ["payments", "intent"],
     createPaymentIntentRequest
     // No successMessage — Stripe redirects on success; toast goes on success page
@@ -70,7 +92,6 @@ export function useCreatePaymentIntentMutation() {
 
 export function useConfirmPaymentMutation() {
   return usePaymentMutation(["payments", "confirm"], confirmPaymentRequest, {
-    successMessage: "Payment confirmed!",
-    invalidateKeys: [["bookings"], ["my-bookings"]],
+    invalidateKeys: [["bookings"], ["booking"], ["notifications"]],
   })
 }

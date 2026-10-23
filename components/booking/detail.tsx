@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -34,6 +35,8 @@ import {
   type TimelineEvent,
 } from "@/components/detail"
 import { formatCurrency } from "@/lib/utils"
+import { isSlotPast } from "@/lib/booking"
+import { useNow } from "@/hooks/use-now"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -206,7 +209,9 @@ function getSessionTimes(items: Booking["items"]) {
 function buildTimeline(
   booking: Booking,
   currency: string | undefined,
-  isAdmin?: boolean
+  isAdmin?: boolean,
+  /** Customer can still pay for this unpaid booking */
+  canPay?: boolean
 ): TimelineEvent[] {
   const status = booking.status.toUpperCase()
   const payment = booking.payment
@@ -298,7 +303,15 @@ function buildTimeline(
   }
 
   // What happens next, so first-time customers know what to expect
-  if (status === "PENDING") {
+  if (status === "PENDING" && canPay) {
+    events.push({
+      id: "next-pay",
+      title: "Complete your payment",
+      icon: CreditCard,
+      upcoming: true,
+      description: "Your slot is held until you pay or cancel.",
+    })
+  } else if (status === "PENDING") {
     events.push({
       id: "next-confirm",
       title: "Waiting for confirmation",
@@ -348,14 +361,12 @@ export function BookingDetailPage({
   const nextStatusLabel = nextStatus
     ? STATUS_ACTION_LABEL[nextStatus]
     : undefined
-  const hint = actionHint(status, isAdmin)
 
   const slot = booking.items[0]?.slot
   const lane = slot?.lane
   const times = getSessionTimes(booking.items)
   const payment = booking.payment
   const currency = payment?.currency
-  const timeline = buildTimeline(booking, currency, isAdmin)
   // No money has moved yet (no payment, or one that was never completed)
   const isUncharged =
     !payment ||
@@ -370,6 +381,22 @@ export function BookingDetailPage({
     !payment.paidAt &&
     !payment.refundAmount
   const customerName = `${booking.user.firstName} ${booking.user.lastName}`
+
+  // Unpaid bookings can be paid until the session starts (the server enforces this too)
+  const now = useNow()
+  const firstSlot = booking.items
+    .map((item) => item.slot)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))[0]
+  const sessionStarted = !!firstSlot && isSlotPast(firstSlot, now)
+  const isUnpaid = status === "PENDING" && isUncharged
+  const canPay = !isAdmin && isUnpaid && !!firstSlot && !sessionStarted
+  const hint =
+    isUnpaid && sessionStarted
+      ? isAdmin
+        ? "This session started without being paid for."
+        : "This session started without payment, so it can no longer be paid for. Cancel it to free the slot."
+      : actionHint(status, isAdmin)
+  const timeline = buildTimeline(booking, currency, isAdmin, canPay)
 
   const handleStatusUpdate = () => {
     if (!nextStatus) return
@@ -401,7 +428,7 @@ export function BookingDetailPage({
         >
           <XCircle />
           <span className="md:hidden">
-            {isAdmin ? "Cancel" : "Cancel booking"}
+            {isAdmin || canPay ? "Cancel" : "Cancel booking"}
           </span>
           <span className="hidden md:inline">Cancel booking</span>
         </Button>
@@ -486,6 +513,16 @@ export function BookingDetailPage({
     </AlertDialog>
   )
 
+  const payAction = canPay && (
+    <Button asChild className={detailActionClass}>
+      <Link href={`/panel/bookings/${booking.id}/pay`}>
+        <CreditCard />
+        <span className="md:hidden">Pay now</span>
+        <span className="hidden md:inline">Complete payment</span>
+      </Link>
+    </Button>
+  )
+
   const moreMenu = isAdmin && (
     <>
       <DropdownMenu>
@@ -542,6 +579,7 @@ export function BookingDetailPage({
   const actions = hasActions && (
     <>
       {statusAction}
+      {payAction}
       {cancelAction}
       {moreMenu}
     </>
@@ -824,6 +862,16 @@ export function BookingDetailPage({
                         : "You haven't been charged for this booking."
                   }
                   className="py-2"
+                  action={
+                    canPay ? (
+                      <Button asChild className="h-11 w-full text-sm md:h-9">
+                        <Link href={`/panel/bookings/${booking.id}/pay`}>
+                          <CreditCard />
+                          Complete payment
+                        </Link>
+                      </Button>
+                    ) : undefined
+                  }
                 />
               )}
             </InfoCard>

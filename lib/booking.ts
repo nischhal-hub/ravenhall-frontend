@@ -11,7 +11,7 @@ const pad = (n: number) => String(n).padStart(2, "0")
  * `slot.date` is the calendar day ("YYYY-MM-DD…") and `startTime` is "HH:mm",
  * both in the centre's local time, so plain string comparison is enough.
  */
-export function isSlotPast(slot: Slot, now: Date) {
+export function isSlotPast(slot: Pick<Slot, "date" | "startTime">, now: Date) {
   const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
   const day = slot.date.slice(0, 10)
   if (day !== today) return day < today
