@@ -4,6 +4,7 @@ import { useState } from "react"
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Slot } from "@/types/lane-response.types"
+import { isBookable } from "@/lib/booking"
 
 const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 const MONTHS = [
@@ -58,8 +59,9 @@ export function MiniCalendar({
     } else setViewMonth((m) => m + 1)
   }
 
+  // Dot only when the day still has a slot that can be booked now
   const hasSlots = (dateStr: string) =>
-    slots.some((s) => s.date.startsWith(dateStr))
+    slots.some((s) => s.date.startsWith(dateStr) && isBookable(s, today))
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5">

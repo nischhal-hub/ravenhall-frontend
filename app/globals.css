@@ -127,3 +127,11 @@
     @apply font-sans;
     }
 }
+
+/* On phones, lift the chat button above a page's fixed action bar
+   (DetailPageHeader) so it never covers buttons like Pay now or Cancel */
+@media (width < 48rem) {
+  body:has([data-mobile-action-bar]) [data-chat-launcher] {
+    bottom: calc(5.25rem + env(safe-area-inset-bottom));
+  }
+}

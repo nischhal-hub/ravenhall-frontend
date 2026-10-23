@@ -4,6 +4,24 @@ export const EQUIPMENT_FEE = 10
 
 const isFree = (slot: Slot) => slot.isAvailable && !slot.isBlocked
 
+const pad = (n: number) => String(n).padStart(2, "0")
+
+/**
+ * True once a slot's start time has arrived, on the viewer's local clock.
+ * `slot.date` is the calendar day ("YYYY-MM-DD…") and `startTime` is "HH:mm",
+ * both in the centre's local time, so plain string comparison is enough.
+ */
+export function isSlotPast(slot: Pick<Slot, "date" | "startTime">, now: Date) {
+  const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  const day = slot.date.slice(0, 10)
+  if (day !== today) return day < today
+  return slot.startTime <= `${pad(now.getHours())}:${pad(now.getMinutes())}`
+}
+
+/** Free to book right now: not booked, not blocked, not already started */
+export const isBookable = (slot: Slot, now: Date) =>
+  isFree(slot) && !isSlotPast(slot, now)
+
 /**
  * Returns the `duration` back-to-back free slots starting at `start`, or null
  * if the session doesn't fit (a booked/blocked slot or a gap in between).

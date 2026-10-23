@@ -171,6 +171,7 @@ export function Chatbot() {
     return (
       <Button
         aria-label="Open Ravenhall assistant"
+        data-chat-launcher
         onClick={() => setOpen(true)}
         className="fixed right-4 bottom-5 z-50 h-12 rounded-full px-5 shadow-lg sm:right-8 sm:bottom-8"
       >

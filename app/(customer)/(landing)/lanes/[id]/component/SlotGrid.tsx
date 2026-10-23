@@ -1,12 +1,14 @@
 import { cn } from "@/lib/utils"
 import { Slot } from "@/types/lane-response.types"
-import { getSlotRange } from "@/lib/booking"
+import { getSlotRange, isSlotPast } from "@/lib/booking"
 
 interface SlotGridProps {
   slots: Slot[]
   selectedSlot: Slot | null
   duration: number
   onSelect: (slot: Slot) => void
+  /** Current time; slots that have already started can't be picked */
+  now: Date
 }
 
 export function SlotGrid({
@@ -14,6 +16,7 @@ export function SlotGrid({
   selectedSlot,
   duration,
   onSelect,
+  now,
 }: SlotGridProps) {
   // Every slot the chosen session would occupy, e.g. 10:00 + 2h → 10:00, 11:00
   const selectedIds = new Set(
@@ -46,23 +49,29 @@ export function SlotGrid({
         <div className="grid grid-cols-4 gap-2">
           {slots.map((slot) => {
             const isBooked = !slot.isAvailable || slot.isBlocked
+            // Start time has already passed today
+            const isPast = !isBooked && isSlotPast(slot, now)
             // Free, but not enough consecutive free slots after it
-            const isTooShort = !isBooked && !getSlotRange(slots, slot, duration)
+            const isTooShort =
+              !isBooked && !isPast && !getSlotRange(slots, slot, duration)
+            const isUnavailable = isBooked || isPast || isTooShort
             const isSelected = selectedSlot?.id === slot.id
             const isIncluded = !isSelected && selectedIds.has(slot.id)
 
             return (
               <button
                 key={slot.id}
-                disabled={isBooked || isTooShort}
+                disabled={isUnavailable}
                 onClick={() => onSelect(slot)}
+                aria-label={
+                  isPast ? `${slot.startTime}, already started` : undefined
+                }
                 className={cn(
                   "flex flex-col items-center gap-0.5 rounded-xl border px-2 py-2.5 text-sm font-semibold transition-all",
-                  (isBooked || isTooShort) &&
+                  isUnavailable &&
                     "cursor-not-allowed border-border bg-muted text-muted-foreground/40",
                   isIncluded && "border-foreground/60 bg-foreground/10",
-                  !isBooked &&
-                    !isTooShort &&
+                  !isUnavailable &&
                     !isSelected &&
                     !isIncluded &&
                     "border-border bg-background text-foreground hover:border-accent hover:bg-accent/10",
@@ -78,7 +87,7 @@ export function SlotGrid({
                       ? "text-background/70"
                       : isBooked
                         ? "text-destructive"
-                        : isTooShort
+                        : isPast || isTooShort
                           ? "text-muted-foreground/60"
                           : "text-accent"
                   )}
@@ -89,9 +98,11 @@ export function SlotGrid({
                       ? "Included"
                       : isBooked
                         ? "Booked"
-                        : isTooShort
-                          ? "Too short"
-                          : "Available"}
+                        : isPast
+                          ? "Passed"
+                          : isTooShort
+                            ? "Too short"
+                            : "Available"}
                 </span>
               </button>
             )
