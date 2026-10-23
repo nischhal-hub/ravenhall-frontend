@@ -145,8 +145,8 @@ export function AuthLayout({
   return (
     <main className="grid min-h-svh bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Brand panel (desktop) */}
-      {/* Fixed navy in both themes: the panel is a photo-backed brand surface */}
-      <aside className="relative hidden overflow-hidden bg-[#13304f] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+      {/* Fixed pitch green in both themes: the panel is a photo-backed brand surface */}
+      <aside className="relative hidden overflow-hidden bg-[#1f5130] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
         <Image
           src="/images/landing/hero.jpg"
           alt=""
@@ -157,7 +157,7 @@ export function AuthLayout({
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-[#0b1a2e] via-[#0f2440]/85 to-[#13304f]/60"
+          className="absolute inset-0 bg-linear-to-t from-[#0f2418] via-[#16391f]/85 to-[#1f5130]/60"
         />
 
         <div className="relative flex items-center justify-between gap-4">
@@ -194,7 +194,7 @@ export function AuthLayout({
             {brand.benefits.map(({ icon: Icon, title: benefitTitle, text }) => (
               <li key={benefitTitle} className="flex gap-3.5">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15">
-                  <Icon className="size-4.5 text-[#86efac]" aria-hidden />
+                  <Icon className="size-4.5 text-[#d9b85e]" aria-hidden />
                 </span>
                 <div>
                   <p className="font-semibold">{benefitTitle}</p>
