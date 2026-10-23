@@ -100,6 +100,11 @@ export interface PosPriceItem {
 
 export interface PosPriceCalculation {
   items: PosPriceItem[]
+  /** Sum of slot rates (discountable) */
+  laneHire: number
+  /** Flat per-booking fee, never discounted */
+  equipmentFee: number
+  /** laneHire + equipmentFee, before discounts */
   totalAmount: number
   discountBreakdown: {
     membership: {
@@ -220,6 +225,9 @@ export interface PosReceipt {
     amount: number
   }>
   pricing: {
+    laneHire: number
+    /** 0 for older bookings made before the fee existed */
+    equipmentFee: number
     subtotal: number
     discount: number
     discountCode: string | null

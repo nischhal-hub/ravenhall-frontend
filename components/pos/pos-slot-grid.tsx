@@ -382,7 +382,7 @@ export function PosSlotGrid({
                                     <Ban className="size-2.5" /> Blocked
                                   </span>
                                 ) : (
-                                  <span className="text-accent font-medium">Free (${lane.hourlyRate})</span>
+                                  <span className="text-accent font-medium">Free (${lane.hourlyRate.toFixed(2)})</span>
                                 )}
                               </div>
                             </button>

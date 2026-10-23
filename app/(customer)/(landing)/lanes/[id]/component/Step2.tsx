@@ -17,20 +17,22 @@ import {
 import { Lane, Slot } from "@/types/lane-response.types"
 import { useCreateBookingMutation } from "@/services/mutations/booking.mutations"
 import { toast } from "sonner"
+import { calculateBookingPrice } from "@/lib/booking"
 
 const PROMO_CODES: Record<string, number> = {
   OPENING20: 12,
   CRICKET10: 10,
 }
 
-const EQUIPMENT_FEE = 10
-const MEMBER_DISCOUNT = 0.15
-
 interface Step2Props {
   lane: Lane
   date: string
   slot: Slot
   duration: 1 | 2 | 3
+  /** End of the whole session (start + duration) */
+  endTime: string
+  memberDiscountPct: number
+  isMemberLoading: boolean
   // ✅ FIX: onNext now includes bookingId as the third argument
   onNext: (promo: string, discount: number, bookingId: string) => void
   onBack: () => void
@@ -41,6 +43,9 @@ export function Step2({
   date,
   slot,
   duration,
+  endTime,
+  memberDiscountPct,
+  isMemberLoading,
   onNext,
   onBack,
 }: Step2Props) {
@@ -52,10 +57,12 @@ export function Step2({
 
   const createBookingMutation = useCreateBookingMutation()
 
-  const laneHire = lane.hourlyRate * duration
-  const memberDiscount = laneHire * MEMBER_DISCOUNT
-  const subtotal = laneHire - memberDiscount - promoDiscount
-  const total = subtotal + EQUIPMENT_FEE
+  const price = calculateBookingPrice({
+    hourlyRate: lane.hourlyRate,
+    duration,
+    memberDiscountPct,
+    promoDiscount,
+  })
 
   const applyPromo = () => {
     const code = promoInput.trim().toUpperCase()
@@ -78,11 +85,11 @@ export function Step2({
       slotId: slot.id,
       date,
       startTime: slot.startTime,
-      endTime: slot.endTime,
+      endTime,
       duration,
-      totalAmount: total,
-      discountAmount: promoDiscount + memberDiscount,
-      finalAmount: total,
+      totalAmount: price.gross,
+      discountAmount: price.memberDiscount + price.promoDiscount,
+      finalAmount: price.total,
       promoCode: appliedPromo || null,
     }
 
@@ -104,7 +111,7 @@ export function Step2({
       }
 
       // ✅ FIX: Pass bookingId as third argument to onNext
-      onNext(appliedPromo, promoDiscount, bookingId)
+      onNext(appliedPromo, price.promoDiscount, bookingId)
     } catch (err) {
       console.error("Booking creation failed:", err)
     }
@@ -166,7 +173,7 @@ export function Step2({
                 <Clock className="size-3" /> Time
               </span>
               <p className="font-semibold text-foreground">
-                {slot.startTime} — {slot.endTime}
+                {slot.startTime} — {endTime}
               </p>
             </div>
           </div>
@@ -183,19 +190,21 @@ export function Step2({
           <h2 className="font-bold text-foreground">Offers & Rewards</h2>
 
           {/* Member discount banner */}
-          <div className="flex gap-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20">
-              <ShieldCheck className="size-4 text-accent" />
+          {memberDiscountPct > 0 && (
+            <div className="flex gap-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20">
+                <ShieldCheck className="size-4 text-accent" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-accent">
+                  Member Discount Applied — {memberDiscountPct}% off
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Applies to lane hire. Equipment fee is not discounted.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-accent">
-                Member Discount Applied — 15% off
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Includes $10 bowling machine included
-              </p>
-            </div>
-          </div>
+          )}
 
           {/* Promo Code */}
           <div>
@@ -252,29 +261,33 @@ export function Step2({
             {/* Line items */}
             <div className="space-y-3 px-6 pb-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Lane Hire (Base)</span>
+                <span className="text-muted-foreground">
+                  Lane Hire ({duration} Hr)
+                </span>
                 <span className="font-semibold text-foreground">
-                  ${laneHire.toFixed(2)}
+                  ${price.laneHire.toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between text-accent">
-                <span>Member Discount (15%)</span>
-                <span className="font-semibold">
-                  -${memberDiscount.toFixed(2)}
-                </span>
-              </div>
-              {promoDiscount > 0 && (
+              {memberDiscountPct > 0 && (
+                <div className="flex justify-between text-accent">
+                  <span>Member Discount ({memberDiscountPct}%)</span>
+                  <span className="font-semibold">
+                    -${price.memberDiscount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              {price.promoDiscount > 0 && (
                 <div className="flex justify-between text-accent">
                   <span>Promo ({appliedPromo})</span>
                   <span className="font-semibold">
-                    -${promoDiscount.toFixed(2)}
+                    -${price.promoDiscount.toFixed(2)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-muted-foreground">
-                <span>Equipment Rental</span>
+                <span>Equipment Fee</span>
                 <span className="font-semibold text-foreground">
-                  ${EQUIPMENT_FEE.toFixed(2)}
+                  ${price.equipmentFee.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -289,7 +302,7 @@ export function Step2({
                   TOTAL TO PAY
                 </span>
                 <span className="text-3xl font-black tracking-tight text-foreground">
-                  ${total.toFixed(2)}
+                  ${price.total.toFixed(2)}
                 </span>
               </div>
               <p className="mt-0.5 text-right text-xs text-muted-foreground">
@@ -301,7 +314,7 @@ export function Step2({
             <div className="px-6 pb-6">
               <Button
                 onClick={handleProceed}
-                disabled={createBookingMutation.isPending}
+                disabled={createBookingMutation.isPending || isMemberLoading}
                 className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
               >
                 {createBookingMutation.isPending ? (

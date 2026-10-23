@@ -81,6 +81,8 @@ function useBookingMutation<TData, TVariables>(
     onSuccess: () => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["bookings"] })
+      queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
+      // Single-booking detail (useBookingById) — keyed ["booking", id]
       queryClient.invalidateQueries({ queryKey: ["booking"] })
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
       toast.success(successMessage)

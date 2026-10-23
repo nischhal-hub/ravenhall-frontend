@@ -23,6 +23,7 @@ import {
   PaymentStatusBadge,
 } from "@/components/reusable/status-badge"
 import { formatCurrency } from "@/lib/utils"
+import { MembershipPlans } from "@/components/membership/membership-plans"
 import { useMyMembershipQuery } from "@/services/queries/membership.query"
 import { ApiError } from "@/types/response"
 
@@ -195,22 +196,22 @@ function PageSkeleton() {
 // ─────────────────────────────────────────────────────────────────────────────
 // No membership state
 // ─────────────────────────────────────────────────────────────────────────────
-function NoMembership({ onJoin }: { onJoin: () => void }) {
+function NoMembership() {
   return (
-    <div className="mx-auto max-w-md px-4 py-24 text-center">
-      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-border">
-        <Shield className="h-9 w-9 text-muted-foreground" />
+    <div className="min-h-screen bg-background pb-20">
+      <PanelHero
+        eyebrow="No Active Membership"
+        eyebrowIcon={Shield}
+        title="Your Membership"
+        description="Join a plan to unlock discounts, priority booking, and exclusive lane access."
+      />
+      <div className="mx-auto max-w-6xl px-4 pt-10">
+        <MembershipPlans />
+        <p className="mt-8 text-center text-xs text-muted-foreground">
+          All prices are in AUD and include GST. Cancel or change your plan at
+          any time.
+        </p>
       </div>
-      <h2 className="text-2xl font-bold text-foreground">
-        No Active Membership
-      </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Join a membership plan to unlock discounts, priority booking, and
-        exclusive lane access.
-      </p>
-      <Button onClick={onJoin} className="mt-8 h-12 w-full rounded-xl text-base font-bold">
-        View Plans <ChevronRight className="ml-1 h-4 w-4" />
-      </Button>
     </div>
   )
 }
@@ -246,13 +247,11 @@ export default function MembershipPage() {
 
   // ── No membership ────────────────────────────────────────────────────────
   // The API answers 200 with `data: null` when the user has never joined;
-  // treat a 404 the same way. Neither is an error for the user.
-  const noMembership =
-    (!isError && !membership) ||
-    (error instanceof ApiError && error.status === 404)
-  if (noMembership) {
-    return <NoMembership onJoin={() => router.push("/membership")} />
-  }
+  // a 404 means the same. Neither is an error for the user.
+  const notFound =
+    (error instanceof ApiError && error.status === 404) ||
+    (error instanceof Error && /not found|404/i.test(error.message))
+  if (!membership && (!isError || notFound)) return <NoMembership />
 
   // ── Couldn't load (network/server) ───────────────────────────────────────
   if (isError || !membership) {
@@ -496,7 +495,7 @@ export default function MembershipPage() {
           <div className="anim d6 flex flex-wrap gap-3 pt-2">
             <Button
               variant="outline"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/panel")}
               className="h-11 rounded-xl px-6 font-semibold"
             >
               Go to Dashboard
