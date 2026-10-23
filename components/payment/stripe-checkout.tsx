@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { loadStripe } from "@stripe/stripe-js"
+import { loadStripe, type StripeElementsOptions } from "@stripe/stripe-js"
 import {
   Elements,
   PaymentElement,
@@ -95,7 +95,7 @@ function CheckoutForm({
         type="button"
         onClick={handlePay}
         disabled={!stripe || !elements || loading}
-        className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
+        className="h-12 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
       >
         {loading ? (
           <>
@@ -116,14 +116,38 @@ function CheckoutForm({
 
       <div className="flex items-center justify-center gap-5 border-t border-border pt-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <ShieldCheck className="size-3.5 text-accent" /> SSL Secured
+          <ShieldCheck className="size-3.5 text-primary dark:text-rose-400" />{" "}
+          SSL Secured
         </span>
         <span className="flex items-center gap-1">
-          <CheckCircle2 className="size-3.5 text-accent" /> Instant Confirmation
+          <CheckCircle2 className="size-3.5 text-primary dark:text-rose-400" />{" "}
+          Instant Confirmation
         </span>
       </div>
     </div>
   )
+}
+
+/**
+ * Stripe's card form lives in its own iframe and can't read our CSS, so pass
+ * the current theme's colours in (rose primary, light or dark surface).
+ */
+function stripeAppearance(): StripeElementsOptions["appearance"] {
+  if (typeof window === "undefined") return { theme: "stripe" }
+  const root = document.documentElement
+  const css = getComputedStyle(root)
+  const token = (name: string, fallback: string) =>
+    css.getPropertyValue(name).trim() || fallback
+  return {
+    theme: root.classList.contains("dark") ? "night" : "stripe",
+    variables: {
+      colorPrimary: token("--primary", "#be123c"),
+      colorBackground: token("--card", "#ffffff"),
+      colorText: token("--foreground", "#1f1215"),
+      colorDanger: "#dc2626",
+      borderRadius: "10px",
+    },
+  }
 }
 
 /**
@@ -149,8 +173,8 @@ export function StripeCheckout({ bookingId }: { bookingId: string }) {
         role="status"
       >
         <div className="relative">
-          <div className="size-14 rounded-full border-4 border-accent/15" />
-          <Loader2 className="absolute inset-0 m-auto size-8 animate-spin text-accent" />
+          <div className="size-14 rounded-full border-4 border-primary/15" />
+          <Loader2 className="absolute inset-0 m-auto size-8 animate-spin text-primary dark:text-rose-400" />
         </div>
         <p className="mt-4 text-sm font-medium text-foreground">
           Preparing secure payment...
@@ -197,7 +221,7 @@ export function StripeCheckout({ bookingId }: { bookingId: string }) {
       stripe={stripePromise}
       options={{
         clientSecret: intent.data.clientSecret,
-        appearance: { theme: "stripe", variables: { colorPrimary: "#22c55e" } },
+        appearance: stripeAppearance(),
       }}
     >
       <CheckoutForm

@@ -179,7 +179,7 @@ export function Step2({
           </div>
 
           {/* Duration badge */}
-          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-accent">
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold text-primary dark:text-rose-400">
             <Clock className="size-3" />
             {duration} hour{duration > 1 ? "s" : ""} session
           </div>
@@ -193,10 +193,10 @@ export function Step2({
           {memberDiscountPct > 0 && (
             <div className="flex gap-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20">
-                <ShieldCheck className="size-4 text-accent" />
+                <ShieldCheck className="size-4 text-primary dark:text-rose-400" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-accent">
+                <p className="text-sm font-semibold text-primary dark:text-rose-400">
                   Member Discount Applied — {memberDiscountPct}% off
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -232,7 +232,7 @@ export function Step2({
             </div>
 
             {promoSuccess && (
-              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-accent">
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary dark:text-rose-400">
                 <CheckCircle2 className="size-3.5" />
                 {promoSuccess}
               </p>
@@ -269,7 +269,7 @@ export function Step2({
                 </span>
               </div>
               {memberDiscountPct > 0 && (
-                <div className="flex justify-between text-accent">
+                <div className="flex justify-between text-primary dark:text-rose-400">
                   <span>Member Discount ({memberDiscountPct}%)</span>
                   <span className="font-semibold">
                     -${price.memberDiscount.toFixed(2)}
@@ -277,7 +277,7 @@ export function Step2({
                 </div>
               )}
               {price.promoDiscount > 0 && (
-                <div className="flex justify-between text-accent">
+                <div className="flex justify-between text-primary dark:text-rose-400">
                   <span>Promo ({appliedPromo})</span>
                   <span className="font-semibold">
                     -${price.promoDiscount.toFixed(2)}
@@ -315,7 +315,7 @@ export function Step2({
               <Button
                 onClick={handleProceed}
                 disabled={createBookingMutation.isPending || isMemberLoading}
-                className="h-12 w-full rounded-xl bg-accent text-base font-bold text-accent-foreground hover:bg-accent/90 disabled:opacity-60"
+                className="h-12 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
               >
                 {createBookingMutation.isPending ? (
                   <>
@@ -340,10 +340,10 @@ export function Step2({
           {/* Trust badges */}
           <div className="flex items-center justify-center gap-6 py-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <ShieldCheck className="size-3.5 text-accent" /> SSL Secured
+              <ShieldCheck className="size-3.5 text-primary dark:text-rose-400" /> SSL Secured
             </span>
             <span className="flex items-center gap-1">
-              <CheckCircle2 className="size-3.5 text-accent" /> Instant
+              <CheckCircle2 className="size-3.5 text-primary dark:text-rose-400" /> Instant
               Confirmation
             </span>
           </div>

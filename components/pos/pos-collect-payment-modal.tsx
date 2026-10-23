@@ -84,7 +84,7 @@ export function PosCollectPaymentModal({
       <DialogContent className="sm:max-w-md p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base font-bold">
-            <DollarSign className="size-5 text-accent" />
+            <DollarSign className="size-5 text-primary dark:text-rose-400" />
             Collect Payment
           </DialogTitle>
           {booking && (
@@ -156,7 +156,7 @@ export function PosCollectPaymentModal({
                 <div className={cn(
                   "h-9 px-3 flex items-center rounded-md font-mono text-sm font-bold border",
                   tenderedNum >= targetAmount && targetAmount > 0
-                    ? "bg-accent/10 border-accent/30 text-accent"
+                    ? "bg-accent/10 border-accent/30 text-primary dark:text-rose-400"
                     : "bg-muted text-muted-foreground border-border"
                 )}>
                   ${changeDue.toFixed(2)}

@@ -6,7 +6,8 @@ export function HowItWorksSection() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden bg-[#1e3a5f] px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
+      style={{ background: "var(--gradient-hero)" }}
+      className="relative overflow-hidden px-4 py-16 sm:px-6 lg:px-8 lg:py-24"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_45%)]" />
       <div className="relative mx-auto w-full max-w-7xl">
@@ -25,7 +26,7 @@ export function HowItWorksSection() {
               key={step.id}
               className="rounded-3xl bg-white/5 p-6 text-center backdrop-blur-sm"
             >
-              <div className="mx-auto mb-5 inline-flex size-14 items-center justify-center rounded-full border-2 border-white/15 bg-primary text-lg font-black text-accent">
+              <div className="mx-auto mb-5 inline-flex size-14 items-center justify-center rounded-full border-2 border-white/15 bg-primary text-lg font-black text-highlight-soft">
                 {step.complete ? <CheckCircle2 className="size-7" /> : step.id}
               </div>
               <h3 className="text-lg font-bold text-white">{step.title}</h3>

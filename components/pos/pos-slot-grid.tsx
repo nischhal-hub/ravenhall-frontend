@@ -306,7 +306,7 @@ export function PosSlotGrid({
                         className={cn(
                           "text-[11px] font-medium px-2 py-0.5",
                           availableCount > 0
-                            ? "border-accent/40 text-accent font-semibold"
+                            ? "border-emerald-500/40 text-emerald-700 dark:text-emerald-400 font-semibold"
                             : "text-muted-foreground"
                         )}
                       >
@@ -382,7 +382,7 @@ export function PosSlotGrid({
                                     <Ban className="size-2.5" /> Blocked
                                   </span>
                                 ) : (
-                                  <span className="text-accent font-medium">Free (${lane.hourlyRate.toFixed(2)})</span>
+                                  <span className="text-emerald-700 dark:text-emerald-400 font-medium">Free (${lane.hourlyRate.toFixed(2)})</span>
                                 )}
                               </div>
                             </button>

@@ -107,7 +107,7 @@ export default function MembershipSuccessClient() {
             <Button
               size="lg"
               onClick={handleRetry}
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               Retry Activation
@@ -147,7 +147,7 @@ export default function MembershipSuccessClient() {
     <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-background to-muted/30 px-4 py-12">
       <Card className="w-full max-w-lg p-10 text-center shadow-xl">
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-accent/15">
-          <CheckCircle2 className="h-12 w-12 text-accent" />
+          <CheckCircle2 className="h-12 w-12 text-emerald-700 dark:text-emerald-400" />
         </div>
 
         <h1 className="mb-3 text-4xl font-bold">Payment Successful!</h1>
@@ -172,7 +172,7 @@ export default function MembershipSuccessClient() {
 
           <div className="flex justify-between border-b py-3">
             <span className="text-muted-foreground">Status</span>
-            <span className="font-semibold text-accent">Active</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-400">Active</span>
           </div>
 
           <div className="flex justify-between py-3">
@@ -211,7 +211,7 @@ export default function MembershipSuccessClient() {
           <Button
             size="lg"
             onClick={() => router.push("/panel/membership")}
-            className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
           >
             Go to Dashboard
             <ArrowRight className="ml-2 h-4 w-4" />

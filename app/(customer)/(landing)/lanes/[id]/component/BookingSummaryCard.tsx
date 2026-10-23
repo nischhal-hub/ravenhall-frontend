@@ -58,7 +58,7 @@ export function BookingSummaryCard({
         {selectedDate && (
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="size-3.5 text-accent" />
+              <Calendar className="size-3.5 text-primary dark:text-rose-400" />
               <span className="text-xs font-semibold tracking-wide uppercase">
                 Date
               </span>
@@ -75,7 +75,7 @@ export function BookingSummaryCard({
             {selectedSlot && (
               <>
                 <div className="mt-2 flex items-center gap-2 text-muted-foreground">
-                  <Clock className="size-3.5 text-accent" />
+                  <Clock className="size-3.5 text-primary dark:text-rose-400" />
                   <span className="text-xs font-semibold tracking-wide uppercase">
                     Time
                   </span>
@@ -93,7 +93,7 @@ export function BookingSummaryCard({
             <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Duration
             </span>
-            <Badge variant="outline" className="border-accent text-accent">
+            <Badge variant="outline" className="border-accent text-primary dark:text-rose-400">
               Recommended
             </Badge>
           </div>
@@ -121,7 +121,7 @@ export function BookingSummaryCard({
             <span>${price.laneHire.toFixed(2)}</span>
           </div>
           {memberDiscountPct > 0 && (
-            <div className="flex justify-between text-accent">
+            <div className="flex justify-between text-primary dark:text-rose-400">
               <span>Member Discount ({memberDiscountPct}%)</span>
               <span>-${price.memberDiscount.toFixed(2)}</span>
             </div>

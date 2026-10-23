@@ -133,15 +133,15 @@ export function Step1({
             endTime &&
             onNext(selectedDate, selectedSlot, duration, endTime)
           }
-          className="h-11 w-full rounded-xl bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
+          className="h-11 w-full rounded-xl bg-primary font-semibold text-primary-foreground hover:bg-primary/90"
         >
           Continue to Details →
         </Button>
 
         <div className="flex gap-3 rounded-xl bg-foreground p-4 text-background">
-          <AlertCircle className="mt-0.5 size-4 shrink-0 text-accent" />
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-primary dark:text-rose-400" />
           <div>
-            <p className="mb-0.5 text-xs font-bold text-accent">
+            <p className="mb-0.5 text-xs font-bold text-primary dark:text-rose-400">
               Peak Hour Notice
             </p>
             <p className="text-xs text-background/70">

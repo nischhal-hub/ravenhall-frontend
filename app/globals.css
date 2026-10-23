@@ -4,8 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Pitch Green + Gold: primary = deep pitch green (brand), accent = readable
-   action green (buttons, "available"), highlight = gold for sparing emphasis */
+/* Rose theme: primary = rose (brand + main actions), accent = soft rose tint,
+   highlight = gold for sparing emphasis */
 
 :root {
   --background: #fbf6f7;
@@ -24,6 +24,8 @@
   --accent-foreground: #881337;
   --highlight: #a16207;
   --highlight-foreground: #ffffff;
+  /* Gold text/icons on dark brand surfaces (hero, footer, rose panels) */
+  --highlight-soft: #f0c06a;
   --border: #ebdde0;
   --input: #d9c6cb;
   --ring: #be123c;
@@ -35,6 +37,17 @@
   --sidebar-accent-foreground: #881337;
   --sidebar-border: #ebdde0;
   --sidebar-ring: #be123c;
+
+  /* Restored: used app-wide (danger buttons/badges, rounded corners) */
+  --destructive: oklch(0.577 0.245 27.325);
+  --radius: 0.625rem;
+  /* Chart series (validated for colour-blind separation on cards):
+     rose, indigo, amber, cyan, neutral */
+  --chart-1: #be123c;
+  --chart-2: #4f46e5;
+  --chart-3: #b45309;
+  --chart-4: #0b7fa3;
+  --chart-5: #a3949a;
 
   --gradient-brand: linear-gradient(135deg, #be123c 0%, #9d174d 100%);
   --gradient-hero: linear-gradient(
@@ -66,6 +79,7 @@
   --accent-foreground: #fda4af;
   --highlight: #d9a441;
   --highlight-foreground: #12090c;
+  --highlight-soft: #f0c06a;
   --border: #33212a;
   --input: #422a34;
   --ring: #fb7185;
@@ -77,6 +91,13 @@
   --sidebar-accent-foreground: #fda4af;
   --sidebar-border: #33212a;
   --sidebar-ring: #fb7185;
+
+  --destructive: oklch(0.704 0.191 22.216);
+  --chart-1: #e0566f;
+  --chart-2: #7c7cf0;
+  --chart-3: #bd8129;
+  --chart-4: #2a9bb5;
+  --chart-5: #6e5c63;
 
   --gradient-brand: linear-gradient(135deg, #9f1239 0%, #831843 100%);
   --gradient-hero: linear-gradient(
@@ -114,6 +135,7 @@
   --color-accent: var(--accent);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-highlight: var(--highlight);
+  --color-highlight-soft: var(--highlight-soft);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);

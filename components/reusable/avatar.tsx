@@ -100,7 +100,7 @@ export const Avatar = ({ bg, name, src, size, shape }: TProps) => {
       ) : (
         <div
           style={{
-            backgroundColor: bg || "#E1E6FF",
+            backgroundColor: bg || "var(--secondary)",
             width: size || "40px",
             height: size || "40px",
             fontSize: `${parseInt(size || "40px") / 2.5}px`,

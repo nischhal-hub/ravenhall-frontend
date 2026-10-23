@@ -7,7 +7,9 @@ export function SiteFooter() {
   return (
     <footer
       id="contact"
-      className="bg-primary px-4 py-16 text-sm text-primary-foreground/80 sm:px-6 lg:px-8"
+      // Same brand surface as SiteHeader
+      style={{ background: "var(--gradient-brand)" }}
+      className="px-4 py-16 text-sm text-primary-foreground/80 sm:px-6 lg:px-8"
     >
       <div className="mx-auto grid w-full max-w-7xl gap-10 md:grid-cols-4">
         <div className="space-y-5">
@@ -65,7 +67,7 @@ export function SiteFooter() {
                   key={item.text}
                   className="flex items-start gap-3 leading-relaxed"
                 >
-                  <Icon className="mt-0.5 size-4 text-accent" />
+                  <Icon className="mt-0.5 size-4 text-highlight-soft" />
                   <span>{item.text}</span>
                 </li>
               )
@@ -74,9 +76,7 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4 className="mb-4 font-bold text-primary-foreground">
-            Newsletter
-          </h4>
+          <h4 className="mb-4 font-bold text-primary-foreground">Newsletter</h4>
           <p className="mb-3 text-primary-foreground/70">
             Get offers, coaching updates, and member-only announcements.
           </p>

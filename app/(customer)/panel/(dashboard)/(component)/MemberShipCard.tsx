@@ -105,7 +105,7 @@ export function MembershipCard({
 
       {/* Perks */}
       <div className="mb-5 flex items-center gap-2">
-        <Sparkles className="h-3.5 w-3.5 text-accent" />
+        <Sparkles className="h-3.5 w-3.5 text-primary dark:text-rose-400" />
         <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Benefits
         </p>
@@ -116,7 +116,7 @@ export function MembershipCard({
             key={p}
             className="flex items-center gap-2.5 text-sm text-foreground"
           >
-            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-accent" />
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-primary dark:text-rose-400" />
             {p}
           </li>
         ))}

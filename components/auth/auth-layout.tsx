@@ -145,8 +145,11 @@ export function AuthLayout({
   return (
     <main className="grid min-h-svh bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* Brand panel (desktop) */}
-      {/* Fixed pitch green in both themes: the panel is a photo-backed brand surface */}
-      <aside className="relative hidden overflow-hidden bg-[#1f5130] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
+      {/* Theme hero gradient (globals.css) behind the photo; always a dark surface */}
+      <aside
+        style={{ background: "var(--gradient-hero)" }}
+        className="relative hidden overflow-hidden text-white lg:flex lg:flex-col lg:justify-between lg:p-12"
+      >
         <Image
           src="/images/landing/hero.jpg"
           alt=""
@@ -157,7 +160,7 @@ export function AuthLayout({
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-[#0f2418] via-[#16391f]/85 to-[#1f5130]/60"
+          className="absolute inset-0 bg-linear-to-t from-black/55 via-black/15 to-transparent"
         />
 
         <div className="relative flex items-center justify-between gap-4">
@@ -194,7 +197,7 @@ export function AuthLayout({
             {brand.benefits.map(({ icon: Icon, title: benefitTitle, text }) => (
               <li key={benefitTitle} className="flex gap-3.5">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15">
-                  <Icon className="size-4.5 text-[#d9b85e]" aria-hidden />
+                  <Icon className="size-4.5 text-highlight-soft" aria-hidden />
                 </span>
                 <div>
                   <p className="font-semibold">{benefitTitle}</p>
@@ -217,12 +220,12 @@ export function AuthLayout({
           <BackLink
             href={backHref}
             label={backLabel}
-            className="border-border bg-card text-foreground hover:border-secondary/40 hover:bg-muted focus-visible:ring-secondary/40"
+            className="border-border bg-card text-foreground hover:border-primary/40 hover:bg-muted focus-visible:ring-ring/40"
           />
           <Link
             href={backHref}
             aria-label="Ravenhall Cricket home"
-            className="flex min-h-11 items-center gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-secondary/40"
+            className="flex min-h-11 items-center gap-2 rounded-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/40"
           >
             <BrandMark className="size-8 rounded-lg [&_svg]:size-4" />
             <span className="font-heading text-sm font-semibold max-[360px]:sr-only">
@@ -233,7 +236,7 @@ export function AuthLayout({
 
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8 motion-safe:animate-in motion-safe:duration-300 motion-safe:fade-in motion-safe:slide-in-from-bottom-2">
           <header className="mb-7 space-y-2">
-            <p className="text-xs font-semibold tracking-[0.12em] text-secondary uppercase dark:text-sky-300">
+            <p className="text-xs font-semibold tracking-[0.12em] text-primary uppercase dark:text-rose-400">
               {eyebrow}
             </p>
             <h1 className="font-heading text-3xl font-semibold tracking-tight text-balance text-foreground">

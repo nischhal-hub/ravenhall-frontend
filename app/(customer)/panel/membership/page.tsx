@@ -93,7 +93,7 @@ function DaysRing({ days, total }: { days: number; total: number }) {
       </svg>
       <div className="absolute flex flex-col items-center">
         <span
-          className={`text-3xl leading-none font-black tabular-nums ${urgent ? "text-destructive" : "text-accent"}`}
+          className={`text-3xl leading-none font-black tabular-nums ${urgent ? "text-destructive" : "text-primary dark:text-rose-400"}`}
         >
           {days}
         </span>
@@ -165,7 +165,7 @@ function PerkRow({ text }: { text: string }) {
   return (
     <li className="flex items-center gap-3 border-b border-border py-2.5 last:border-0">
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15">
-        <CheckCircle2 className="h-3.5 w-3.5 text-accent" />
+        <CheckCircle2 className="h-3.5 w-3.5 text-primary dark:text-rose-400" />
       </div>
       <span className="text-sm text-foreground">{text}</span>
     </li>
@@ -434,7 +434,7 @@ export default function MembershipPage() {
             {/* Perks card */}
             <div className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-4 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-accent" />
+                <Sparkles className="h-4 w-4 text-primary dark:text-rose-400" />
                 <h2 className="font-bold text-foreground">Your Benefits</h2>
               </div>
               <ul className="divide-y divide-border">

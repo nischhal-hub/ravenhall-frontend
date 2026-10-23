@@ -31,11 +31,15 @@ export function SiteHeader() {
   const isCustomer = normalizeRole(user?.role) === "customer"
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+    // Same brand surface as SiteFooter so the page opens and closes alike
+    <header
+      style={{ background: "var(--gradient-brand)" }}
+      className="sticky top-0 z-50 border-b border-white/10 text-white shadow-sm"
+    >
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="font-heading text-xl font-black tracking-tight text-primary italic sm:text-2xl"
+          className="rounded font-heading text-xl font-black tracking-tight text-white italic outline-none focus-visible:ring-2 focus-visible:ring-white/60 sm:text-2xl"
         >
           Ravenhall Cricket
         </Link>
@@ -45,7 +49,7 @@ export function SiteHeader() {
             <Link
               key={link.label}
               href={link.href}
-              className="text-sm font-semibold text-muted-foreground transition hover:text-primary"
+              className="rounded text-sm font-semibold text-white/80 transition outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/60"
             >
               {link.label}
             </Link>
@@ -54,7 +58,11 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-2 md:flex">
           {isCustomer ? (
-            <Button asChild size="lg" className="px-4 font-semibold">
+            <Button
+              asChild
+              size="lg"
+              className="bg-white px-4 font-semibold text-primary hover:bg-white/90"
+            >
               <Link href="/panel">Dashboard</Link>
             </Button>
           ) : (
@@ -63,11 +71,15 @@ export function SiteHeader() {
                 asChild
                 variant="ghost"
                 size="lg"
-                className="px-4 text-primary"
+                className="border border-white/30 px-4 text-white hover:bg-white/10 hover:text-white"
               >
                 <Link href="/auth">Login</Link>
               </Button>
-              <Button asChild size="lg" className="px-4 font-semibold">
+              <Button
+                asChild
+                size="lg"
+                className="bg-white px-4 font-semibold text-primary hover:bg-white/90"
+              >
                 <Link href="/auth/register">Register</Link>
               </Button>
             </>
@@ -77,7 +89,7 @@ export function SiteHeader() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="size-10 text-white hover:bg-white/10 hover:text-white md:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((prev) => !prev)}
         >
@@ -86,13 +98,13 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+        <div className="border-t border-white/10 px-4 py-4 md:hidden">
           <nav className="space-y-3">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="block rounded-xl px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+                className="block rounded-xl px-3 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/10 hover:text-white"
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -101,7 +113,10 @@ export function SiteHeader() {
           </nav>
           {isCustomer ? (
             <div className="mt-4">
-              <Button asChild className="h-9 w-full">
+              <Button
+                asChild
+                className="h-11 w-full bg-white text-primary hover:bg-white/90"
+              >
                 <Link href="/panel" onClick={() => setOpen(false)}>
                   Dashboard
                 </Link>
@@ -109,12 +124,19 @@ export function SiteHeader() {
             </div>
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-2">
-              <Button asChild variant="outline" className="h-9">
+              <Button
+                asChild
+                variant="outline"
+                className="h-11 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              >
                 <Link href="/auth" onClick={() => setOpen(false)}>
                   Login
                 </Link>
               </Button>
-              <Button asChild className="h-9">
+              <Button
+                asChild
+                className="h-11 bg-white text-primary hover:bg-white/90"
+              >
                 <Link href="/auth/register" onClick={() => setOpen(false)}>
                   Register
                 </Link>

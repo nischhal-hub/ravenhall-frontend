@@ -287,7 +287,7 @@ export function PosCartPanel({
           <Label className="text-xs font-semibold text-foreground flex items-center justify-between">
             <span>Customer</span>
             {customerSelection.customer?.membership?.isActive && (
-              <span className="text-[10px] text-accent font-medium">
+              <span className="text-[10px] text-primary dark:text-rose-400 font-medium">
                 Member pricing applied
               </span>
             )}
@@ -376,7 +376,7 @@ export function PosCartPanel({
               </Label>
               {appliedPromoCode ? (
                 <div className="flex items-center justify-between rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-xs">
-                  <div className="flex items-center gap-2 font-mono font-bold text-accent">
+                  <div className="flex items-center gap-2 font-mono font-bold text-primary dark:text-rose-400">
                     <Sparkles className="size-3.5" />
                     <span>{appliedPromoCode}</span>
                     {calculatedPrice?.discountCodeRecord && (
@@ -506,7 +506,7 @@ export function PosCartPanel({
             )}
 
             {pctSource && (
-              <div className="flex justify-between text-accent font-medium">
+              <div className="flex justify-between text-primary dark:text-rose-400 font-medium">
                 <span>
                   {pctSource === "membership"
                     ? `Membership Discount (${discountBreakdown?.membership?.plan} ${appliedPctValue}%)`
@@ -519,14 +519,14 @@ export function PosCartPanel({
             )}
 
             {flatDiscountAmount > 0 && (
-              <div className="flex justify-between text-accent font-medium">
+              <div className="flex justify-between text-primary dark:text-rose-400 font-medium">
                 <span>Staff Flat Discount</span>
                 <span className="font-mono">-${flatDiscountAmount.toFixed(2)}</span>
               </div>
             )}
 
             {pctDiscountAmount > 0 && flatDiscountAmount > 0 && (
-              <div className="flex justify-between text-xs font-semibold text-accent pt-1 border-t border-dashed border-border/80">
+              <div className="flex justify-between text-xs font-semibold text-primary dark:text-rose-400 pt-1 border-t border-dashed border-border/80">
                 <span>Total Discount Saved</span>
                 <span className="font-mono">-${totalDiscount.toFixed(2)}</span>
               </div>
@@ -600,7 +600,7 @@ export function PosCartPanel({
                       className={cn(
                         "h-8 px-2.5 flex items-center rounded-md font-mono text-xs font-bold border",
                         tenderedNum >= finalAmount && finalAmount > 0
-                          ? "bg-accent/15 border-accent/40 text-accent font-bold"
+                          ? "bg-accent/15 border-accent/40 text-primary dark:text-rose-400 font-bold"
                           : "bg-muted text-muted-foreground border-border"
                       )}
                     >
