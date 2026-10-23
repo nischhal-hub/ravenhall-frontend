@@ -1,4 +1,6 @@
+import { Activity, CheckCircle2, Timer, XCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 // ================== ACTIVE / INACTIVE ==================
 
@@ -41,14 +43,31 @@ export function isBookingCancellable(status: string) {
   return ["PENDING", "CONFIRMED"].includes(status.toUpperCase())
 }
 
-export function BookingStatusBadge({ status }: { status: string }) {
+const BOOKING_STATUS_ICON: Record<BookingStatus, React.ElementType> = {
+  CONFIRMED: CheckCircle2,
+  PENDING: Timer,
+  CANCELLED: XCircle,
+  COMPLETED: Activity,
+}
+
+export function BookingStatusBadge({
+  status,
+  showIcon,
+  className,
+}: {
+  status: string
+  showIcon?: boolean
+  className?: string
+}) {
   const config = BOOKING_STATUS_CONFIG[status as BookingStatus] || {
     label: status,
     variant: "secondary" as const,
   }
+  const Icon = BOOKING_STATUS_ICON[status as BookingStatus]
 
   return (
-    <Badge variant={config.variant} className="capitalize">
+    <Badge variant={config.variant} className={cn("capitalize", className)}>
+      {showIcon && Icon && <Icon aria-hidden />}
       {config.label}
     </Badge>
   )
@@ -64,16 +83,27 @@ export const PAYMENT_STATUS_CONFIG: Record<
   PAID: { label: "Paid", variant: "default" },
   FAILED: { label: "Failed", variant: "destructive" },
   REFUNDED: { label: "Refunded", variant: "outline" },
+  PARTIALLY_REFUNDED: { label: "Partly refunded", variant: "outline" },
   PENDING: { label: "Pending", variant: "secondary" },
 }
 
-export function PaymentStatusBadge({ status }: { status: string }) {
+export function PaymentStatusBadge({
+  status,
+  className,
+}: {
+  status: string
+  className?: string
+}) {
   const config = PAYMENT_STATUS_CONFIG[status.toUpperCase()] || {
     label: "Pending",
     variant: "secondary" as const,
   }
 
-  return <Badge variant={config.variant}>{config.label}</Badge>
+  return (
+    <Badge variant={config.variant} className={className}>
+      {config.label}
+    </Badge>
+  )
 }
 
 // ================== MEMBERSHIP STATUS ==================

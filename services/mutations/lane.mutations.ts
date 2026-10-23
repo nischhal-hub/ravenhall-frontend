@@ -60,6 +60,8 @@ function useLaneMutation<TData, TVariables>(
     mutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["lanes"] })
+      // Keeps the lane detail page in sync after editing from it
+      queryClient.invalidateQueries({ queryKey: ["lane"] })
 
       toast.success(successMessage)
     },
