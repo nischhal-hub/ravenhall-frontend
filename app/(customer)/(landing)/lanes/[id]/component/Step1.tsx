@@ -8,23 +8,62 @@ import { BookingSummaryCard } from "./BookingSummaryCard"
 import { Button } from "@/components/ui/button"
 import { AlertCircle } from "lucide-react"
 import { Lane, Slot } from "@/types/lane-response.types"
+import { getSlotRange } from "@/lib/booking"
 
 interface Step1Props {
   lane: Lane
-  onNext: (date: string, slot: Slot, duration: 1 | 2 | 3) => void
+  /** `endTime` is when the whole session finishes (start + duration). */
+  onNext: (
+    date: string,
+    slot: Slot,
+    duration: 1 | 2 | 3,
+    endTime: string
+  ) => void
+  memberDiscountPct: number
+  /** Pre-select a date / slot (used by deep links from the chat assistant). */
+  initialDate?: string
+  initialSlotId?: string
 }
 
-export function Step1({ lane, onNext }: Step1Props) {
+export function Step1({
+  lane,
+  onNext,
+  initialDate,
+  initialSlotId,
+  memberDiscountPct,
+}: Step1Props) {
   const today = new Date()
   const [selectedDate, setSelectedDate] = useState(
-    `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
+    initialDate && /^\d{4}-\d{2}-\d{2}$/.test(initialDate)
+      ? initialDate
+      : `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`
   )
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(() => {
+    const match = initialSlotId
+      ? lane.slots.find((s) => s.id === initialSlotId)
+      : undefined
+    return match && match.isAvailable && !match.isBlocked ? match : null
+  })
   const [duration, setDuration] = useState<1 | 2 | 3>(1)
 
   const daySlots = useMemo(() => {
-    return lane.slots.filter((s) => s.date.startsWith(selectedDate))
+    return lane.slots
+      .filter((s) => s.date.startsWith(selectedDate))
+      .sort((a, b) => a.startTime.localeCompare(b.startTime))
   }, [lane.slots, selectedDate])
+
+  const sessionSlots = selectedSlot
+    ? getSlotRange(daySlots, selectedSlot, duration)
+    : null
+  const endTime = sessionSlots?.[sessionSlots.length - 1].endTime ?? null
+
+  // A longer session may not fit from the picked start, so drop the pick
+  const handleDurationChange = (d: 1 | 2 | 3) => {
+    setDuration(d)
+    if (selectedSlot && !getSlotRange(daySlots, selectedSlot, d)) {
+      setSelectedSlot(null)
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -54,6 +93,7 @@ export function Step1({ lane, onNext }: Step1Props) {
         <SlotGrid
           slots={daySlots}
           selectedSlot={selectedSlot}
+          duration={duration}
           onSelect={setSelectedSlot}
         />
       </div>
@@ -68,14 +108,18 @@ export function Step1({ lane, onNext }: Step1Props) {
           lane={lane}
           selectedDate={selectedDate}
           selectedSlot={selectedSlot}
+          endTime={endTime}
           duration={duration}
-          onDurationChange={setDuration}
+          memberDiscountPct={memberDiscountPct}
+          onDurationChange={handleDurationChange}
         />
 
         <Button
-          disabled={!selectedSlot}
+          disabled={!selectedSlot || !endTime}
           onClick={() =>
-            selectedSlot && onNext(selectedDate, selectedSlot, duration)
+            selectedSlot &&
+            endTime &&
+            onNext(selectedDate, selectedSlot, duration, endTime)
           }
           className="h-11 w-full rounded-xl bg-accent font-semibold text-accent-foreground hover:bg-accent/90"
         >
