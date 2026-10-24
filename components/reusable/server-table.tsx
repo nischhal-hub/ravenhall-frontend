@@ -39,7 +39,7 @@ interface DataTableProps<TData, TValue> {
   className?: string
 }
 
-const TableSkeletonRow = ({ columns }: { columns: any[] }) => (
+const TableSkeletonRow = ({ columns }: { columns: readonly unknown[] }) => (
   <TableRow>
     {columns.map((_, i) => (
       <TableCell key={i} className="py-4">

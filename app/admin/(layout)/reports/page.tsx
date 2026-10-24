@@ -4,10 +4,7 @@ import { useState } from "react"
 import {
   Calendar as CalendarIcon,
   RefreshCw,
-  TrendingUp,
-  Download,
   AlertCircle,
-  FileSpreadsheet,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,7 +27,6 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
-  subMonths,
 } from "date-fns"
 import { cn } from "@/lib/utils"
 

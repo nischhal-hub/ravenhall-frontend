@@ -27,7 +27,6 @@ interface BookingsListProps {
   search: string
   onSearch: (v: string) => void
   onPageChange: (p: number) => void
-  onBookingClick?: (id: string) => void
 }
 
 const FILTERS = [
@@ -45,7 +44,6 @@ export function BookingsList({
   search,
   onSearch,
   onPageChange,
-  onBookingClick,
 }: BookingsListProps) {
   const [activeFilter, setActiveFilter] = useState<string>("ALL")
 

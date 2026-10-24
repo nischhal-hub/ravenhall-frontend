@@ -3,7 +3,6 @@ import { apiClient } from '@/services/api/client'
 import type {
   ExpenseApiResponse,
   ExpenseCategoriesApiResponse,
-  ExpenseCategory,
   ExpenseCategoryApiResponse,
   ExpenseFilterParams,
   ExpensesApiResponse,

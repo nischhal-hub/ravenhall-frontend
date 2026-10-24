@@ -198,7 +198,6 @@ function PlanCard({
 export function MembershipPlans() {
   const router = useRouter()
   const { data, isLoading, error } = useMembershipPlansQuery()
-  //   @ts-expect-error API wraps the plans in `data`
   const plans: RawPlan[] = data?.data || []
 
   const handleSubscribe = (plan: TransformedPlan) => {

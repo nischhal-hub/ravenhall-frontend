@@ -43,7 +43,10 @@ export type LoginResponse = AuthApiResponse & {
 }
 
 export type RefreshTokenResponse = AuthApiResponse & {
-  accessToken: string
+  data: {
+    accessToken: string
+    refreshToken?: string
+  }
 }
 
 export type GetMeResponse = AuthApiResponse & {

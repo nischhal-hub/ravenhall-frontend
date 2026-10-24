@@ -12,7 +12,7 @@ import type { ExpenseCategoryFormData } from '@/schemas/expense'
 export function useCreateExpenseMutation() {
   const queryClient = useQueryClient()
 
-  return useMutation<ExpenseApiResponse, Error, FormData | Record<string, any>>({
+  return useMutation<ExpenseApiResponse, Error, FormData | Record<string, unknown>>({
     mutationKey: ['expenses', 'create'],
     mutationFn: async (payload) => {
       const isFormData = typeof window !== 'undefined' && payload instanceof FormData
@@ -31,8 +31,8 @@ export function useCreateExpenseMutation() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(`Expense "${res.data.title}" added successfully`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to create expense'
+    onError: (error) => {
+      const message = error.message || 'Failed to create expense'
       toast.error(message)
     },
   })
@@ -44,7 +44,7 @@ export function useUpdateExpenseMutation() {
   return useMutation<
     ExpenseApiResponse,
     Error,
-    { id: string; payload: FormData | Record<string, any> }
+    { id: string; payload: FormData | Record<string, unknown> }
   >({
     mutationKey: ['expenses', 'update'],
     mutationFn: async ({ id, payload }) => {
@@ -65,8 +65,8 @@ export function useUpdateExpenseMutation() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(`Expense "${res.data.title}" updated successfully`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to update expense'
+    onError: (error) => {
+      const message = error.message || 'Failed to update expense'
       toast.error(message)
     },
   })
@@ -91,8 +91,8 @@ export function useDeleteExpenseMutation() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success('Expense deleted successfully')
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to delete expense'
+    onError: (error) => {
+      const message = error.message || 'Failed to delete expense'
       toast.error(message)
     },
   })
@@ -113,8 +113,8 @@ export function useCreateExpenseCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: ['expense-categories'] })
       toast.success(`Category "${res.data.name}" created`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to create category'
+    onError: (error) => {
+      const message = error.message || 'Failed to create category'
       toast.error(message)
     },
   })
@@ -141,8 +141,8 @@ export function useUpdateExpenseCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: ['expenses'] })
       toast.success(`Category "${res.data.name}" updated`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to update category'
+    onError: (error) => {
+      const message = error.message || 'Failed to update category'
       toast.error(message)
     },
   })
@@ -161,8 +161,8 @@ export function useDeleteExpenseCategoryMutation() {
       queryClient.invalidateQueries({ queryKey: ['expense-categories'] })
       toast.success('Category deleted successfully')
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to delete category'
+    onError: (error) => {
+      const message = error.message || 'Failed to delete category'
       toast.error(message)
     },
   })

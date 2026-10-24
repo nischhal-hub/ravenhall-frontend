@@ -1,19 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { RefreshCw, UserPlus } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import PageHeader from "@/components/ui/page-header"
-import { useModalContext } from "@/components/context/modal-context"
 import { useUsersQuery } from "@/services/queries/user.query"
 import { getUserColumns } from "./column"
 import { ServerFilterDataTable } from "@/components/reusable/server-table"
 
 export default function UsersPage() {
-  const { openModal } = useModalContext()
-
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
   const [search, setSearch] = useState("")

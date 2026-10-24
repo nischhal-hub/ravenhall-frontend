@@ -9,8 +9,6 @@ import {
   Check,
   X,
   Loader2,
-  AlertCircle,
-  Sparkles,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {

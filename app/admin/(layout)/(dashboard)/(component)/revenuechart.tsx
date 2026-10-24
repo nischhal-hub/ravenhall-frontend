@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import {
@@ -23,16 +22,11 @@ import {
 } from "recharts"
 import type { RevenueMonth } from "@/types/dashboard-response"
 
-const RANGES = ["7d", "30d", "90d", "6m"] as const
-type Range = (typeof RANGES)[number]
-
 interface RevenueChartProps {
   data: RevenueMonth[]
 }
 
 export function RevenueChart({ data = [] }: RevenueChartProps) {
-  const [range, setRange] = useState<Range>("30d")
-
   // Filter data based on selected range (you can enhance this logic later)
   const filteredData = data.slice(-12) // Show last 12 months by default
 
@@ -49,13 +43,9 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
   })
 
   const totalRevenue = filteredData.reduce((sum, item) => sum + item.revenue, 0)
-  const totalBookings = filteredData.reduce(
-    (sum, item) => sum + item.bookings,
-    0
-  )
 
   // Moving Average (3 periods)
-  const getMovingAverage = (dataPoints: any[], window: number) => {
+  const getMovingAverage = (dataPoints: { revenue: number }[], window: number) => {
     return dataPoints.map((_, index) => {
       const start = Math.max(0, index - window + 1)
       const subset = dataPoints.slice(start, index + 1)
@@ -76,26 +66,6 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
     return `$${value}`
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-lg border border-border bg-card p-3 shadow-xl">
-          <p className="mb-2 font-semibold">{label}</p>
-          <p className="text-primary">
-            Revenue:{" "}
-            <span className="font-bold">{formatYAxis(payload[0].value)}</span>
-          </p>
-          {payload[1] && (
-            <p className="text-sm text-muted-foreground">
-              Trend: {formatYAxis(payload[1].value)}
-            </p>
-          )}
-        </div>
-      )
-    }
-    return null
-  }
-
   return (
     <Card className="col-span-1 lg:col-span-8">
       <CardHeader className="flex flex-col pb-3 sm:flex-row sm:items-center sm:justify-between">
@@ -108,22 +78,6 @@ export function RevenueChart({ data = [] }: RevenueChartProps) {
             </span>
           </p>
         </div>
-
-        {/* <div className="mt-3 flex gap-2 sm:mt-0">
-          {RANGES.map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`rounded-lg px-4 py-1.5 text-sm transition-all ${
-                range === r
-                  ? "bg-primary font-medium text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {r}
-            </button>
-          ))}
-        </div> */}
       </CardHeader>
 
       <CardContent>

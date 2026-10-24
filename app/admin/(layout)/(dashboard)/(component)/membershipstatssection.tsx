@@ -86,7 +86,7 @@ export function MembershipStatsSection({ stats }: Props) {
                   background={{ fill: "var(--muted)" }}
                 />
                 <Tooltip
-                  formatter={(v: any) => [`${v}%`, ""]}
+                  formatter={(v) => [`${v}%`, ""]}
                   contentStyle={{
                     borderRadius: 8,
                     border: "1px solid var(--border)",

@@ -4,7 +4,6 @@ import { QueryProvider } from "@/components/providers/query-provider"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
-//@ts-ignore
 import "./globals.css"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import ModalRoot from "@/components/ui/modal"

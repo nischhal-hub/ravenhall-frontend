@@ -2,13 +2,9 @@
 
 import { useState } from "react"
 import {
-  CreditCard,
   History,
   Store,
-  CalendarCheck,
   User,
-  Sparkles,
-  ShieldCheck,
 } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +16,6 @@ import { PosReceiptModal } from "./pos-receipt-modal"
 import { PosCollectPaymentModal } from "./pos-collect-payment-modal"
 import { useMeQuery } from "@/services/queries/auth"
 import type { PosBookingDetail, PosBookingListItem } from "@/types/pos-response.types"
-import { format } from "date-fns"
 
 export default function PosTerminal() {
   const { data: currentUser } = useMeQuery()

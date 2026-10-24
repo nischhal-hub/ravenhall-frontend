@@ -1,6 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query"
 
-import { clearAuthTokens } from "@/services/auth/token-store"
+import {
+  cancelProactiveRefresh,
+  scheduleProactiveRefresh,
+} from "@/services/auth/refresh"
+import {
+  clearAuthTokens,
+  setAuthTokens,
+  type AuthTokens,
+} from "@/services/auth/token-store"
 
 /**
  * Drops every cached, user-specific query (bookings, notifications, profile,
@@ -13,7 +21,14 @@ export async function resetUserState(queryClient: QueryClient) {
   queryClient.clear()
 }
 
+/** Stores a new session's tokens and arms the refresh-before-expiry timer */
+export function beginSession(tokens: AuthTokens, role?: string) {
+  setAuthTokens(tokens, role)
+  scheduleProactiveRefresh()
+}
+
 export async function endSession(queryClient: QueryClient) {
+  cancelProactiveRefresh()
   clearAuthTokens()
   await resetUserState(queryClient)
 }

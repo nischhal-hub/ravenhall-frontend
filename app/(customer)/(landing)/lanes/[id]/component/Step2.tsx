@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
   Edit2,
-  Tag,
   CheckCircle2,
   Loader2,
   ShieldCheck,
@@ -94,15 +93,10 @@ export function Step2({
     }
 
     try {
-      // @ts-expect-error - adjust based on your actual API response shape
       const result = await createBookingMutation.mutateAsync(payload)
 
-      // Handle different possible response shapes
-      const bookingId =
-        result?.id ||
-        result?.bookingId ||
-        result?.data?.id ||
-        result?.data?.bookingId
+      // The API wraps the booking: { status, message, data: { id, ... } }
+      const bookingId = result?.data?.id
 
       if (!bookingId) {
         console.error("Booking created but no ID returned:", result)

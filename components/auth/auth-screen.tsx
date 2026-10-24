@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import {
   useForm,
   type FieldValues,
@@ -39,13 +39,13 @@ import {
   useResetPasswordMutation,
   useVerifyEmailMutation,
 } from "@/services/mutations/auth.mutations"
-import { setAuthTokens } from "@/services/auth/token-store"
-import { resetUserState } from "@/services/auth/session"
+import { beginSession, resetUserState } from "@/services/auth/session"
 import { useQueryClient } from "@tanstack/react-query"
 import { ApiError } from "@/types/response"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AuthLayout } from "@/components/auth/auth-layout"
+import { SessionExpiredNotice } from "@/components/auth/session-expired-notice"
 
 type AuthMode =
   "login" | "register" | "forgot-password" | "verify-email" | "reset-password"
@@ -391,7 +391,7 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
       // bookings/notifications can render before fresh data arrives
       await resetUserState(queryClient)
       if (response.data?.accessToken) {
-        setAuthTokens(
+        beginSession(
           {
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
@@ -534,6 +534,12 @@ export function AuthScreen({ mode, role }: AuthScreenProps) {
         </>
       }
     >
+      {mode === "login" && !formError && !formSuccess ? (
+        <Suspense fallback={null}>
+          <SessionExpiredNotice />
+        </Suspense>
+      ) : null}
+
       {formError ? (
         <Alert variant="destructive" className="mb-5 px-3.5 py-3" role="alert">
           <CircleAlert />

@@ -10,8 +10,14 @@ export interface UpdateBookingPayload {
 }
 
 // ================== REQUEST FUNCTIONS ==================
+export type CreateBookingResponse = {
+  status: string
+  message: string
+  data: { id: string; bookingRef: string }
+}
+
 export async function createBookingRequest(data: CreateBookingPayload) {
-  const response = await apiClient.post("/bookings", data)
+  const response = await apiClient.post<CreateBookingResponse>("/bookings", data)
   return response.data
 }
 

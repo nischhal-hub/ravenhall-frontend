@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { Printer, CheckCircle, Clock, MapPin, Phone, Mail, User, Receipt as ReceiptIcon } from "lucide-react"
+import { Printer, CheckCircle, MapPin, Phone, Mail, User, Receipt as ReceiptIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/modal/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { usePosReceiptQuery } from "@/services/queries/pos.query"
 import type { PosReceipt } from "@/types/pos-response.types"
 import { format } from "date-fns"

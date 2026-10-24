@@ -54,9 +54,8 @@ export const useDeleteItem = () => {
       closeModal("DELETE_ITEM")
     },
 
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || "Deletion failed"
-      toast.error(message)
+    onError: () => {
+      toast.error("Deletion failed")
     },
   })
 

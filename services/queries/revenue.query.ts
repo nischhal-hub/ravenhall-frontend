@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { apiClient } from "../api/client"
 import type {
-  ReportGroupByInterval,
   RevenueReportApiResponse,
   RevenueReportQueryParams,
   RevenueSummaryApiResponse,

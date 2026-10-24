@@ -1,7 +1,13 @@
 "use client"
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+import {
+  setSessionExpiredHandler,
+  startSessionSync,
+} from "@/services/auth/refresh"
+import { endSession } from "@/services/auth/session"
 
 type QueryProviderProps = {
   children: React.ReactNode
@@ -23,6 +29,17 @@ export function QueryProvider({ children }: QueryProviderProps) {
         },
       })
   )
+
+  // An expired session ends through the normal logout path (tokens + cache);
+  // the refresh timer and cross-tab sync run for the life of the tab
+  useEffect(() => {
+    setSessionExpiredHandler(() => endSession(queryClient))
+    const stopSync = startSessionSync()
+    return () => {
+      stopSync()
+      setSessionExpiredHandler(null)
+    }
+  }, [queryClient])
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

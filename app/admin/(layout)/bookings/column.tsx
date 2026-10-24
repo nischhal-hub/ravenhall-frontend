@@ -2,7 +2,7 @@
 
 import { type ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown, Eye } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import { ActionButton } from "@/components/reusable/action-btn"
 import { BookingStatusBadge } from "@/components/reusable/status-badge"
 import { Booking } from "@/types/booking-response.types"

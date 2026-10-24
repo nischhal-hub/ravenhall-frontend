@@ -100,24 +100,16 @@ export default function MembershipCheckout({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  const createIntent = useCreateMembershipPaymentIntent()
+  // mutateAsync is stable across renders, so it can be an effect dependency
+  const { mutateAsync: createIntent } = useCreateMembershipPaymentIntent()
 
   useEffect(() => {
     const initialize = async () => {
       try {
-        const response = await createIntent.mutateAsync({ plan })
+        const response = await createIntent({ plan })
 
-        // Handle different possible response shapes
-        const secret =
-          response?.clientSecret ||
-          //@ts-ignore
-          response?.data?.clientSecret ||
-          //@ts-ignore
-          response?.data?.client_secret ||
-          //@ts-ignore
-          response?.body?.clientSecret ||
-          //@ts-ignore
-          response?.body?.data?.clientSecret
+        // The API wraps the payload: { status, message, data: { clientSecret } }
+        const secret = response?.data?.clientSecret
 
         if (secret) {
           setClientSecret(secret)
@@ -125,10 +117,10 @@ export default function MembershipCheckout({
           console.error("❌ No clientSecret in response:", response)
           setError("Invalid response from server (no clientSecret)")
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error("❌ Error creating intent:", err)
-        const msg =
-          err?.response?.data?.message || err.message || "Unknown error"
+        // apiClient rejects with ApiError, whose message is the server's
+        const msg = (err instanceof Error && err.message) || "Unknown error"
         setError(msg)
         toast.error(msg)
       } finally {
@@ -137,7 +129,7 @@ export default function MembershipCheckout({
     }
 
     initialize()
-  }, [plan])
+  }, [plan, createIntent])
 
   if (isLoading) {
     return (

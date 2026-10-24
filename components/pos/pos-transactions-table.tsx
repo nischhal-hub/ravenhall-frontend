@@ -8,10 +8,6 @@ import {
   RefreshCw,
   Eye,
   Calendar as CalendarIcon,
-  Filter,
-  CheckCircle2,
-  Clock,
-  ArrowUpDown,
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -34,7 +30,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { ServerFilterDataTable } from "@/components/reusable/server-table"
 import { BookingStatusBadge, PaymentStatusBadge } from "@/components/reusable/status-badge"
 import { usePosBookingsQuery } from "@/services/queries/pos.query"
-import type { PosBookingListItem, PosPaymentMethod } from "@/types/pos-response.types"
+import type { PosBookingListItem } from "@/types/pos-response.types"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format } from "date-fns"
 

@@ -7,14 +7,11 @@ export const BookingStatusEnum = z.enum([
   "COMPLETED",
 ])
 
+// Body of POST /bookings (the API derives lane, date and price from the slot)
 export const createBookingSchema = z.object({
-  laneId: z.string().min(1, "Lane is required"),
-  date: z.string().min(1, "Date is required"), // YYYY-MM-DD
-  startTime: z.string().min(1, "Start time is required"), // HH:mm
-  endTime: z.string().min(1, "End time is required"), // HH:mm
-  numberOfPeople: z.number().min(1, "At least 1 person required").max(20),
-  specialRequests: z.string().optional(),
-  // status will be set by backend as PENDING by default
+  slotId: z.string().min(1, "Slot is required"),
+  duration: z.number().int().min(1).max(3).optional(),
+  discountCode: z.string().optional(),
 })
 
 export type CreateBookingPayload = z.infer<typeof createBookingSchema>

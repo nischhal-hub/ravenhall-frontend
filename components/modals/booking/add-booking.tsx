@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useForm } from "react-hook-form"
@@ -84,13 +83,13 @@ export default function CreateAdminBooking() {
       slotId: formData.slotId,
     }
 
-    createBooking(bookingPayload as any, {
+    createBooking(bookingPayload, {
       onSuccess: () => {
         toast.success("Booking created successfully!")
         form.reset()
         setSelectedDate(new Date())
       },
-      onError: (error: any) => {
+      onError: (error) => {
         toast.error(error?.message || "Failed to create booking")
       },
     })
@@ -131,7 +130,7 @@ export default function CreateAdminBooking() {
                         </div>
                       </SelectItem>
                     ) : lanes.length > 0 ? (
-                      lanes.map((lane: any) => (
+                      lanes.map((lane) => (
                         <SelectItem key={lane.id} value={lane.id}>
                           {lane.name} ({lane.type})
                         </SelectItem>
@@ -206,7 +205,7 @@ export default function CreateAdminBooking() {
                           </div>
                         </SelectItem>
                       ) : slots.length > 0 ? (
-                        slots.map((slot: any) => (
+                        slots.map((slot) => (
                           <SelectItem
                             key={slot.id}
                             value={slot.id}

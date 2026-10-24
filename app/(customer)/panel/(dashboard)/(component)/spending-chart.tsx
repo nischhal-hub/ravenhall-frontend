@@ -8,6 +8,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  type TooltipContentProps,
 } from "recharts"
 import { TrendingUp } from "lucide-react"
 
@@ -33,7 +34,11 @@ function buildChartData(bookings: Booking[]) {
     }))
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: Partial<TooltipContentProps<number, string>>) {
   if (!active || !payload?.length) return null
   return (
     <div className="rounded-xl border border-border bg-card px-4 py-2.5 shadow-lg">
@@ -42,7 +47,7 @@ function CustomTooltip({ active, payload, label }: any) {
         {new Intl.NumberFormat("en-AU", {
           style: "currency",
           currency: "AUD",
-        }).format(payload[0].value)}
+        }).format(Number(payload[0].value ?? 0))}
       </p>
     </div>
   )

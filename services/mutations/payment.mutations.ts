@@ -68,9 +68,8 @@ function usePaymentMutation<TData, TVariables>(
       }
       options?.onSuccess?.(data)
     },
-    onError: (error: any) => {
+    onError: (error) => {
       const message =
-        error?.response?.data?.message ||
         error.message ||
         "Payment failed. Please try again."
       toast.error(message)
