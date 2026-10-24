@@ -28,6 +28,16 @@ export const createDiscountCodeSchema = z
       .min(1, "Max uses must be at least 1")
       .optional(),
 
+    // Kept as the input's string; empty means "no minimum". Converted to a
+    // number when sent (see discount.mutations.ts).
+    minBookingAmount: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || (Number.isFinite(Number(val)) && Number(val) >= 0),
+        "Minimum spend must be a positive amount"
+      ),
+
     validFrom: z.string().min(1, "Start date is required"),
     validTo: z.string().min(1, "End date is required"),
   })

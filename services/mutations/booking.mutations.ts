@@ -68,6 +68,17 @@ export async function updateBookingStatusRequest({
   return response.data
 }
 
+export async function applyDiscountCodeRequest({
+  id,
+  code,
+}: {
+  id: string
+  code: string
+}) {
+  const response = await apiClient.post(`/bookings/${id}/discount`, { code })
+  return response.data
+}
+
 export async function deleteBookingRequest(id: string) {
   const response = await apiClient.delete(`/bookings/${id}`)
   return response.data
@@ -91,6 +102,8 @@ function useBookingMutation<TData, TVariables>(
       // Single-booking detail (useBookingById) — keyed ["booking", id]
       queryClient.invalidateQueries({ queryKey: ["booking"] })
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
+      // Open checkout (StripeCheckout) shows the amount the server will charge
+      queryClient.invalidateQueries({ queryKey: ["payment-intent"] })
       toast.success(successMessage)
     },
     // Some callers' errors carry the raw axios response; prefer its message
@@ -145,6 +158,14 @@ export function useUpdateBookingStatusMutation() {
     ["bookings", "status"],
     updateBookingStatusRequest,
     "Booking status updated successfully"
+  )
+}
+
+export function useApplyDiscountCodeMutation() {
+  return useBookingMutation(
+    ["bookings", "discount"],
+    applyDiscountCodeRequest,
+    "Discount code applied"
   )
 }
 

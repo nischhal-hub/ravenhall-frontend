@@ -13,6 +13,11 @@ function toDate(value?: string) {
   return value ? new Date(value) : undefined
 }
 
+// Empty input = no minimum spend (null clears an existing one)
+function toAmount(value?: string) {
+  return value ? Number(value) : null
+}
+
 export async function createDiscountCodeRequest(
   data: CreateDiscountCodePayload
 ) {
@@ -21,6 +26,7 @@ export async function createDiscountCodeRequest(
     {
       ...data,
       code: formatCode(data.code),
+      minBookingAmount: toAmount(data.minBookingAmount),
       validFrom: new Date(data.validFrom),
       validTo: new Date(data.validTo),
     }
@@ -35,6 +41,7 @@ export type UpdateDiscountCodePayload = {
   description?: string
   discountPct?: number
   maxUses?: number
+  minBookingAmount?: string
   validFrom?: string
   validTo?: string
 }
@@ -50,6 +57,7 @@ export async function updateDiscountCodeRequest({
     {
       ...data,
       code: formatCode(data.code),
+      minBookingAmount: toAmount(data.minBookingAmount),
       validFrom: toDate(data.validFrom),
       validTo: toDate(data.validTo),
     }

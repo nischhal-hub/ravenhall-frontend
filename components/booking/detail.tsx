@@ -343,7 +343,10 @@ export function BookingDetailPage({
   isAdmin,
 }: BookingDetailPageProps) {
   const router = useRouter()
-  const statusOptions = getStatusUpdateOptions(booking.status)
+  const statusOptions = getStatusUpdateOptions(
+    booking.status,
+    booking.payment?.status
+  )
   const [cancelReason, setCancelReason] = useState("")
   const [deleteOpen, setDeleteOpen] = useState(false)
 
@@ -395,7 +398,9 @@ export function BookingDetailPage({
       ? isAdmin
         ? "This session started without being paid for."
         : "This session started without payment, so it can no longer be paid for. Cancel it to free the slot."
-      : actionHint(status, isAdmin)
+      : isAdmin && isUnpaid
+        ? "Awaiting payment. It's confirmed automatically once paid online, or record the payment at the POS."
+        : actionHint(status, isAdmin)
   const timeline = buildTimeline(booking, currency, isAdmin, canPay)
 
   const handleStatusUpdate = () => {

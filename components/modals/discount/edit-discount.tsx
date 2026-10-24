@@ -35,6 +35,8 @@ export default function EditDiscount({ data }: _ModalProps<TModalDataMap["EDIT_D
       description: data?.description || "",
       discountPct: data?.discountPct || 10,
       maxUses: data?.maxUses || undefined,
+      minBookingAmount:
+        data?.minBookingAmount != null ? String(data.minBookingAmount) : "",
       validFrom: data?.validFrom ? data.validFrom.split("T")[0] : "",
       validTo: data?.validTo ? data.validTo.split("T")[0] : "",
     },
@@ -83,6 +85,14 @@ export default function EditDiscount({ data }: _ModalProps<TModalDataMap["EDIT_D
             label="Max Uses (Optional)"
             type="number"
             placeholder="100"
+          />
+
+          <FormInput
+            form={form}
+            name="minBookingAmount"
+            label="Min Booking Total ($, Optional)"
+            type="number"
+            placeholder="50"
           />
 
           <div className="md:col-span-2">

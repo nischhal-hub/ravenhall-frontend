@@ -3,8 +3,12 @@
 import { type ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { ActionButton } from "@/components/reusable/action-btn"
-import { RoleBadge } from "@/components/reusable/status-badge"
+import {
+  AccountStatusBadge,
+  RoleBadge,
+} from "@/components/reusable/status-badge"
 import { User } from "@/types/user-response.types"
+import { UserStatusAction } from "./status-action"
 
 export function getUserColumns(): ColumnDef<User>[] {
   return [
@@ -31,6 +35,11 @@ export function getUserColumns(): ColumnDef<User>[] {
       accessorKey: "role",
       header: "Role",
       cell: ({ row }) => <RoleBadge role={row.original.role} />,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => <AccountStatusBadge status={row.original.status} />,
     },
     {
       id: "membership",
@@ -78,14 +87,16 @@ export function getUserColumns(): ColumnDef<User>[] {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <ActionButton<User>
-          row={row.original}
-          // edit={{ key: "EDIT_USER" }}
-          delete={{ type: "user" }}
-          view={{
-            onPageUrl: `/admin/users`,
-          }}
-        />
+        <div className="flex items-center gap-2">
+          {/* Accounts are deactivated, never deleted, so history is kept */}
+          <UserStatusAction user={row.original} />
+          <ActionButton<User>
+            row={row.original}
+            view={{
+              onPageUrl: `/admin/users`,
+            }}
+          />
+        </div>
       ),
     },
   ]

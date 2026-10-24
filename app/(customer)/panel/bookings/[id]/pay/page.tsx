@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card"
 import { EmptyState } from "@/components/reusable/empty-state"
 import { type Booking } from "@/components/booking/detail"
 import { StripeCheckout } from "@/components/payment/stripe-checkout"
+import { PromoCodeForm } from "@/components/payment/promo-code-form"
 import {
   AmountRow,
   DetailColumns,
@@ -173,7 +174,11 @@ export default function CompletePaymentPage() {
               />
               {booking.discountAmount > 0 && (
                 <AmountRow
-                  label="Discount"
+                  label={
+                    booking.discountCode?.code
+                      ? `Discount (${booking.discountCode.code})`
+                      : "Discount"
+                  }
                   value={`− ${formatCurrency(booking.discountAmount)}`}
                 />
               )}
@@ -183,6 +188,12 @@ export default function CompletePaymentPage() {
                 value={formatCurrency(booking.finalAmount)}
               />
             </div>
+            {/* One code per booking; the server enforces it too */}
+            {!booking.discountCodeId && (
+              <div className="mt-5 border-t border-border pt-4">
+                <PromoCodeForm bookingId={booking.id} />
+              </div>
+            )}
           </InfoCard>
         }
       />
