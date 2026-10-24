@@ -122,7 +122,7 @@ export function UserStatsSection({ stats }: Props) {
                 background: "var(--card)",
                 fontSize: 12,
               }}
-              formatter={(v: any) => [v, "Users"]}
+              formatter={(v) => [v, "Users"]}
               cursor={{ fill: "var(--muted)", opacity: 0.4 }}
             />
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>

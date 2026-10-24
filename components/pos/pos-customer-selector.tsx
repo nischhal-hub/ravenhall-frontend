@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, UserCheck, UserPlus, Users, X, Crown, Check, Loader2, Sparkles } from "lucide-react"
+import { Search, UserCheck, UserPlus, Users, X, Crown, Check, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,7 +10,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { usePosCustomersQuery } from "@/services/queries/pos.query"
 import { useCreateWalkInCustomerMutation } from "@/services/mutations/pos.mutations"
 import type { PosCustomer } from "@/types/pos-response.types"
-import { cn } from "@/lib/utils"
 
 export interface CustomerSelection {
   type: "EXISTING" | "WALKIN_FORM" | "GUEST"

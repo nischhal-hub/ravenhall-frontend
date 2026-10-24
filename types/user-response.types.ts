@@ -1,3 +1,5 @@
+import type { AppNotification } from "./notification-response.types"
+
 // ==================== CORE USER TYPE ====================
 export interface User {
   id: string
@@ -68,7 +70,7 @@ export interface UserProfileData {
     finalAmount: number
     createdAt: string
   }>
-  notifications?: any[] // You can define a proper type later
+  notifications?: AppNotification[]
 }
 
 // ==================== PAYLOADS ====================

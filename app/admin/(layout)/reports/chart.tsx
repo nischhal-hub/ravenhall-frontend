@@ -5,24 +5,20 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
-  Receipt,
   RotateCcw,
-  CalendarCheck,
   Tag,
   CreditCard,
-  Building,
   Store,
-  Layers,
   Search,
   ArrowUpRight,
   ArrowDownRight,
   Percent,
 } from "lucide-react"
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   BarChart,
   Bar,
@@ -299,7 +295,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                   />
                   <Tooltip
                     {...chartTooltip}
-                    formatter={(value: any, name: any) => [
+                    formatter={(value, name) => [
                       `$${Number(value).toFixed(2)} AUD`,
                       name === "revenue"
                         ? "Revenue"
@@ -348,7 +344,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
                   />
                   <Tooltip
                     {...chartTooltip}
-                    formatter={(value: any, name: any) => [
+                    formatter={(value, name) => [
                       `$${Number(value).toFixed(2)} AUD`,
                       name === "revenue"
                         ? "Revenue"
@@ -618,7 +614,7 @@ export function RevenueChart({ report }: RevenueChartProps) {
         <div className="flex items-center justify-between">
           <Tabs
             value={transactionTab}
-            onValueChange={(val) => setTransactionTab(val as any)}
+            onValueChange={(val) => setTransactionTab(val as typeof transactionTab)}
             className="w-auto"
           >
             <TabsList className="h-8 p-1">

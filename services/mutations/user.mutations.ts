@@ -2,6 +2,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ApiError } from "@/types/response"
+import type { Booking } from "@/types/booking-response.types"
+import type { AppNotification } from "@/types/notification-response.types"
 import { toast } from "sonner"
 import { apiClient } from "../api/client"
 
@@ -15,8 +17,9 @@ export interface ProfileData {
   phone?: string
   imageUrl?: string
   isEmailVerified?: boolean
-  bookings?: any[]
-  notifications?: any[]
+  // GET /auth/profile: bookings without the user, IN_APP notifications
+  bookings?: Omit<Booking, "user">[]
+  notifications?: AppNotification[]
   membership?: {
     plan: string
     isActive: boolean

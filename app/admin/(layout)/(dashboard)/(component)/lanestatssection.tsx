@@ -13,6 +13,7 @@ import {
   PieChart,
   Pie,
   Legend,
+  type TooltipContentProps,
 } from "recharts"
 import {
   Card,
@@ -38,7 +39,10 @@ const LANE_COLORS: Record<string, string> = {
   GENERAL: "var(--chart-3)",
 }
 
-const CustomBarTooltip = ({ active, payload }: any) => {
+const CustomBarTooltip = ({
+  active,
+  payload,
+}: Partial<TooltipContentProps<number, string>>) => {
   if (!active || !payload?.length) return null
   const d = payload[0].payload as LaneSummary
   return (
@@ -168,7 +172,7 @@ export function LaneStatsSection({ lanes, laneStats }: Props) {
                   wrapperStyle={{ fontSize: 11, paddingTop: 4 }}
                 />
                 <Tooltip
-                  formatter={(v: any) => [`${v} lanes`, ""]}
+                  formatter={(v) => [`${v} lanes`, ""]}
                   contentStyle={{
                     borderRadius: 8,
                     border: "1px solid var(--border)",

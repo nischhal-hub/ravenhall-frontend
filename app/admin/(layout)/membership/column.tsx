@@ -71,7 +71,7 @@ export function getMembershipColumns(): ColumnDef<MembershipPlan>[] {
     {
       id: "actions",
       header: "Actions",
-      cell: ({ row }) => (
+      cell: () => (
         <div className="text-sm text-muted-foreground">System Plan</div>
       ),
     },

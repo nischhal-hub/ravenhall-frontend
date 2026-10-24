@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.99",
@@ -52,10 +53,12 @@
     "@types/stripe-v3": "^3.1.33",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.1.7",
+    "jsdom": "26.1.0",
     "postcss": "^8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4.2.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "3.2.4"
   }
 }

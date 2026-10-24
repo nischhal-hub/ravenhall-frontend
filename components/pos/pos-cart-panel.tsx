@@ -17,9 +17,7 @@ import {
   Percent,
   CheckCircle2,
   Loader2,
-  AlertCircle,
   Receipt,
-  User,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -43,6 +41,7 @@ import {
   useCalculatePosPriceMutation,
   useCreatePosBookingMutation,
 } from "@/services/mutations/pos.mutations"
+import type { CreatePosBookingPayload } from "@/schemas/pos"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { EQUIPMENT_FEE } from "@/lib/booking"
@@ -115,6 +114,7 @@ export function PosCartPanel({
   // Recalculate price when slots, customer, promo code, or custom discounts change
   useEffect(() => {
     if (selectedSlots.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- slots are parent props; clearing here keeps an old price from flashing when slots are re-picked
       setCalculatedPrice(null)
       setPriceError(false)
       return
@@ -218,7 +218,7 @@ export function PosCartPanel({
 
     const { customPct, customFlat } = customDiscount
 
-    const payload = {
+    const payload: CreatePosBookingPayload = {
       slotIds: selectedSlots.map((s) => s.slotId),
       paymentMethod,
       paymentStatus,
@@ -235,7 +235,7 @@ export function PosCartPanel({
       isGuest: customerSelection.type === "GUEST",
     }
 
-    createBooking(payload as any, {
+    createBooking(payload, {
       onSuccess: (booking) => {
         // Reset states
         onClearAllSlots()

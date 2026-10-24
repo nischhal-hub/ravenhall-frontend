@@ -1,4 +1,4 @@
-const ACCESS_TOKEN_KEY = "ravenhall_access_token"
+export const ACCESS_TOKEN_KEY = "ravenhall_access_token"
 const REFRESH_TOKEN_KEY = "ravenhall_refresh_token"
 const AUTH_ROLE_KEY = "ravenhall_role"
 

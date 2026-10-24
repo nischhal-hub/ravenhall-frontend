@@ -1,5 +1,3 @@
-import { PosPaymentMethod } from "./pos-response.types"
-
 export type ExpensePaymentMethod = "STRIPE" | "CASH" | "CARD" | "BANK_TRANSFER" | "OTHER"
 
 export interface ExpenseCategory {

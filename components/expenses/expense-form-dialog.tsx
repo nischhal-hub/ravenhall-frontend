@@ -1,13 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   DollarSign,
   Receipt,
-  Calendar as CalendarIcon,
-  Tag,
   CreditCard,
   Banknote,
   Building2,
@@ -79,7 +77,8 @@ export function ExpenseFormDialog({
   const isEditing = Boolean(expense)
 
   const { data: categoriesData, isLoading: isLoadingCategories } = useExpenseCategoriesQuery()
-  const categories = categoriesData?.data || []
+  // Memoised so the reset effect below doesn't re-run on every render while loading
+  const categories = useMemo(() => categoriesData?.data || [], [categoriesData])
 
   const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
@@ -88,7 +87,7 @@ export function ExpenseFormDialog({
   const { mutate: updateExpense, isPending: isUpdating } = useUpdateExpenseMutation()
 
   const form = useForm<ExpenseFormData>({
-    resolver: zodResolver(expenseFormSchema) as any,
+    resolver: zodResolver(expenseFormSchema),
     defaultValues: {
       title: "",
       amount: 0,

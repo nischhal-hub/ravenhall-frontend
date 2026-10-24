@@ -58,8 +58,8 @@ export function useCreateWalkInCustomerMutation() {
       queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success(`Customer ${customer.firstName} ${customer.lastName} registered successfully`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to register customer'
+    onError: (error) => {
+      const message = error.message || 'Failed to register customer'
       toast.error(message)
     },
   })
@@ -72,8 +72,8 @@ export function useCalculatePosPriceMutation() {
   return useMutation<PosPriceCalculation, Error, CalculatePosPricePayload>({
     mutationKey: ['pos', 'calculate-price'],
     mutationFn: calculatePosPriceRequest,
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to calculate price'
+    onError: (error) => {
+      const message = error.message || 'Failed to calculate price'
       toast.error(message)
     },
   })
@@ -96,8 +96,8 @@ export function useCreatePosBookingMutation() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(`Booking ${booking.bookingRef} processed successfully!`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to create POS booking'
+    onError: (error) => {
+      const message = error.message || 'Failed to create POS booking'
       toast.error(message)
     },
   })
@@ -124,8 +124,8 @@ export function useCompletePosPaymentMutation() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       toast.success(`Payment recorded! Booking ${booking.bookingRef} is now confirmed.`)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to complete payment'
+    onError: (error) => {
+      const message = error.message || 'Failed to complete payment'
       toast.error(message)
     },
   })

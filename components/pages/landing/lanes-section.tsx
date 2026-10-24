@@ -1,12 +1,15 @@
 "use client"
-/* eslint-disable react-hooks/set-state-in-effect */
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import type { Lane } from "@/types/lane-response.types" // Adjust import if needed
 import { useLaneQuery } from "@/services/queries/lane.query"
 import Link from "next/link"
+
+type LaneStat = {
+  label: string
+  icon?: React.ComponentType<{ className?: string }>
+}
 
 const fallbackImages = [
   "/images/landing/lane-club.jpg",
@@ -15,25 +18,23 @@ const fallbackImages = [
 ]
 
 export function LanesSection() {
-  const [lanes, setLanes] = useState<Lane[]>([])
-
   const { data, isLoading, error } = useLaneQuery({
     page: 1,
     limit: 9,
     search: "",
   })
 
-  useEffect(() => {
-    if (data?.data) {
-      const lanesWithImages = data.data.lanes.map((lane, index) => ({
+  // Derived from the query; no state to keep in sync
+  const lanes = useMemo(
+    () =>
+      (data?.data?.lanes ?? []).map((lane, index) => ({
         ...lane,
         image: lane.imageUrl || fallbackImages[index % fallbackImages.length],
         imageAlt: `${lane.name || "Cricket Lane"} - Professional Indoor Lane`,
         badge: "INDOOR",
-      }))
-      setLanes(lanesWithImages)
-    }
-  }, [data])
+      })),
+    [data]
+  )
 
   if (isLoading) {
     return (
@@ -144,7 +145,7 @@ export function LanesSection() {
                 {/* Stats - adapt according to your actual Lane type */}
                 {Array.isArray(lane.stats) && lane.stats.length > 0 && (
                   <ul className="flex flex-wrap gap-3 text-xs text-muted-foreground sm:text-sm">
-                    {lane.stats.map((stat: any) => {
+                    {lane.stats.map((stat: LaneStat) => {
                       const Icon = stat.icon
                       return (
                         <li

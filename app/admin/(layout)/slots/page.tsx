@@ -1,8 +1,7 @@
 "use client"
 
-import { Plus, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useModalContext } from "@/components/context/modal-context"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import PageHeader from "@/components/ui/page-header"
@@ -12,8 +11,6 @@ import { getslotColumns } from "./column"
 import { ServerFilterDataTable } from "@/components/reusable/server-table"
 
 export default function SlotTable() {
-  const { openModal } = useModalContext()
-
   const [page, setPage] = useState(1)
   const [limit] = useState(10)
   const [search, setSearch] = useState("")

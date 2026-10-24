@@ -105,7 +105,7 @@ export interface BookingDetail {
     updatedAt: string
   } | null
 
-  discountCode: any | null
+  discountCode: { code: string; discountPct: number } | null
 }
 export interface BookingItem {
   id: string

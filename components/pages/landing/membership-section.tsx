@@ -20,7 +20,7 @@ export function MembershipSection() {
 
   // Transform API data
   const transformedPlans =
-    plans?.map((plan: any) => ({
+    plans?.map((plan) => ({
       name:
         plan.plan === "MONTHLY"
           ? "Monthly"
@@ -43,7 +43,7 @@ export function MembershipSection() {
       durationDays: plan.durationDays,
     })) || []
 
-  const handleSubscribe = (plan: any) => {
+  const handleSubscribe = (plan: (typeof transformedPlans)[number]) => {
     if (plan.rawPlan === "CASUAL") {
       console.log("Activating casual plan")
       return

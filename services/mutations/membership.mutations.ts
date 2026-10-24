@@ -6,10 +6,19 @@ import { toast } from "sonner"
 // API Requests
 // ─────────────────────────────────────────────
 
+export type MembershipPaymentIntentResponse = {
+  status: string
+  message: string
+  data: { clientSecret: string; paymentId: string }
+}
+
 export async function createMembershipPaymentIntentRequest(data: {
   plan: string
-}): Promise<{ clientSecret: string; paymentId: string }> {
-  const response = await apiClient.post("/memberships/payment/intent", data)
+}): Promise<MembershipPaymentIntentResponse> {
+  const response = await apiClient.post<MembershipPaymentIntentResponse>(
+    "/memberships/payment/intent",
+    data
+  )
   return response.data
 }
 
@@ -49,9 +58,8 @@ function useMembershipPaymentMutation<TData, TVariables>(
       }
       options?.onSuccess?.(data)
     },
-    onError: (error: any) => {
-      const message = error?.response?.data?.message || "Payment failed"
-      toast.error(message)
+    onError: () => {
+      toast.error("Payment failed")
     },
   })
 }

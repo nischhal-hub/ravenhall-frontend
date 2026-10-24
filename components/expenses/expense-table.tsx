@@ -6,17 +6,14 @@ import {
   RefreshCw,
   Search,
   Calendar as CalendarIcon,
-  Filter,
   Receipt,
   Tag,
-  DollarSign,
   TrendingDown,
   Edit2,
   Trash2,
   ExternalLink,
   Layers,
   FileText,
-  AlertCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -34,7 +31,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
 import { ServerFilterDataTable } from "@/components/reusable/server-table"
 import {
   useExpenseCategoriesQuery,
@@ -44,7 +40,7 @@ import {
 import { useDeleteExpenseMutation } from "@/services/mutations/expense.mutations"
 import { ExpenseFormDialog } from "./expense-form-dialog"
 import { ManageCategoriesDialog } from "./manage-categories-dialog"
-import type { Expense, ExpenseCategory } from "@/types/expense-response.types"
+import type { Expense } from "@/types/expense-response.types"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format, subDays, startOfMonth, endOfMonth } from "date-fns"
 import { cn } from "@/lib/utils"

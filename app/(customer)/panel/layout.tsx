@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/sidebar/index"
 import {
   ArrowBigLeft,
-  Bell,
   CalendarCheck2,
   Crown,
   LayoutDashboard,

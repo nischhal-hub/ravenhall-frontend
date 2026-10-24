@@ -10,6 +10,7 @@ import { BookingPageSkeleton } from "./component/BookingPageSkeleton"
 import { Step1 } from "./component/Step1"
 import { Step2 } from "./component/Step2"
 import { Step3 } from "./component/Step3"
+import type { Slot } from "@/types/lane-response.types"
 
 export default function BookingPage() {
   const params = useParams()
@@ -19,7 +20,7 @@ export default function BookingPage() {
 
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [bookingDate, setBookingDate] = useState("")
-  const [bookingSlot, setBookingSlot] = useState<any>(null)
+  const [bookingSlot, setBookingSlot] = useState<Slot | null>(null)
   const [bookingDuration, setBookingDuration] = useState<1 | 2 | 3>(1)
   const [bookingEndTime, setBookingEndTime] = useState("")
   const [appliedPromo, setAppliedPromo] = useState("")
@@ -38,7 +39,7 @@ export default function BookingPage() {
 
   const handleStep1Next = (
     date: string,
-    slot: any,
+    slot: Slot,
     duration: 1 | 2 | 3,
     endTime: string
   ) => {
