@@ -34,7 +34,10 @@ export default function EditBookingStatus({
 }: _ModalProps<TModalDataMap["EDIT_BOOKING_STATUS"]>) {
   const { mutate: updateStatus, isPending } = useUpdateBookingStatusMutation()
   const { closeModal } = useModalContext()
-  const options = getStatusUpdateOptions(data?.status ?? "")
+  const options = getStatusUpdateOptions(
+    data?.status ?? "",
+    data?.payment?.status
+  )
 
   const form = useForm({
     resolver: zodResolver(updateBookingStatusSchema),
@@ -46,8 +49,9 @@ export default function EditBookingStatus({
   if (options.length === 0) {
     return (
       <p className="p-2 text-sm text-muted-foreground">
-        This booking is {data?.status?.toLowerCase()} and its status can no
-        longer be changed.
+        {data?.status?.toUpperCase() === "PENDING"
+          ? "This booking hasn't been paid yet. It's confirmed automatically once the online payment goes through; for counter bookings, record the payment at the POS."
+          : `This booking is ${data?.status?.toLowerCase()} and its status can no longer be changed.`}
       </p>
     )
   }

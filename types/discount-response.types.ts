@@ -5,6 +5,7 @@ export interface Discount {
   discountPct: number
   maxUses: number | null
   usedCount: number
+  minBookingAmount: number | null
   validFrom: string
   validTo: string
   isActive: boolean

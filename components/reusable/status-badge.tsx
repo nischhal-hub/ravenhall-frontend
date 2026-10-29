@@ -12,6 +12,17 @@ export function ActiveBadge({ isActive }: { isActive: boolean }) {
   )
 }
 
+// ================== ACCOUNT STATUS ==================
+
+export function AccountStatusBadge({ status }: { status: string }) {
+  const isInactive = status?.toUpperCase() === "INACTIVE"
+  return (
+    <Badge variant={isInactive ? "destructive" : "default"}>
+      {isInactive ? "Deactivated" : "Active"}
+    </Badge>
+  )
+}
+
 // ================== BOOKING STATUS ==================
 
 export type BookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "COMPLETED"
@@ -35,8 +46,18 @@ const BOOKING_STATUS_UPDATES: Record<BookingStatus, BookingStatus[]> = {
   COMPLETED: [],
 }
 
-export function getStatusUpdateOptions(status: string): BookingStatus[] {
-  return BOOKING_STATUS_UPDATES[status.toUpperCase() as BookingStatus] ?? []
+/**
+ * Like the server, only offers CONFIRMED once the payment has succeeded:
+ * online bookings confirm themselves when paid, counter bookings via the POS.
+ */
+export function getStatusUpdateOptions(
+  status: string,
+  paymentStatus?: string | null
+): BookingStatus[] {
+  const options =
+    BOOKING_STATUS_UPDATES[status.toUpperCase() as BookingStatus] ?? []
+  const isPaid = paymentStatus?.toUpperCase() === "SUCCEEDED"
+  return options.filter((next) => next !== "CONFIRMED" || isPaid)
 }
 
 export function isBookingCancellable(status: string) {

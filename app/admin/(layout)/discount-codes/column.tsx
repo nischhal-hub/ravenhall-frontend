@@ -6,6 +6,7 @@ import { ArrowUpDown } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ActionButton } from "@/components/reusable/action-btn"
 import { Discount } from "@/types/discount-response.types"
+import { formatCurrency } from "@/lib/utils"
 
 export function getDiscountColumns(): ColumnDef<Discount>[] {
   return [
@@ -62,6 +63,16 @@ export function getDiscountColumns(): ColumnDef<Discount>[] {
           </div>
         )
       },
+    },
+    {
+      accessorKey: "minBookingAmount",
+      header: "Min. Spend",
+      cell: ({ row }) =>
+        row.original.minBookingAmount != null ? (
+          <span>{formatCurrency(row.original.minBookingAmount)}</span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       accessorKey: "validFrom",

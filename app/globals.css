@@ -4,113 +4,75 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Rose theme: primary = rose (brand + main actions), accent = soft rose tint,
-   highlight = gold for sparing emphasis */
-
 :root {
-  --background: #fbf6f7;
-  --foreground: #1f1215;
-  --card: #ffffff;
-  --card-foreground: #1f1215;
-  --popover: #ffffff;
-  --popover-foreground: #1f1215;
-  --primary: #be123c;
-  --primary-foreground: #ffffff;
-  --secondary: #f7e6ea;
-  --secondary-foreground: #881337;
-  --muted: #f4eced;
-  --muted-foreground: #5f4b50;
-  --accent: #fde4ea;
-  --accent-foreground: #881337;
-  --highlight: #a16207;
-  --highlight-foreground: #ffffff;
-  /* Gold text/icons on dark brand surfaces (hero, footer, rose panels) */
-  --highlight-soft: #f0c06a;
-  --border: #ebdde0;
-  --input: #d9c6cb;
-  --ring: #be123c;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1f1215;
-  --sidebar-primary: #be123c;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fde4ea;
-  --sidebar-accent-foreground: #881337;
-  --sidebar-border: #ebdde0;
-  --sidebar-ring: #be123c;
-
-  /* Restored: used app-wide (danger buttons/badges, rounded corners) */
+  --background: #f8fafc;
+  --foreground: #1e293b;
+  --card: #f8fafc;
+  --card-foreground: #1e293b;
+  --popover: #f8fafc;
+  --popover-foreground: #1e293b;
+  --primary: #1e3a5f;
+  --primary-foreground: #f8fafc;
+  --secondary: #2e6da4;
+  --secondary-foreground: #f8fafc;
+  --muted: #e2e8f0;
+  --muted-foreground: #475569;
+  --accent: #22c55e;
+  --accent-foreground: #052e16;
   --destructive: oklch(0.577 0.245 27.325);
+  --border: #cbd5e1;
+  --input: #cbd5e1;
+  --ring: #2e6da4;
+  --chart-1: #1e3a5f;
+  --chart-2: #2e6da4;
+  --chart-3: #22c55e;
+  --chart-4: #94a3b8;
+  --chart-5: #64748b;
   --radius: 0.625rem;
-  /* Chart series (validated for colour-blind separation on cards):
-     rose, indigo, amber, cyan, neutral */
-  --chart-1: #be123c;
-  --chart-2: #4f46e5;
-  --chart-3: #b45309;
-  --chart-4: #0b7fa3;
-  --chart-5: #a3949a;
-
-  --gradient-brand: linear-gradient(135deg, #be123c 0%, #9d174d 100%);
-  --gradient-hero: linear-gradient(
-    135deg,
-    #881337 0%,
-    #9d174d 55%,
-    #6b21a8 100%
-  );
-  --gradient-indigo: linear-gradient(135deg, #3730a3 0%, #1e40af 100%);
-  --gradient-amber: linear-gradient(135deg, #a16207 0%, #9a3412 100%);
-  --gradient-rose: linear-gradient(135deg, #9f1239 0%, #86198f 100%);
-  --gradient-cyan: linear-gradient(135deg, #155e75 0%, #0f766e 100%);
+  --sidebar: #f1f5f9;
+  --sidebar-foreground: #1e293b;
+  --sidebar-primary: #1e3a5f;
+  --sidebar-primary-foreground: #f8fafc;
+  --sidebar-accent: #2e6da4;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #cbd5e1;
+  --sidebar-ring: #2e6da4;
 }
 
 .dark {
-  --background: #12090c;
-  --foreground: #f3e6e9;
-  --card: #1c1014;
-  --card-foreground: #f3e6e9;
-  --popover: #1c1014;
-  --popover-foreground: #f3e6e9;
-  --primary: #be123c;
-  --primary-foreground: #ffffff;
-  --secondary: #271820;
-  --secondary-foreground: #ecd3da;
-  --muted: #22141a;
-  --muted-foreground: #b7a0a7;
-  --accent: #3a1220;
-  --accent-foreground: #fda4af;
-  --highlight: #d9a441;
-  --highlight-foreground: #12090c;
-  --highlight-soft: #f0c06a;
-  --border: #33212a;
-  --input: #422a34;
-  --ring: #fb7185;
-  --sidebar: #150b0f;
-  --sidebar-foreground: #f3e6e9;
-  --sidebar-primary: #be123c;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #3a1220;
-  --sidebar-accent-foreground: #fda4af;
-  --sidebar-border: #33212a;
-  --sidebar-ring: #fb7185;
-
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #60a5fa;
+  --primary-foreground: #082f49;
+  --secondary: #2e6da4;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #cbd5e1;
+  --accent: #22c55e;
+  --accent-foreground: #052e16;
   --destructive: oklch(0.704 0.191 22.216);
-  --chart-1: #e0566f;
-  --chart-2: #7c7cf0;
-  --chart-3: #bd8129;
-  --chart-4: #2a9bb5;
-  --chart-5: #6e5c63;
-
-  --gradient-brand: linear-gradient(135deg, #9f1239 0%, #831843 100%);
-  --gradient-hero: linear-gradient(
-    135deg,
-    #4c0d22 0%,
-    #6b1237 55%,
-    #3b1458 100%
-  );
-  --gradient-indigo: linear-gradient(135deg, #2e2a7a 0%, #1e3a8a 100%);
-  --gradient-amber: linear-gradient(135deg, #7a4a07 0%, #7c2d12 100%);
-  --gradient-rose: linear-gradient(135deg, #7f1032 0%, #5b1466 100%);
-  --gradient-cyan: linear-gradient(135deg, #0f4c5c 0%, #115e59 100%);
+  --border: #334155;
+  --input: #475569;
+  --ring: #60a5fa;
+  --chart-1: #60a5fa;
+  --chart-2: #2e6da4;
+  --chart-3: #22c55e;
+  --chart-4: #94a3b8;
+  --chart-5: #64748b;
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #60a5fa;
+  --sidebar-primary-foreground: #082f49;
+  --sidebar-accent: #2e6da4;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #334155;
+  --sidebar-ring: #60a5fa;
 }
+
 @theme inline {
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
@@ -133,9 +95,6 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
-  --color-highlight-foreground: var(--highlight-foreground);
-  --color-highlight: var(--highlight);
-  --color-highlight-soft: var(--highlight-soft);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -166,13 +125,5 @@
   }
   html {
     @apply font-sans;
-  }
-}
-
-/* On phones, lift the chat button above a page's fixed action bar
-   (DetailPageHeader) so it never covers buttons like Pay now or Cancel */
-@media (width < 48rem) {
-  body:has([data-mobile-action-bar]) [data-chat-launcher] {
-    bottom: calc(5.25rem + env(safe-area-inset-bottom));
   }
 }

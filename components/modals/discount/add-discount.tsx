@@ -33,6 +33,7 @@ export default function CreateDiscountCodeForm() {
       description: "",
       discountPct: 10,
       maxUses: undefined,
+      minBookingAmount: "",
       validFrom: "",
       validTo: "",
     },
@@ -79,6 +80,15 @@ export default function CreateDiscountCodeForm() {
             label="Maximum Uses (optional)"
             type="number"
             placeholder="100"
+          />
+
+          {/* Minimum spend */}
+          <FormInput
+            form={form}
+            name="minBookingAmount"
+            label="Minimum Booking Total ($, optional)"
+            type="number"
+            placeholder="50"
           />
 
           {/* Description - Using Textarea */}

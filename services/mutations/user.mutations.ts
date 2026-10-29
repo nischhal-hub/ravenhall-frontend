@@ -4,6 +4,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ApiError } from "@/types/response"
 import type { Booking } from "@/types/booking-response.types"
 import type { AppNotification } from "@/types/notification-response.types"
+import type {
+  AccountStatus,
+  UpdateUserStatusResult,
+} from "@/types/user-response.types"
 import { toast } from "sonner"
 import { apiClient } from "../api/client"
 
@@ -88,6 +92,55 @@ export function useUpdateProfileMutation() {
     },
     onError: (error: ApiError) => {
       toast.error(error?.message || "Failed to update profile")
+    },
+  })
+}
+
+// ADMIN - deactivate / reactivate an account
+export function useUpdateUserStatusMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    UpdateUserStatusResult,
+    ApiError,
+    { id: string; status: AccountStatus; reason?: string }
+  >({
+    mutationKey: ["users", "status"],
+    mutationFn: async ({ id, ...body }) => {
+      const { data } = await apiClient.patch<{ data: UpdateUserStatusResult }>(
+        `/admin/users/${id}/status`,
+        body
+      )
+      return data.data
+    },
+    onSuccess: (result) => {
+      // Refetch from the server so the list shows the stored status, not a guess
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+      if (result.cancelledBookings.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["bookings"] })
+      }
+
+      if (result.user.status === "INACTIVE") {
+        const cancelled = result.cancelledBookings.length
+        toast.success(
+          cancelled > 0
+            ? `Account deactivated. ${cancelled} upcoming booking${cancelled === 1 ? "" : "s"} cancelled.`
+            : "Account deactivated"
+        )
+      } else {
+        toast.success("Account reactivated")
+      }
+
+      if (result.failedBookings.length > 0) {
+        toast.error(
+          `Couldn't cancel ${result.failedBookings
+            .map((b) => b.bookingRef)
+            .join(", ")}. Please cancel ${result.failedBookings.length === 1 ? "it" : "them"} manually.`
+        )
+      }
+    },
+    onError: (error: ApiError) => {
+      toast.error(error?.message || "Failed to update account status")
     },
   })
 }

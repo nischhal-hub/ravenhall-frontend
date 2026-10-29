@@ -1,6 +1,15 @@
 import type { AppNotification } from "./notification-response.types"
 
 // ==================== CORE USER TYPE ====================
+// INACTIVE = deactivated by an admin (can't log in)
+export type AccountStatus = "ACTIVE" | "INACTIVE"
+
+export interface UpdateUserStatusResult {
+  user: Pick<User, "id" | "email" | "firstName" | "lastName" | "role" | "status" | "deactivatedAt">
+  cancelledBookings: string[]
+  failedBookings: { bookingRef: string; message: string }[]
+}
+
 export interface User {
   id: string
   email: string
@@ -8,6 +17,8 @@ export interface User {
   lastName: string
   phone: string | null
   role: "CUSTOMER" | "STAFF" | "ADMIN"
+  status: AccountStatus
+  deactivatedAt?: string | null
   isEmailVerified: boolean
   createdAt: string
   updatedAt?: string
