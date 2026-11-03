@@ -11,6 +11,7 @@ import { Step1 } from "./component/Step1"
 import { Step2 } from "./component/Step2"
 import { Step3 } from "./component/Step3"
 import type { Slot } from "@/types/lane-response.types"
+import type { CheckoutResult } from "@/services/mutations/payment.mutations"
 
 export default function BookingPage() {
   const params = useParams()
@@ -23,10 +24,8 @@ export default function BookingPage() {
   const [bookingSlot, setBookingSlot] = useState<Slot | null>(null)
   const [bookingDuration, setBookingDuration] = useState<1 | 2 | 3>(1)
   const [bookingEndTime, setBookingEndTime] = useState("")
-  const [appliedPromo, setAppliedPromo] = useState("")
-  const [promoDiscount, setPromoDiscount] = useState(0)
-  // ✅ FIX 1: Store bookingId in state so Step3 can receive it
-  const [bookingId, setBookingId] = useState("")
+  // Started in Step 2; the booking itself is only created once it's paid
+  const [checkout, setCheckout] = useState<CheckoutResult | null>(null)
 
   const lane = data?.data
   const { discountPct: memberDiscountPct, isLoading: isMemberLoading } =
@@ -50,11 +49,8 @@ export default function BookingPage() {
     setStep(2)
   }
 
-  // ✅ FIX 2: Accept and store bookingId from Step2's onNext callback
-  const handleStep2Next = (promo: string, discount: number, id: string) => {
-    setAppliedPromo(promo)
-    setPromoDiscount(discount)
-    setBookingId(id)
+  const handleStep2Next = (started: CheckoutResult) => {
+    setCheckout(started)
     setStep(3)
   }
 
@@ -102,18 +98,14 @@ export default function BookingPage() {
                 onBack={() => setStep(1)}
               />
             )}
-            {/* ✅ FIX 3: Pass bookingId to Step3 */}
-            {step === 3 && bookingSlot && (
+            {step === 3 && bookingSlot && checkout && (
               <Step3
                 lane={lane}
                 date={bookingDate}
                 slot={bookingSlot}
                 duration={bookingDuration}
                 endTime={bookingEndTime}
-                memberDiscountPct={memberDiscountPct}
-                promo={appliedPromo}
-                promoDiscount={promoDiscount}
-                bookingId={bookingId}
+                checkout={checkout}
                 onBack={() => setStep(2)}
               />
             )}

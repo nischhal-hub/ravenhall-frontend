@@ -39,6 +39,54 @@ export async function confirmPaymentRequest(data: {
   return response.data.data
 }
 
+export interface CheckoutPayload {
+  slotId: string
+  duration: number
+  discountCode?: string
+}
+
+export interface CheckoutResult extends PaymentIntentResult {
+  paymentIntentId: string
+  /** Lane hire + equipment fee, before discounts */
+  totalAmount: number
+  discountAmount: number
+  discountPct: number
+  /** The promo code the server applied (null if the member discount was better) */
+  discountCode: string | null
+}
+
+/**
+ * Starts paying for a new booking. Nothing is booked yet: the server only
+ * creates the booking once the payment succeeds.
+ */
+export async function startCheckoutRequest(
+  data: CheckoutPayload
+): Promise<CheckoutResult> {
+  const response = await apiClient.post<{ data: CheckoutResult }>(
+    "/payments/checkout",
+    data
+  )
+  return response.data.data
+}
+
+export interface ConfirmCheckoutResult {
+  /** "refunded": paid, but the slot was taken meanwhile, so no booking was made */
+  outcome: PaymentOutcome | "refunded"
+  bookingId: string | null
+  bookingRef: string | null
+}
+
+/** After returning from Stripe: the server creates the booking if it's paid */
+export async function confirmCheckoutRequest(data: {
+  paymentIntentId: string
+}): Promise<ConfirmCheckoutResult> {
+  const response = await apiClient.post<{ data: ConfirmCheckoutResult }>(
+    "/payments/checkout/confirm",
+    data
+  )
+  return response.data.data
+}
+
 // ─────────────────────────────────────────────
 // Generic mutation factory
 // ─────────────────────────────────────────────
@@ -86,6 +134,13 @@ export function useCreatePaymentIntentMutation() {
     ["payments", "intent"],
     createPaymentIntentRequest
     // No successMessage — Stripe redirects on success; toast goes on success page
+  )
+}
+
+export function useStartCheckoutMutation() {
+  return usePaymentMutation<CheckoutResult, CheckoutPayload>(
+    ["payments", "checkout"],
+    startCheckoutRequest
   )
 }
 

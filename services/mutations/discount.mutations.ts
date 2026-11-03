@@ -66,6 +66,24 @@ export async function updateDiscountCodeRequest({
   return response.data
 }
 
+export interface ValidateDiscountCodeResult {
+  valid: boolean
+  message: string
+  discountPct: number
+}
+
+/** Checks a promo code before checkout; `amount` lets the server check minimum spend */
+export async function validateDiscountCodeRequest(data: {
+  code: string
+  amount: number
+}) {
+  const response = await apiClient.post<{ data: ValidateDiscountCodeResult }>(
+    "/discount/validate",
+    data
+  )
+  return response.data.data
+}
+
 function useCreateMutation<TData, TVariables>(
   key: string[],
   fn: (vars: TVariables) => Promise<TData>

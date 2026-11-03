@@ -32,19 +32,27 @@ if (!stripeKey) {
 }
 const stripePromise = loadStripe(stripeKey ?? "")
 
-/** Where Stripe sends the customer after paying; the page checks the result */
-export const paymentReturnUrl = (bookingId: string) =>
-  `${window.location.origin}/payment/success?bookingId=${encodeURIComponent(bookingId)}`
+/**
+ * Where Stripe sends the customer after paying; the page checks the result.
+ * Stripe adds `payment_intent`, which identifies a new booking's checkout;
+ * paying for an existing booking passes its `bookingId` instead.
+ */
+export const paymentReturnPath = (params: Record<string, string>) =>
+  `/payment/success?${new URLSearchParams(params)}`
 
-function CheckoutForm({
-  bookingId,
-  amount,
-  currency,
-}: {
-  bookingId: string
+interface StripePaymentFormProps {
+  clientSecret: string
   amount: number
   currency: string
-}) {
+  /** From paymentReturnPath */
+  returnPath: string
+}
+
+function CheckoutForm({
+  amount,
+  currency,
+  returnPath,
+}: Omit<StripePaymentFormProps, "clientSecret">) {
   const stripe = useStripe()
   const elements = useElements()
   const [loading, setLoading] = useState(false)
@@ -67,7 +75,7 @@ function CheckoutForm({
     try {
       const { error } = await stripe.confirmPayment({
         elements,
-        confirmParams: { return_url: paymentReturnUrl(bookingId) },
+        confirmParams: { return_url: `${window.location.origin}${returnPath}` },
       })
 
       // Only reached if payment failed (Stripe redirects on success)
@@ -150,10 +158,25 @@ function stripeAppearance(): StripeElementsOptions["appearance"] {
   }
 }
 
+/** The Stripe card form for a PaymentIntent the server has already created */
+export function StripePaymentForm({
+  clientSecret,
+  ...formProps
+}: StripePaymentFormProps) {
+  return (
+    <Elements
+      stripe={stripePromise}
+      options={{ clientSecret, appearance: stripeAppearance() }}
+    >
+      <CheckoutForm {...formProps} />
+    </Elements>
+  )
+}
+
 /**
- * Starts (or resumes) checkout for a PENDING booking and shows the Stripe card
- * form. The server reuses the booking's PaymentIntent, so opening this again
- * after leaving checkout never charges twice.
+ * Starts (or resumes) checkout for an existing PENDING booking (e.g. a POS
+ * "pay at the counter" one) and shows the Stripe card form. The server reuses
+ * the booking's PaymentIntent, so opening this again never charges twice.
  */
 export function StripeCheckout({ bookingId }: { bookingId: string }) {
   const intent = useQuery({
@@ -217,18 +240,11 @@ export function StripeCheckout({ bookingId }: { bookingId: string }) {
   }
 
   return (
-    <Elements
-      stripe={stripePromise}
-      options={{
-        clientSecret: intent.data.clientSecret,
-        appearance: stripeAppearance(),
-      }}
-    >
-      <CheckoutForm
-        bookingId={bookingId}
-        amount={intent.data.amount}
-        currency={intent.data.currency}
-      />
-    </Elements>
+    <StripePaymentForm
+      clientSecret={intent.data.clientSecret}
+      amount={intent.data.amount}
+      currency={intent.data.currency}
+      returnPath={paymentReturnPath({ bookingId })}
+    />
   )
 }

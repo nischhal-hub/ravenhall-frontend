@@ -4,7 +4,11 @@ import { StepIndicator } from "./StepIndicator"
 import { ArrowLeft, CalendarDays, Clock } from "lucide-react"
 import { Lane, Slot } from "@/types/lane-response.types"
 import { calculateBookingPrice } from "@/lib/booking"
-import { StripeCheckout } from "@/components/payment/stripe-checkout"
+import {
+  StripePaymentForm,
+  paymentReturnPath,
+} from "@/components/payment/stripe-checkout"
+import type { CheckoutResult } from "@/services/mutations/payment.mutations"
 
 interface Step3Props {
   lane: Lane
@@ -13,16 +17,13 @@ interface Step3Props {
   duration: 1 | 2 | 3
   /** End of the whole session (start + duration) */
   endTime: string
-  memberDiscountPct: number
-  promo: string
-  promoDiscount: number
-  /** Created in Step 2 */
-  bookingId: string
+  /** Started in Step 2; its amounts are what the server will charge */
+  checkout: CheckoutResult
   onBack: () => void
 }
 
 // ─────────────────────────────────────────────
-// Step 3 — Payment (booking already created in Step 2)
+// Step 3 — Payment (the booking is created once this is paid)
 // ─────────────────────────────────────────────
 export function Step3({
   lane,
@@ -30,19 +31,10 @@ export function Step3({
   slot,
   duration,
   endTime,
-  memberDiscountPct,
-  promo,
-  promoDiscount,
-  bookingId,
+  checkout,
   onBack,
 }: Step3Props) {
-  const price = calculateBookingPrice({
-    hourlyRate: lane.hourlyRate,
-    duration,
-    memberDiscountPct,
-    promoDiscount,
-  })
-  const total = price.total
+  const price = calculateBookingPrice({ hourlyRate: lane.hourlyRate, duration })
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -56,23 +48,24 @@ export function Step3({
             Payment Details
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Complete your booking securely with Stripe
+            Pay securely with Stripe. Your lane is booked as soon as your
+            payment goes through.
           </p>
         </div>
 
         <StepIndicator step={3} />
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          {bookingId ? (
-            <StripeCheckout bookingId={bookingId} />
-          ) : (
-            <p
-              className="py-10 text-center text-sm text-muted-foreground"
-              role="alert"
-            >
-              We couldn&apos;t find this booking. Go back and try again.
-            </p>
-          )}
+          <StripePaymentForm
+            clientSecret={checkout.clientSecret}
+            amount={checkout.amount}
+            currency={checkout.currency}
+            returnPath={paymentReturnPath({
+              laneId: lane.id,
+              date,
+              slotId: slot.id,
+            })}
+          />
         </div>
       </div>
 
@@ -122,19 +115,15 @@ export function Step3({
                   ${price.laneHire.toFixed(2)}
                 </span>
               </div>
-              {memberDiscountPct > 0 && (
+              {checkout.discountAmount > 0 && (
                 <div className="flex justify-between text-primary dark:text-rose-400">
-                  <span>Member Discount ({memberDiscountPct}%)</span>
-                  <span className="font-semibold">
-                    -${price.memberDiscount.toFixed(2)}
+                  <span>
+                    {checkout.discountCode
+                      ? `Promo (${checkout.discountCode})`
+                      : `Member Discount (${checkout.discountPct}%)`}
                   </span>
-                </div>
-              )}
-              {price.promoDiscount > 0 && (
-                <div className="flex justify-between text-primary dark:text-rose-400">
-                  <span>Promo ({promo})</span>
                   <span className="font-semibold">
-                    -${price.promoDiscount.toFixed(2)}
+                    -${checkout.discountAmount.toFixed(2)}
                   </span>
                 </div>
               )}
@@ -155,7 +144,7 @@ export function Step3({
                   TOTAL AMOUNT
                 </span>
                 <span className="text-3xl font-black tracking-tight text-foreground">
-                  ${total.toFixed(2)}
+                  ${checkout.amount.toFixed(2)}
                 </span>
               </div>
               <p className="mt-0.5 text-right text-xs text-muted-foreground">

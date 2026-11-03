@@ -2,8 +2,6 @@ import {
   CalendarDays,
   Check,
   Clock3,
-  Globe,
-  Camera,
   LockKeyhole,
   Mail,
   MapPin,
@@ -68,22 +66,18 @@ export const bookingSteps = [
   },
 ]
 
-export const footerLinks = [
-  { href: "#", label: "Privacy Policy" },
-  { href: "#", label: "Terms of Service" },
-  { href: "#", label: "FAQ" },
-  { href: "#", label: "Venue Hire" },
-]
-
-export const socials = [
-  { href: "#", icon: Globe, label: "Website" },
-  { href: "#", icon: Camera, label: "Instagram" },
-]
-
 export const contactInfo = [
-  { icon: MapPin, text: "2/56 Barretta Road, Ravenhall VIC 3023" },
-  { icon: Phone, text: "(03) 9000 1234" },
-  { icon: Mail, text: "hello@ravenhallcricket.com.au" },
+  {
+    icon: MapPin,
+    text: "2/56 Barretta Road, Ravenhall VIC 3023",
+    href: "https://www.google.com/maps/search/?api=1&query=2%2F56+Barretta+Road%2C+Ravenhall+VIC+3023",
+  },
+  { icon: Phone, text: "(03) 9000 1234", href: "tel:+61390001234" },
+  {
+    icon: Mail,
+    text: "hello@ravenhallcricket.com.au",
+    href: "mailto:hello@ravenhallcricket.com.au",
+  },
 ]
 
 export const heroStatus = [

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Send } from "lucide-react"
-import { contactInfo, footerLinks, socials } from "./data"
+import { contactInfo } from "./data"
 import { Button } from "@/components/ui/button"
 
 export function SiteFooter() {
@@ -34,23 +34,6 @@ export function SiteFooter() {
             Melbourne West&apos;s premier indoor cricket destination for
             training, team preparation, and year-round match readiness.
           </p>
-
-          <div className="flex items-center gap-2 pt-1">
-            {socials.map((social) => {
-              const Icon = social.icon
-
-              return (
-                <Link
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="flex size-9 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground"
-                >
-                  <Icon className="size-4" />
-                </Link>
-              )
-            })}
-          </div>
 
           <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-emerald-400">
             <span className="size-2 rounded-full bg-accent animate-pulse" />
@@ -117,14 +100,20 @@ export function SiteFooter() {
               const Icon = item.icon
 
               return (
-                <li
-                  key={item.text}
-                  className="flex items-start gap-3 leading-relaxed text-slate-300"
-                >
-                  <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-white/10 text-accent">
-                    <Icon className="size-3.5" />
-                  </div>
-                  <span>{item.text}</span>
+                <li key={item.text}>
+                  <a
+                    href={item.href}
+                    {...(item.href.startsWith("http") && {
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                    })}
+                    className="flex items-start gap-3 rounded leading-relaxed text-slate-300 transition-colors outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-accent"
+                  >
+                    <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-white/10 text-accent">
+                      <Icon className="size-3.5" />
+                    </div>
+                    <span>{item.text}</span>
+                  </a>
                 </li>
               )
             })}
@@ -167,18 +156,7 @@ export function SiteFooter() {
 
       {/* Bottom Bar */}
       <div className="relative mx-auto mt-12 flex w-full max-w-7xl flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center">
-        <p>© 2026 Ravenhall Indoor Cricket Centre. All rights reserved.</p>
-        <div className="flex flex-wrap items-center gap-6">
-          {footerLinks.map((link) => (
-            <Link
-              key={link.label}
-              href={link.href}
-              className="transition-colors hover:text-white"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+        <p>© {new Date().getFullYear()} Ravenhall Indoor Cricket Centre. All rights reserved.</p>
       </div>
     </footer>
   )

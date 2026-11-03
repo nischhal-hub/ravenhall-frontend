@@ -14,14 +14,12 @@ import {
   Layers,
 } from "lucide-react"
 import { Lane, Slot } from "@/types/lane-response.types"
-import { useCreateBookingMutation } from "@/services/mutations/booking.mutations"
-import { toast } from "sonner"
+import {
+  type CheckoutResult,
+  useStartCheckoutMutation,
+} from "@/services/mutations/payment.mutations"
+import { validateDiscountCodeRequest } from "@/services/mutations/discount.mutations"
 import { calculateBookingPrice } from "@/lib/booking"
-
-const PROMO_CODES: Record<string, number> = {
-  OPENING20: 12,
-  CRICKET10: 10,
-}
 
 interface Step2Props {
   lane: Lane
@@ -32,8 +30,8 @@ interface Step2Props {
   endTime: string
   memberDiscountPct: number
   isMemberLoading: boolean
-  // ✅ FIX: onNext now includes bookingId as the third argument
-  onNext: (promo: string, discount: number, bookingId: string) => void
+  /** Checkout has started; nothing is booked until it's paid */
+  onNext: (checkout: CheckoutResult) => void
   onBack: () => void
 }
 
@@ -50,64 +48,76 @@ export function Step2({
 }: Step2Props) {
   const [promoInput, setPromoInput] = useState("")
   const [appliedPromo, setAppliedPromo] = useState("")
-  const [promoDiscount, setPromoDiscount] = useState(0)
+  const [promoPct, setPromoPct] = useState(0)
   const [promoError, setPromoError] = useState("")
   const [promoSuccess, setPromoSuccess] = useState("")
+  const [isCheckingPromo, setIsCheckingPromo] = useState(false)
 
-  const createBookingMutation = useCreateBookingMutation()
+  const startCheckoutMutation = useStartCheckoutMutation()
+  const isBusy = startCheckoutMutation.isPending || isCheckingPromo
 
+  // Same rule as the server: a code replaces the member discount (it's only
+  // applied when it's worth more), and only lane hire is discounted
   const price = calculateBookingPrice({
     hourlyRate: lane.hourlyRate,
     duration,
-    memberDiscountPct,
-    promoDiscount,
+    memberDiscountPct: appliedPromo ? 0 : memberDiscountPct,
+    promoDiscount: (lane.hourlyRate * duration * promoPct) / 100,
   })
 
-  const applyPromo = () => {
+  const clearPromo = () => {
+    setAppliedPromo("")
+    setPromoPct(0)
+  }
+
+  const applyPromo = async () => {
     const code = promoInput.trim().toUpperCase()
-    if (PROMO_CODES[code]) {
-      setAppliedPromo(code)
-      setPromoDiscount(PROMO_CODES[code])
-      setPromoError("")
-      setPromoSuccess(`Code "${code}" applied! You saved $${PROMO_CODES[code]}`)
-    } else {
-      setPromoError("Invalid promo code.")
-      setPromoSuccess("")
-      setAppliedPromo("")
-      setPromoDiscount(0)
+    if (!code) return
+    setPromoError("")
+    setPromoSuccess("")
+    setIsCheckingPromo(true)
+    try {
+      const result = await validateDiscountCodeRequest({
+        code,
+        amount: price.gross,
+      })
+      if (!result.valid) {
+        clearPromo()
+        setPromoError(result.message)
+      } else if (result.discountPct <= memberDiscountPct) {
+        clearPromo()
+        setPromoError(
+          `Your ${memberDiscountPct}% member discount is already better than this code.`
+        )
+      } else {
+        setAppliedPromo(code)
+        setPromoPct(result.discountPct)
+        setPromoSuccess(
+          `Code "${code}" applied: ${result.discountPct}% off lane hire`
+        )
+      }
+    } catch (err) {
+      clearPromo()
+      setPromoError(
+        err instanceof Error ? err.message : "We couldn't check this code."
+      )
+    } finally {
+      setIsCheckingPromo(false)
     }
   }
 
+  // Opens the payment only; the booking is created once it's paid
   const handleProceed = async () => {
-    const payload = {
-      laneId: lane.id,
-      slotId: slot.id,
-      date,
-      startTime: slot.startTime,
-      endTime,
-      duration,
-      totalAmount: price.gross,
-      discountAmount: price.memberDiscount + price.promoDiscount,
-      finalAmount: price.total,
-      promoCode: appliedPromo || null,
-    }
-
     try {
-      const result = await createBookingMutation.mutateAsync(payload)
-
-      // The API wraps the booking: { status, message, data: { id, ... } }
-      const bookingId = result?.data?.id
-
-      if (!bookingId) {
-        console.error("Booking created but no ID returned:", result)
-        toast.error("Booking created but ID missing. Please contact support.")
-        return
-      }
-
-      // ✅ FIX: Pass bookingId as third argument to onNext
-      onNext(appliedPromo, price.promoDiscount, bookingId)
+      const checkout = await startCheckoutMutation.mutateAsync({
+        slotId: slot.id,
+        duration,
+        ...(appliedPromo && { discountCode: appliedPromo }),
+      })
+      onNext(checkout)
     } catch (err) {
-      console.error("Booking creation failed:", err)
+      // The mutation already shows the server's message
+      console.error("Couldn't start checkout:", err)
     }
   }
 
@@ -184,7 +194,7 @@ export function Step2({
           <h2 className="font-bold text-foreground">Offers & Rewards</h2>
 
           {/* Member discount banner */}
-          {memberDiscountPct > 0 && (
+          {memberDiscountPct > 0 && !appliedPromo && (
             <div className="flex gap-3 rounded-xl border border-accent/30 bg-accent/10 p-4">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent/20">
                 <ShieldCheck className="size-4 text-primary dark:text-rose-400" />
@@ -212,16 +222,20 @@ export function Step2({
                 placeholder="e.g. OPENING20"
                 className="font-mono uppercase"
                 onKeyDown={(e) => e.key === "Enter" && applyPromo()}
-                disabled={createBookingMutation.isPending}
+                disabled={isBusy}
               />
               <Button
                 type="button"
                 variant="outline"
                 onClick={applyPromo}
-                disabled={createBookingMutation.isPending}
+                disabled={isBusy || !promoInput.trim()}
                 className="shrink-0"
               >
-                Apply
+                {isCheckingPromo ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Apply"
+                )}
               </Button>
             </div>
 
@@ -262,7 +276,7 @@ export function Step2({
                   ${price.laneHire.toFixed(2)}
                 </span>
               </div>
-              {memberDiscountPct > 0 && (
+              {price.memberDiscount > 0 && (
                 <div className="flex justify-between text-primary dark:text-rose-400">
                   <span>Member Discount ({memberDiscountPct}%)</span>
                   <span className="font-semibold">
@@ -308,13 +322,13 @@ export function Step2({
             <div className="px-6 pb-6">
               <Button
                 onClick={handleProceed}
-                disabled={createBookingMutation.isPending || isMemberLoading}
+                disabled={isBusy || isMemberLoading}
                 className="h-12 w-full rounded-xl bg-primary text-base font-bold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
               >
-                {createBookingMutation.isPending ? (
+                {startCheckoutMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Creating Booking...
+                    Preparing Payment...
                   </>
                 ) : (
                   "Proceed to Payment →"

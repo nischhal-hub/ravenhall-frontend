@@ -20,7 +20,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useBookingById } from "@/services/queries/bookings.query"
-import { confirmPaymentRequest } from "@/services/mutations/payment.mutations"
+import {
+  confirmCheckoutRequest,
+  confirmPaymentRequest,
+} from "@/services/mutations/payment.mutations"
 import { formatCurrency } from "@/lib/utils"
 import { formatTime, minutesBetween } from "@/components/detail"
 import { contactInfo } from "@/components/pages/landing/data"
@@ -47,14 +50,14 @@ function StatusCard({
   tone,
   title,
   description,
-  bookingId,
-  showRetry,
+  retry,
+  view,
 }: {
   tone: "processing" | "problem"
   title: string
   description: string
-  bookingId: string
-  showRetry?: boolean
+  retry?: { href: string; label: string }
+  view: { href: string; label: string }
 }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -77,12 +80,12 @@ function StatusCard({
           {description}
         </p>
         <div className="space-y-2.5">
-          {showRetry && (
+          {retry && (
             <Button
               asChild
               className="h-12 w-full rounded-xl text-sm font-semibold"
             >
-              <Link href={`/panel/bookings/${bookingId}/pay`}>Try again</Link>
+              <Link href={retry.href}>{retry.label}</Link>
             </Button>
           )}
           <Button
@@ -90,7 +93,7 @@ function StatusCard({
             variant="outline"
             className="h-12 w-full rounded-xl text-sm font-semibold"
           >
-            <Link href={`/panel/bookings/${bookingId}`}>View booking</Link>
+            <Link href={view.href}>{view.label}</Link>
           </Button>
         </div>
       </Card>
@@ -103,29 +106,54 @@ export default function PaymentSuccessClient() {
   const router = useRouter()
   const queryClient = useQueryClient()
 
-  const bookingId = searchParams.get("bookingId")
+  // Paying for an existing booking passes its id. A new booking's checkout
+  // has no booking yet: Stripe adds the payment's id, and the booking is
+  // created (by the server) once that payment has gone through.
+  const bookingIdParam = searchParams.get("bookingId")
+  const paymentIntentId = searchParams.get("payment_intent")
+  const isCheckout = !bookingIdParam && !!paymentIntentId
+  const hasReference = !!bookingIdParam || !!paymentIntentId
 
   // The server checks the payment with Stripe, so this is right even if the
   // webhook hasn't arrived yet. Keep checking while it's still processing.
   const confirm = useQuery({
-    queryKey: ["payment-confirm", bookingId],
-    queryFn: () => confirmPaymentRequest({ bookingId: bookingId! }),
-    enabled: !!bookingId,
+    queryKey: ["payment-confirm", bookingIdParam ?? paymentIntentId],
+    queryFn: () =>
+      isCheckout
+        ? confirmCheckoutRequest({ paymentIntentId: paymentIntentId! })
+        : confirmPaymentRequest({ bookingId: bookingIdParam! }),
+    enabled: hasReference,
     retry: 1,
     refetchInterval: (query) =>
       query.state.data?.outcome === "processing" ? 3000 : false,
   })
   const outcome = confirm.data?.outcome
+  const bookingId = bookingIdParam ?? confirm.data?.bookingId ?? null
 
   const { data: bookingData, isLoading: bookingLoading } = useBookingById(
     bookingId || ""
   )
 
+  // Back to the same lane and slot (still pre-selected if it's free)
+  const laneId = searchParams.get("laneId")
+  const rebookParams = new URLSearchParams()
+  for (const key of ["date", "slotId"]) {
+    const value = searchParams.get(key)
+    if (value) rebookParams.set(key, value)
+  }
+  const rebookQuery = rebookParams.toString()
+  const rebookHref = laneId
+    ? `/lanes/${encodeURIComponent(laneId)}${rebookQuery ? `?${rebookQuery}` : ""}`
+    : "/lanes"
+  const view = bookingId
+    ? { href: `/panel/bookings/${bookingId}`, label: "View booking" }
+    : { href: "/panel/bookings", label: "My bookings" }
+
   useEffect(() => {
-    if (!bookingId) {
+    if (!hasReference) {
       router.push("/lanes")
     }
-  }, [bookingId, router])
+  }, [hasReference, router])
 
   // Once paid, refresh anything that still shows the booking as pending
   useEffect(() => {
@@ -133,10 +161,11 @@ export default function PaymentSuccessClient() {
       queryClient.invalidateQueries({ queryKey: ["booking"] })
       queryClient.invalidateQueries({ queryKey: ["bookings"] })
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
+      queryClient.invalidateQueries({ queryKey: ["userDashboard"] })
     }
   }, [outcome, queryClient])
 
-  if (!bookingId || confirm.isPending || bookingLoading) {
+  if (!hasReference || confirm.isPending || bookingLoading) {
     return <PaymentLoadingScreen message="Checking your payment..." />
   }
 
@@ -145,8 +174,12 @@ export default function PaymentSuccessClient() {
       <StatusCard
         tone="problem"
         title="We couldn't check your payment"
-        description="If you were charged, your booking will confirm automatically and we'll email you. You can check its status on the booking page."
-        bookingId={bookingId}
+        description={
+          isCheckout
+            ? "If you were charged, your booking will be created automatically and we'll email you. You can check it under My bookings."
+            : "If you were charged, your booking will confirm automatically and we'll email you. You can check its status on the booking page."
+        }
+        view={view}
       />
     )
   }
@@ -157,7 +190,19 @@ export default function PaymentSuccessClient() {
         tone="processing"
         title="Your payment is processing"
         description="This usually takes a few seconds. You can leave this page; we'll email you as soon as your booking is confirmed."
-        bookingId={bookingId}
+        view={view}
+      />
+    )
+  }
+
+  if (outcome === "refunded") {
+    return (
+      <StatusCard
+        tone="problem"
+        title="This slot was just taken"
+        description="Someone else booked this time while you were paying, so no booking was made and we've refunded you in full. The refund can take 5–10 business days to appear."
+        retry={{ href: rebookHref, label: "Choose another time" }}
+        view={view}
       />
     )
   }
@@ -171,9 +216,16 @@ export default function PaymentSuccessClient() {
             ? "Your payment didn't go through"
             : "Payment not completed"
         }
-        description="You haven't been charged. Your slot is still held, so you can try again or use a different card."
-        bookingId={bookingId}
-        showRetry
+        description={
+          isCheckout
+            ? "You haven't been charged and nothing was booked. You can try again or use a different card."
+            : "You haven't been charged. Your slot is still held, so you can try again or use a different card."
+        }
+        retry={{
+          href: isCheckout ? rebookHref : `/panel/bookings/${bookingId}/pay`,
+          label: "Try again",
+        }}
+        view={view}
       />
     )
   }
