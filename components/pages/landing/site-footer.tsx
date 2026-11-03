@@ -1,9 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Send } from "lucide-react"
 import { contactInfo } from "./data"
-import { Button } from "@/components/ui/button"
 
 export function SiteFooter() {
   return (
@@ -15,7 +13,7 @@ export function SiteFooter() {
       {/* Subtle top ambient glow */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(ellipse_at_top,rgba(46,109,164,0.15),transparent_70%)]" />
 
-      <div className="relative mx-auto grid w-full max-w-7xl gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div className="relative mx-auto grid w-full max-w-7xl gap-10 md:grid-cols-2 lg:grid-cols-3">
         {/* Brand Column */}
         <div className="space-y-4">
           <Link
@@ -118,39 +116,6 @@ export function SiteFooter() {
               )
             })}
           </ul>
-        </div>
-
-        {/* Newsletter Column */}
-        <div>
-          <h4 className="mb-4 font-heading text-sm font-bold tracking-wider text-white uppercase">
-            Stay Updated
-          </h4>
-          <p className="mb-3 text-sm leading-relaxed text-slate-300/85">
-            Get exclusive member offers, coaching clinic alerts, and priority lane
-            updates.
-          </p>
-          <form
-            className="flex items-center gap-2"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="h-11 w-full rounded-xl border border-white/20 bg-white/10 px-3.5 text-sm text-white placeholder:text-white/50 outline-none transition-colors focus:border-accent focus:ring-1 focus:ring-accent"
-              required
-            />
-            <Button
-              type="submit"
-              size="icon"
-              className="size-11 shrink-0 rounded-xl bg-accent text-accent-foreground shadow-sm transition-transform hover:bg-accent/90 active:scale-95"
-              aria-label="Subscribe to newsletter"
-            >
-              <Send className="size-4" />
-            </Button>
-          </form>
-          <p className="mt-2 text-xs text-slate-400">
-            Instant booking confirmation. No spam, ever.
-          </p>
         </div>
       </div>
 
